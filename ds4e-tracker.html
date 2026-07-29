@@ -25,7 +25,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 /* ── MAP VIEW ── */
 #map-view{height:100vh;display:flex;flex-direction:column;overflow:hidden;}
 .map-hint{padding:6px 14px;font-size:11px;color:#888;background:#fff;border-bottom:0.5px solid #f0f0f0;flex-shrink:0;}
-.map-container{flex:1;min-height:0;overflow:auto;display:flex;align-items:flex-start;justify-content:center;}
+.map-container{flex:1;min-height:0;overflow:auto;display:flex;align-items:flex-start;justify-content:center;background:#fff;}
 #us-map-container{width:100%;display:flex;align-items:center;justify-content:center;}
 #us-map-container svg{width:100%;height:auto;max-height:calc(100vh - 140px);}
 .map-legend{display:flex;flex-wrap:wrap;gap:6px 12px;padding:8px 14px;background:#fff;border-top:0.5px solid #e5e5e5;font-size:11px;color:#555;flex-shrink:0;}
@@ -147,10 +147,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .code-title{font-size:12px;color:#333;line-height:1.4;}
 
 /* ── STD SUBJECT ROW ── */
-.std-row{padding:7px 14px;border-bottom:0.5px solid #f5f5f5;display:grid;grid-template-columns:60px 1fr;gap:8px;align-items:start;}
+.std-row{padding:7px 14px;border-bottom:0.5px solid #f5f5f5;display:grid;grid-template-columns:80px 1fr;gap:8px;align-items:start;}
 .std-row:last-child{border-bottom:none;}
 .std-subj{font-size:11px;font-weight:600;color:#555;padding-top:1px;}
-.std-detail{font-size:12px;color:#444;line-height:1.4;}
+.std-detail{font-size:12px;color:#444;line-height:1.6;}
+.std-link-pill{display:inline-block;margin-top:3px;padding:3px 10px;border-radius:12px;background:#eef3fa;color:#185fa5;font-size:11px;font-weight:500;text-decoration:none;border:0.5px solid #b8d0ef;}
+.std-link-pill:hover{background:#ddeaf8;}
 .std-year{color:#ef4a23;font-weight:600;}
 .std-rev{display:inline-block;margin-top:2px;font-size:10px;color:#888;font-style:italic;}
 .std-rev.in-rev{color:#0f6e56;}
@@ -316,7 +318,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <script>
 // ── Config ───────────────────────────────────────────────────────────────────
 var PUBLIC_SHEET_BASE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRU0_I99UuZvfBam8y_Z2wGwbDfsL5A0CB5MYNogbPfSWnnLIpSQP-sCtgR3Uwz2vByq7thFBIp-MbB/pub?output=csv&sheet=";
-var PROXY_URL = "https://script.google.com/macros/s/AKfycbzBlx3He4o5WbLzGGzP5tnY0GgW2Vo9aVijnl3dgoOjVE7Cia0ZWvnsm_o6oa1A0EZB/exec";
+var PROXY_URL = "https://script.google.com/macros/s/AKfycbznhrk5wYpGeYYwrDKSHfXhsJK-dPKA1Zh9vmA6CVQrJ-AOHX4jTkCWZeZgl1bR7_Ea/exec";
 
 // ── Slim state data (map + list only) ────────────────────────────────────────
 var STATES = [{"name": "Alabama", "icon": "Alabama", "updated": "Jun 30, 2026"}, {"name": "Alaska", "icon": "Alaska", "updated": "Jun 30, 2026"}, {"name": "Arizona", "icon": "Arizona", "updated": "Jun 30, 2026"}, {"name": "Arkansas", "icon": "Arkansas", "updated": "Jun 30, 2026"}, {"name": "California", "icon": "California", "updated": "Jun 30, 2026"}, {"name": "Colorado", "icon": "Colorado", "updated": "Jun 30, 2026"}, {"name": "Connecticut", "icon": "Connecticut", "updated": "Jun 30, 2026"}, {"name": "Delaware", "icon": "Delaware", "updated": "Jun 30, 2026"}, {"name": "District of Columbia", "icon": null, "updated": "Jun 30, 2026"}, {"name": "Florida", "icon": "Florida", "updated": "Jun 30, 2026"}, {"name": "Georgia", "icon": "Georgia", "updated": "Jun 30, 2026"}, {"name": "Hawaii", "icon": "Hawaii", "updated": "Jun 30, 2026"}, {"name": "Idaho", "icon": "Idaho", "updated": "Jun 30, 2026"}, {"name": "Illinois", "icon": "Illinois", "updated": "Jun 30, 2026"}, {"name": "Indiana", "icon": "Indiana", "updated": "Jun 30, 2026"}, {"name": "Iowa", "icon": "Iowa", "updated": "Jun 30, 2026"}, {"name": "Kansas", "icon": "Kansas", "updated": "Jun 30, 2026"}, {"name": "Kentucky", "icon": "Kentucky", "updated": "Jun 30, 2026"}, {"name": "Louisiana", "icon": "Louisiana_", "updated": "Jun 30, 2026"}, {"name": "Maine", "icon": "Maine", "updated": "Jun 30, 2026"}, {"name": "Maryland", "icon": "Maryland", "updated": "Jun 30, 2026"}, {"name": "Massachusetts", "icon": "Massachusetts", "updated": "Jun 30, 2026"}, {"name": "Michigan", "icon": "Michigan", "updated": "Jun 30, 2026"}, {"name": "Minnesota", "icon": "Minnesota", "updated": "Jun 30, 2026"}, {"name": "Mississippi", "icon": "Mississippi", "updated": "Jun 30, 2026"}, {"name": "Missouri", "icon": "Missouri", "updated": "Jun 30, 2026"}, {"name": "Montana", "icon": "Montana", "updated": "Jun 30, 2026"}, {"name": "Nebraska", "icon": "Nebraska", "updated": "Jun 30, 2026"}, {"name": "Nevada", "icon": "Nevada", "updated": "Jun 30, 2026"}, {"name": "New Hampshire", "icon": "New_Hampshire", "updated": "Jun 30, 2026"}, {"name": "New Jersey", "icon": "New_Jersey", "updated": "Jun 30, 2026"}, {"name": "New Mexico", "icon": "New_Mexico", "updated": "Jun 30, 2026"}, {"name": "New York", "icon": "New_York", "updated": "Jun 30, 2026"}, {"name": "North Carolina", "icon": "North_Carolina", "updated": "Jun 30, 2026"}, {"name": "North Dakota", "icon": "North_Dakota", "updated": "Jun 30, 2026"}, {"name": "Ohio", "icon": "Ohio", "updated": "Jun 30, 2026"}, {"name": "Oklahoma", "icon": "Oklahoma", "updated": "Jun 30, 2026"}, {"name": "Oregon", "icon": "Oregon", "updated": "Jun 30, 2026"}, {"name": "Pennsylvania", "icon": "Pennsylvania", "updated": "Jun 30, 2026"}, {"name": "Rhode Island", "icon": "Rhode_Island", "updated": "Jun 30, 2026"}, {"name": "South Carolina", "icon": "South_Carolina", "updated": "Jun 30, 2026"}, {"name": "South Dakota", "icon": "South_Dakota", "updated": "Jun 30, 2026"}, {"name": "Tennessee", "icon": "Tennessee_", "updated": "Jun 30, 2026"}, {"name": "Texas", "icon": "Texas", "updated": "Jun 30, 2026"}, {"name": "Utah", "icon": "Utah", "updated": "Jun 30, 2026"}, {"name": "Vermont", "icon": "Vermont", "updated": "Jun 30, 2026"}, {"name": "Virginia", "icon": "Virginia_", "updated": "Jun 30, 2026"}, {"name": "Washington", "icon": "Washington", "updated": "Jun 30, 2026"}, {"name": "West Virginia", "icon": "West_Virginia_", "updated": "Jun 30, 2026"}, {"name": "Wisconsin", "icon": "Wisconsin", "updated": "Jun 30, 2026"}, {"name": "Wyoming", "icon": "Wyoming_", "updated": "Jun 30, 2026"}];
@@ -702,12 +704,18 @@ function goBack() {
 function renderDetailHero(s, fetched) {
   var area = document.getElementById("detail-hero-area");
   var agency = (fetched && fetched.agency) ? fetched.agency : "";
+  var agencyUrl = (fetched && fetched.agencyUrl) ? fetched.agencyUrl : "";
+  var agencyHtml = agency
+    ? (agencyUrl
+        ? '<a href="' + esc(agencyUrl) + '" target="_blank" rel="noopener" style="color:#b8b6b6;font-size:11px;margin-top:2px;display:block;text-decoration:underline;">' + esc(agency) + "</a>"
+        : '<div class="detail-agency">' + esc(agency) + "</div>")
+    : "";
   var iconHtml = s.icon
     ? '<div class="detail-state-icon"><img src="https://raw.githubusercontent.com/sleav89/DS4E_Nat_Tracker/main/state-icons/' + esc(s.icon) + '.png" alt="" style="width:64px;height:64px;object-fit:contain;display:block;"></div>'
     : '<div class="detail-dc-icon">DC</div>';
   area.innerHTML = '<div class="detail-hero">' + iconHtml
     + '<div class="detail-state-name">' + esc(s.name) + "</div>"
-    + '<div class="detail-agency">' + esc(agency) + "</div>"
+    + agencyHtml
     + '<div class="detail-updated"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#f9c6a4" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Updated ' + esc((fetched && fetched.updated) ? fetched.updated : s.updated) + "</div>"
     + "</div>";
 }
@@ -813,10 +821,6 @@ function renderAdoption(s, fetched) {
   if (fetched && fetched.typeAdoption) h += '<div class="card-row"><div class="row-label">Type of adoption</div><div class="row-value">' + esc(fetched.typeAdoption).replace(/\n/g,"<br>") + "</div></div>";
   if (fetched && fetched.contentAreas) h += '<div class="card-row"><div class="row-label">Content areas</div><div class="row-value">' + esc(fetched.contentAreas).replace(/\n/g,"<br>") + "</div></div>";
   if (fetched && fetched.gradeBand)    h += '<div class="card-row"><div class="row-label">Grade band</div><div class="row-value">' + esc(fetched.gradeBand) + "</div></div>";
-  if (fetched && fetched.agency) {
-    var agencyVal = fetched.agencyUrl ? '<a class="useful-link" href="' + esc(fetched.agencyUrl) + '" target="_blank" rel="noopener">' + esc(fetched.agency) + "</a>" : esc(fetched.agency);
-    h += '<div class="card-row"><div class="row-label">State agency</div><div class="row-value">' + agencyVal + "</div></div>";
-  }
   h += "</div>";
 
   // Course codes
@@ -856,7 +860,7 @@ function renderAdoption(s, fetched) {
     years.forEach(function(yr) {
       var entry = yearMap[yr];
       h += '<div class="timeline-item"><div class="tl-year">' + esc(yr) + "</div>";
-      if (entry.pub) h += '<div class="tl-text">' + esc(entry.pub.event).replace(/\n/g,"<br>") + "</div>";
+      if (entry.pub) h += '<div class="tl-text">' + entry.pub.event.split("\n").map(function(line) { var ci = line.indexOf(":"); return ci > 0 ? "<strong>" + esc(line.slice(0,ci+1)) + "</strong>" + esc(line.slice(ci+1)) : esc(line); }).join("<br>") + "</div>";
       if (entry.conf) {
         h += '<div class="tl-conf"><div class="tl-conf-label">&#x1F512; Confidential</div>';
         h += '<div class="tl-text">' + esc(entry.conf.notes).replace(/\n/g,"<br>") + "</div></div>";
@@ -903,9 +907,21 @@ function renderStandards(s, fetched) {
     if (!sub.val) return;
     hasAny = true;
     h += '<div class="std-row"><div class="std-subj">' + sub.label + "</div><div class=\"std-detail\">";
-    var text = esc(sub.val).replace(/\n/g,"<br>");
-    if (sub.url) h += '<a href="' + esc(sub.url) + '" target="_blank" rel="noopener">' + text + "</a>";
-    else h += text;
+    var lines = sub.val.split("\n");
+    var linkUsed = false;
+    for (var li = 0; li < lines.length; li++) {
+      var line = lines[li].trim();
+      if (!line) continue;
+      if (line.toLowerCase().indexOf("link to") === 0 || line.toLowerCase().indexOf("link:") === 0) {
+        var href = (sub.url && !linkUsed) ? sub.url : "";
+        linkUsed = true;
+        if (href) h += '<br><a class="std-link-pill" href="' + esc(href) + '" target="_blank" rel="noopener">' + esc(line) + ' ↗</a>';
+        else h += '<br><span class="std-link-pill">' + esc(line) + '</span>';
+      } else {
+        if (li > 0) h += "<br>";
+        h += esc(line);
+      }
+    }
     h += "</div></div>";
   });
   if (!hasAny) h += '<div class="card-row"><div class="row-value muted">No standards data on file.</div></div>';
@@ -1113,7 +1129,7 @@ loadTierData(); // refreshes from Google Sheet if reachable
 <div id="password-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;padding:20px;">
   <div style="background:#fff;border-radius:14px;padding:24px;max-width:340px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.18);">
     <div style="font-size:17px;font-weight:600;color:#1c1c1e;margin-bottom:6px;">Private Data</div>
-    <div style="font-size:13px;color:#888;margin-bottom:16px;">Enter the DS4E team password to view internal notes, contacts, and confidential events.</div>
+    <div style="font-size:13px;color:#888;margin-bottom:16px;">Enter password to view internal notes, contacts, and confidential information.</div>
     <input id="pw-input" type="password" placeholder="Password" autocomplete="off"
       style="width:100%;border:1px solid #ddd;border-radius:10px;padding:10px 12px;font-size:15px;outline:none;margin-bottom:8px;"
       onkeydown="if(event.key==='Enter')submitPassword()">
