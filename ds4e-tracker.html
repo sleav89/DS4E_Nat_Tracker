@@ -430,17 +430,30 @@ function parsePublicSheet(csv) {
 
 // ── Private sheet parser ──────────────────────────────────────────────────────
 function parsePrivateSheet(rows) {
-  var d = { internal:"", contacts:[], confEvents:[] };
+  var d = { internal:"", engagementData:[], contacts:[], confEvents:[] };
   var section = "";
   var inContacts = false;
   var inEvents = false;
+  var inData = false;
   for (var i = 0; i < rows.length; i++) {
     var r = rows[i];
     var c0 = r[0] ? String(r[0]).trim() : "";
-    if (c0 === "INTERNAL INFORMATION")      { section = "internal"; continue; }
-    if (c0 === "POINTS OF CONTACT")         { section = "contacts"; inContacts = false; continue; }
+    if (c0 === "INTERNAL INFORMATION")        { section = "internal"; continue; }
+    if (c0 === "Data")                         { section = "data"; inData = false; continue; }
+    if (c0 === "POINTS OF CONTACT")           { section = "contacts"; inContacts = false; continue; }
     if (c0 === "CONFIDENTIAL EVENTS TRACKER") { section = "events"; inEvents = false; continue; }
     if (section === "internal" && c0 === "Internal Notes") d.internal = String(r[1] || "").trim();
+    if (section === "data") {
+      if (c0 === "Year") { inData = true; continue; }
+      if (inData && c0 && c0 !== "[SY XXXX]") {
+        var enrollment = r[1] !== null && r[1] !== undefined && r[1] !== "" ? String(r[1]).trim() : "";
+        var pd = r[2] !== null && r[2] !== undefined && r[2] !== "" ? String(r[2]).trim() : "";
+        // Strip trailing .0 from numbers
+        enrollment = enrollment.replace(/\.0$/, "");
+        pd = pd.replace(/\.0$/, "");
+        if (enrollment || pd) d.engagementData.push({year: c0, enrollment: enrollment, pd: pd});
+      }
+    }
     if (section === "contacts") {
       if (c0 === "First Name") { inContacts = true; continue; }
       if (inContacts && c0 && c0 !== "[First]") {
@@ -765,10 +778,11 @@ function renderList() {
 
 // ── Detail view ───────────────────────────────────────────────────────────────
 var DETAIL_TABS = [
-  {id:"overview",  label:"Overview"},
-  {id:"adoption",  label:"Adoption"},
-  {id:"standards", label:"Standards"},
-  {id:"contacts",  label:"Contacts"},
+  {id:"overview",    label:"Overview"},
+  {id:"adoption",    label:"Adoption"},
+  {id:"standards",   label:"Standards"},
+  {id:"engagement",  label:"Engagement"},
+  {id:"contacts",    label:"Contacts"},
 ];
 
 function showDetail(s) {
@@ -873,10 +887,11 @@ function switchDetailTab(id) {
 }
 
 function renderTabContent(tabId, s, fetched) {
-  if (tabId === "overview")  return renderOverview(s, fetched);
-  if (tabId === "adoption")  return renderAdoption(s, fetched);
-  if (tabId === "standards") return renderStandards(s, fetched);
-  if (tabId === "contacts")  return renderContacts(s);
+  if (tabId === "overview")    return renderOverview(s, fetched);
+  if (tabId === "adoption")    return renderAdoption(s, fetched);
+  if (tabId === "standards")   return renderStandards(s, fetched);
+  if (tabId === "engagement")  return renderEngagement(s);
+  if (tabId === "contacts")    return renderContacts(s);
   return "";
 }
 
@@ -1027,6 +1042,32 @@ function renderAdoption(s, fetched) {
   }
 
   // Contacts (private)
+  return h;
+}
+
+// ── ENGAGEMENT TAB ────────────────────────────────────────────────────────────
+function renderEngagement(s) {
+  var priv = (PRIVATE_DATA && PRIVATE_DATA[s.name]) ? PRIVATE_DATA[s.name] : null;
+  if (!priv) {
+    return '<div class="loading-card" style="color:#888;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><div>Unlock private data to view engagement.</div></div>';
+  }
+  var data = priv.engagementData || [];
+  if (data.length === 0) {
+    return '<div class="loading-card" style="color:#888;">No engagement data on file for this state.</div>';
+  }
+  var h = '<div class="card"><div class="card-header">Student Enrollment &amp; Teacher PD</div>';
+  // Table header
+  h += '<div style="display:grid;grid-template-columns:130px 1fr 1fr;padding:6px 14px 4px;font-size:10px;font-weight:600;color:#aaa;text-transform:uppercase;letter-spacing:0.4px;border-bottom:0.5px solid #eee;">';
+  h += '<div>School Year</div><div>Student Enrollment</div><div>Teacher PD</div></div>';
+  // Data rows
+  data.forEach(function(row) {
+    h += '<div style="display:grid;grid-template-columns:130px 1fr 1fr;padding:8px 14px;border-bottom:0.5px solid #f5f5f5;font-size:12px;">';
+    h += '<div style="font-weight:600;color:#ef4a23;">' + esc(row.year) + '</div>';
+    h += '<div style="color:#333;">' + (row.enrollment ? esc(Number(row.enrollment).toLocaleString()) : '<span style="color:#ccc;">—</span>') + '</div>';
+    h += '<div style="color:#333;">' + (row.pd ? esc(Number(row.pd).toLocaleString()) : '<span style="color:#ccc;">—</span>') + '</div>';
+    h += '</div>';
+  });
+  h += '</div>';
   return h;
 }
 
