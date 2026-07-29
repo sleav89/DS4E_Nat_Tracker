@@ -138,6 +138,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .timeline-item{padding:8px 14px;border-bottom:0.5px solid #f5f5f5;display:grid;grid-template-columns:145px 1fr;gap:8px;}
 .timeline-item:last-child{border-bottom:none;}
 .tl-year{font-size:11px;font-weight:600;color:#ef4a23;padding-top:1px;}
+.tl-year-sub{display:block;font-size:10px;font-weight:400;color:#ef4a23;opacity:0.85;margin-top:2px;}
 .tl-text{font-size:12px;color:#444;line-height:1.5;}
 
 /* ── COURSE CODES ── */
@@ -326,6 +327,7 @@ var STATES = [{"name": "Alabama", "icon": "Alabama", "updated": "Jun 30, 2026"},
 // ── Runtime cache ────────────────────────────────────────────────────────────
 var STATE_CACHE = {};      // stateName -> parsed public sheet data
 var PRIVATE_DATA = null;   // null until unlocked; then {stateName: {internal,contacts,confEvents}}
+var CACHED_PASSWORD = null; // stored after first successful unlock for per-state lazy fetching
 var PRIVATE_UNLOCKED = false;
 var currentDetailState = null;
 
@@ -367,7 +369,7 @@ function parsePublicSheet(csv) {
     scienceStd:"", scienceStdUrl:"", csStd:"", csStdUrl:"", cteStd:"", cteStdUrl:"",
     linkStandards:"", revisionCycle:"", stdComments:"", stdResources:"",
     courseCodeUpdated:"", addedToCatalog:"", linkCatalog:"",
-    courseCodesRaw:"", courseCategory:"",
+    courseCodesRaw:"", archivedCodesRaw:"", courseCategory:"",
     gradCredits:"", gradCoursework:"", gradReqResources:"",
     timeline:[]
   };
@@ -416,6 +418,7 @@ function parsePublicSheet(csv) {
       else if (c0 === "Added to State Course Catalog")    d.addedToCatalog = c1;
       else if (c0 === "Link to Course Catalog")           d.linkCatalog = c2 || c1;
       else if (c0 === "State Course Code(s)")             d.courseCodesRaw = c1;
+      else if (c0 === "Archived Course Code(s)")          d.archivedCodesRaw = c1;
       else if (c0 === "State Course Category")            d.courseCategory = c1;
       else if (c0 === "Math Graduation Credits")          d.gradCredits = c1;
       else if (c0 === "Math Graduation Coursework")       d.gradCoursework = c1;
@@ -490,9 +493,35 @@ function fetchStateData(stateName, callback) {
     .catch(function(err) { callback(null, err.message); });
 }
 
+// ── Parse multiple timeline links from column C ───────────────────────────────
+// Column C can have multiple lines. Each line is either:
+//   "Label Text|https://url.com"   → pill with custom label
+//   "https://url.com"              → pill labeled "View source"
+function parseTimelineLinks(urlCell) {
+  if (!urlCell) return [];
+  var lines = urlCell.split("\n");
+  var links = [];
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i].trim();
+    if (!line) continue;
+    var pipeIdx = line.indexOf("|");
+    if (pipeIdx > 0) {
+      var label = line.slice(0, pipeIdx).trim();
+      var url   = line.slice(pipeIdx + 1).trim();
+      if (url) links.push({ label: label, url: url });
+    } else if (line.indexOf("http") === 0) {
+      links.push({ label: "View source", url: line });
+    }
+  }
+  return links;
+}
+
 // ── Fetch: private data via proxy ─────────────────────────────────────────────
-function fetchPrivateData(password, callback) {
-  fetch(PROXY_URL + "?password=" + encodeURIComponent(password))
+// Pass stateName to fetch only that state (fast). Omit to fetch all states.
+function fetchPrivateData(password, stateName, callback) {
+  var url = PROXY_URL + "?password=" + encodeURIComponent(password);
+  if (stateName) url += "&state=" + encodeURIComponent(stateName);
+  fetch(url)
     .then(function(r) { return r.json(); })
     .then(function(json) {
       if (json.error) { callback(null, json.error); return; }
@@ -691,6 +720,21 @@ function onDataLoaded(s, fetched) {
   renderDetailHero(s, fetched);
   renderDetailTabs(s, fetched);
   switchDetailTab("overview");
+  // If password is cached but we don't have this state's private data yet, fetch it lazily
+  if (CACHED_PASSWORD && (!PRIVATE_DATA || !PRIVATE_DATA[s.name])) {
+    fetchPrivateData(CACHED_PASSWORD, s.name, function(data, err) {
+      if (!err && data) {
+        if (!PRIVATE_DATA) PRIVATE_DATA = {};
+        var keys = Object.keys(data);
+        for (var i = 0; i < keys.length; i++) PRIVATE_DATA[keys[i]] = data[keys[i]];
+        // Re-render if still on this state
+        if (currentDetailState && currentDetailState.name === s.name && STATE_CACHE[s.name]) {
+          renderDetailTabs(currentDetailState, STATE_CACHE[currentDetailState.name]);
+          switchDetailTab("contacts");
+        }
+      }
+    });
+  }
 }
 
 function goBack() {
@@ -821,12 +865,30 @@ function renderAdoption(s, fetched) {
   if (fetched && fetched.gradeBand)    h += '<div class="card-row"><div class="row-label">Grade band</div><div class="row-value">' + esc(fetched.gradeBand) + "</div></div>";
   h += "</div>";
 
-  // Course codes
-  if (fetched && fetched.courseCodesRaw) {
-    var codes = parseCourseCodesRaw(fetched.courseCodesRaw);
-    if (codes.length > 0) {
+  // Course codes (supports Current + optional Archived two-column layout)
+  if (fetched && (fetched.courseCodesRaw || fetched.archivedCodesRaw)) {
+    var codes         = parseCourseCodesRaw(fetched.courseCodesRaw);
+    var archivedCodes = parseCourseCodesRaw(fetched.archivedCodesRaw);
+    if (codes.length > 0 || archivedCodes.length > 0) {
       h += '<div class="card"><div class="card-header">Course Codes</div>';
-      codes.forEach(function(cc) { h += '<div class="code-row"><div class="code-num">' + esc(cc.code) + '</div><div class="code-title">' + esc(cc.title) + "</div></div>"; });
+      if (archivedCodes.length > 0) {
+        // Two-column layout: Current | Archived
+        h += '<div style="display:grid;grid-template-columns:1fr 1fr;padding:5px 14px 4px;font-size:10px;color:#aaa;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;border-bottom:0.5px solid #eee;"><div>Current</div><div>Archived</div></div>';
+        var maxLen = Math.max(codes.length, archivedCodes.length);
+        for (var ci = 0; ci < maxLen; ci++) {
+          h += '<div style="display:grid;grid-template-columns:1fr 1fr;padding:7px 14px;border-bottom:0.5px solid #f5f5f5;">';
+          if (codes[ci]) {
+            h += '<div style="display:flex;gap:8px;align-items:flex-start;"><div class="code-num">' + esc(codes[ci].code) + '</div><div class="code-title">' + esc(codes[ci].title) + '</div></div>';
+          } else { h += '<div></div>'; }
+          if (archivedCodes[ci]) {
+            h += '<div style="display:flex;gap:8px;align-items:flex-start;"><div class="code-num" style="color:#ef4a23;">' + esc(archivedCodes[ci].code) + '</div><div class="code-title">' + esc(archivedCodes[ci].title) + '</div></div>';
+          } else { h += '<div></div>'; }
+          h += '</div>';
+        }
+      } else {
+        // Single-column layout (no archived codes)
+        codes.forEach(function(cc) { h += '<div class="code-row"><div class="code-num">' + esc(cc.code) + '</div><div class="code-title">' + esc(cc.title) + "</div></div>"; });
+      }
       if (fetched.courseCategory) h += '<div class="card-row"><div class="row-label">Category</div><div class="row-value">' + esc(fetched.courseCategory).replace(/\n/g,", ") + "</div></div>";
       if (fetched.linkCatalog) h += '<div class="card-row"><div class="row-label">Course catalog</div><div class="row-value"><a class="useful-link" href="' + esc(fetched.linkCatalog) + '" target="_blank" rel="noopener">View catalog</a></div></div>';
       h += "</div>";
@@ -857,10 +919,20 @@ function renderAdoption(s, fetched) {
     var years = Object.keys(yearMap).sort();
     years.forEach(function(yr) {
       var entry = yearMap[yr];
-      h += '<div class="timeline-item"><div class="tl-year">' + esc(yr) + "</div>";
+      var yrParts = yr.split("\n");
+      var yrHtml = esc(yrParts[0]);
+      if (yrParts.length > 1) { yrHtml += '<span class="tl-year-sub">' + yrParts.slice(1).map(esc).join(" ") + '</span>'; }
+      h += '<div class="timeline-item"><div class="tl-year">' + yrHtml + "</div>";
       if (entry.pub) {
-        h += '<div class="tl-text">' + entry.pub.event.split("\n").map(function(line) { var ci = line.indexOf(":"); return ci > 0 ? "<strong>" + esc(line.slice(0,ci+1)) + "</strong>" + esc(line.slice(ci+1)) : esc(line); }).join("<br>") + "</div>";
-        if (entry.pub.url) h += '<div class="tl-text" style="margin-top:4px;"><a class="std-link-pill" href="' + esc(entry.pub.url) + '" target="_blank" rel="noopener">View source ↗</a></div>';
+        h += '<div class="tl-text">' + entry.pub.event.split("\n").map(function(line) { var ci = line.indexOf(":"); return ci > 0 ? "<strong>" + esc(line.slice(0,ci+1)) + "</strong>" + esc(line.slice(ci+1)) : esc(line); }).join("<br>");
+        var tlLinks = parseTimelineLinks(entry.pub.url);
+        if (tlLinks.length > 0) {
+          h += '<br>';
+          for (var tli = 0; tli < tlLinks.length; tli++) {
+            h += '<a class="std-link-pill" style="margin-top:4px;margin-right:4px;display:inline-block;" href="' + esc(tlLinks[tli].url) + '" target="_blank" rel="noopener">' + esc(tlLinks[tli].label) + ' ↗</a>';
+          }
+        }
+        h += "</div>";
       }
       if (entry.conf) {
         h += '<div class="tl-conf"><div class="tl-conf-label">&#x1F512; Confidential</div>';
@@ -972,19 +1044,24 @@ function submitPassword() {
   var btn = document.getElementById("pw-submit");
   btn.disabled = true; btn.textContent = "Checking...";
   document.getElementById("pw-error").textContent = "";
-  fetchPrivateData(pw, function(data, err) {
+  // Fetch only the current state's private data — much faster than all 51 states at once
+  var stateName = currentDetailState ? currentDetailState.name : null;
+  fetchPrivateData(pw, stateName, function(data, err) {
     if (err || !data) {
       document.getElementById("pw-error").textContent = err === "Invalid password" ? "Incorrect password." : "Could not connect. Try again.";
       btn.disabled = false; btn.textContent = "Unlock"; return;
     }
-    PRIVATE_DATA = data;
+    if (!PRIVATE_DATA) PRIVATE_DATA = {};
+    var keys = Object.keys(data);
+    for (var i = 0; i < keys.length; i++) PRIVATE_DATA[keys[i]] = data[keys[i]];
+    CACHED_PASSWORD = pw;
     PRIVATE_UNLOCKED = true;
     hidePasswordModal();
     updateLockUI();
     // Re-render current state detail if one is open
     if (currentDetailState && STATE_CACHE[currentDetailState.name]) {
       renderDetailTabs(currentDetailState, STATE_CACHE[currentDetailState.name]);
-      switchDetailTab("overview");
+      switchDetailTab("contacts");
     }
   });
 }
