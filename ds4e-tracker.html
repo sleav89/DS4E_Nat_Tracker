@@ -198,6 +198,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .useful-link{display:inline-flex;align-items:center;gap:5px;color:#6290c8;text-decoration:none;font-size:13px;margin-top:4px;}
 .useful-link:hover{text-decoration:underline;}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
 </head>
 <body>
 
@@ -1033,28 +1035,12 @@ function renderMap(container, us) {
 function initMap() {
   var container = document.getElementById("us-map-container");
   container.innerHTML = '<div style="text-align:center;padding:40px;color:#aaa;">Loading map...</div>';
-  var s1 = document.createElement("script");
-  s1.src = "https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js";
-  s1.onload = function() {
-    var s2 = document.createElement("script");
-    s2.src = "https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js";
-    s2.onload = function() {
-      fetch("https://cdn.jsdelivr.net/npm/us-atlas@3/states-albers-10m.json")
-        .then(function(r) { return r.json(); })
-        .then(function(us) { renderMap(container, us); })
-        .catch(function() {
-          container.innerHTML = '<div style="text-align:center;padding:40px;color:#e05252;">Map could not be loaded. Check your internet connection.</div>';
-        });
-    };
-    s2.onerror = function() {
-      container.innerHTML = '<div style="text-align:center;padding:40px;color:#e05252;">Map library could not be loaded.</div>';
-    };
-    document.head.appendChild(s2);
-  };
-  s1.onerror = function() {
-    container.innerHTML = '<div style="text-align:center;padding:40px;color:#e05252;">Map library could not be loaded.</div>';
-  };
-  document.head.appendChild(s1);
+  fetch("https://cdn.jsdelivr.net/npm/us-atlas@3/states-albers-10m.json")
+    .then(function(r) { return r.json(); })
+    .then(function(us) { renderMap(container, us); })
+    .catch(function(err) {
+      container.innerHTML = '<div style="text-align:center;padding:40px;color:#e05252;">Map could not be loaded.</div>';
+    });
 }
 
 // ── Nav ───────────────────────────────────────────────────────────────────────
