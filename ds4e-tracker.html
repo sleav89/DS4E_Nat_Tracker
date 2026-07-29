@@ -26,7 +26,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 #map-view{height:100vh;display:flex;flex-direction:column;overflow:hidden;}
 .map-hint{padding:6px 14px;font-size:11px;color:#888;background:#fff;border-bottom:0.5px solid #f0f0f0;flex-shrink:0;}
 .map-container{flex:1;min-height:0;overflow:auto;display:flex;align-items:flex-start;justify-content:center;}
-#us-map-container{width:100%;display:flex;align-items:center;}
+#us-map-container{width:100%;display:flex;align-items:center;justify-content:center;}
+#us-map-container svg{width:100%;height:auto;max-height:calc(100vh - 140px);}
 .map-legend{display:flex;flex-wrap:wrap;gap:6px 12px;padding:8px 14px;background:#fff;border-top:0.5px solid #e5e5e5;font-size:11px;color:#555;flex-shrink:0;}
 .map-legend-item{display:flex;align-items:center;gap:5px;}
 .map-legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
@@ -318,7 +319,7 @@ var PUBLIC_SHEET_BASE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRU0_I9
 var PROXY_URL = "https://script.google.com/macros/s/AKfycbzBlx3He4o5WbLzGGzP5tnY0GgW2Vo9aVijnl3dgoOjVE7Cia0ZWvnsm_o6oa1A0EZB/exec";
 
 // ── Slim state data (map + list only) ────────────────────────────────────────
-var STATES = [{"name": "Alabama", "tiers": ["Tier 2: Course Pilot or Teacher Professional Development Program", "Tier 1: State Course Code"], "goals": ["Tier 2: Course Pilot or Teacher Professional Development Program"], "icon": "Alabama", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "", "statewide": "Yes"}, {"name": "Alaska", "tiers": ["Tier 0: Research and/or Development"], "goals": ["Tier 0: Research and/or Development"], "icon": "Alaska", "updated": "Jun 30, 2026", "gradFilter": "local", "mathStatusOverride": "", "statewide": "No"}, {"name": "Arizona", "tiers": ["Tier 2: Course Pilot or Teacher Professional Development Program", "Tier 1: State Course Code"], "goals": ["Tier 3: Standards Adoption"], "icon": "Arizona", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "In Process", "statewide": "Yes"}, {"name": "Arkansas", "tiers": ["Tier 2: Course Pilot or Teacher Professional Development Program", "Tier 1: State Course Code"], "goals": ["Tier 3: Standards Adoption"], "icon": "Arkansas", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "Pause", "statewide": "Yes"}, {"name": "California", "tiers": ["Tier 3: Standards Adoption"], "goals": ["Tier 3: Standards Adoption"], "icon": "California", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "", "statewide": "Yes"}, {"name": "Colorado", "tiers": ["Tier 1: State Course Code", "Tier 2: Course Pilot or Teacher Professional Development Program"], "goals": ["Tier 3: Standards Adoption"], "icon": "Colorado", "updated": "Jun 30, 2026", "gradFilter": "local", "mathStatusOverride": "Finalized", "statewide": "No"}, {"name": "Connecticut", "tiers": ["Tier 1: State Course Code"], "goals": ["Tier 1: State Course Code"], "icon": "Connecticut", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "To Watch", "statewide": "No"}, {"name": "Delaware", "tiers": ["Tier 0: Research and/or Development"], "goals": ["Tier 2: Course Pilot or Teacher Professional Development Program"], "icon": "Delaware", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "", "statewide": "No"}, {"name": "District of Columbia", "tiers": ["Tier 1: State Course Code"], "goals": ["Tier 1: State Course Code"], "icon": null, "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "", "statewide": "Yes"}, {"name": "Florida", "tiers": ["Tier 2: Course Pilot or Teacher Professional Development Program", "Tier 1: State Course Code"], "goals": ["Tier 2: Course Pilot or Teacher Professional Development Program"], "icon": "Florida", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "", "statewide": "Yes"}, {"name": "Georgia", "tiers": ["Tier 2: Course Pilot or Teacher Professional Development Program", "Tier 1: State Course Code"], "goals": ["Tier 2: Course Pilot or Teacher Professional Development Program"], "icon": "Georgia", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "", "statewide": "Yes"}, {"name": "Hawaii", "tiers": ["Tier 2: Course Pilot or Teacher Professional Development Program"], "goals": ["Tier 3: Standards Adoption"], "icon": "Hawaii", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "Draft / Public Comment", "statewide": "Development"}, {"name": "Idaho", "tiers": ["Tier 2: Course Pilot or Teacher Professional Development Program", "Tier 1: State Course Code"], "goals": ["Tier 3: Standards Adoption"], "icon": "Idaho", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "To Watch", "statewide": "Development"}, {"name": "Illinois", "tiers": ["Tier 1: State Course Code"], "goals": ["Tier 1: State Course Code"], "icon": "Illinois", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "", "statewide": "No"}, {"name": "Indiana", "tiers": ["Tier 2: Course Pilot or Teacher Professional Development Program"], "goals": ["Tier 3: Standards Adoption"], "icon": "Indiana", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "", "statewide": "No"}, {"name": "Iowa", "tiers": ["Tier 1: State Course Code"], "goals": ["Tier 3: Standards Adoption"], "icon": "Iowa", "updated": "Jun 30, 2026", "gradFilter": "local", "mathStatusOverride": "", "statewide": "No"}, {"name": "Kansas", "tiers": ["None"], "goals": ["None"], "icon": "Kansas", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "", "statewide": "No"}, {"name": "Kentucky", "tiers": ["Tier 1: State Course Code"], "goals": ["Tier 2: Course Pilot or Teacher Professional Development Program"], "icon": "Kentucky", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "In Process", "statewide": "No"}, {"name": "Louisiana", "tiers": ["None"], "goals": ["Tier 3: Standards Adoption"], "icon": "Louisiana_", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "In Process", "statewide": "No"}, {"name": "Maine", "tiers": ["None"], "goals": ["Tier 0: Research and/or Development"], "icon": "Maine", "updated": "Jun 30, 2026", "gradFilter": "local", "mathStatusOverride": "Pause", "statewide": "No"}, {"name": "Maryland", "tiers": ["None"], "goals": ["Tier 3: Standards Adoption"], "icon": "Maryland", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "To Watch", "statewide": "Pending"}, {"name": "Massachusetts", "tiers": ["Tier 2: Course Pilot or Teacher Professional Development Program", "Tier 1: State Course Code"], "goals": ["Tier 2: Course Pilot or Teacher Professional Development Program"], "icon": "Massachusetts", "updated": "Jun 30, 2026", "gradFilter": "local", "mathStatusOverride": "", "statewide": "Yes"}, {"name": "Michigan", "tiers": ["Tier 2: Course Pilot or Teacher Professional Development Program", "Tier 1: State Course Code"], "goals": ["Tier 2: Course Pilot or Teacher Professional Development Program"], "icon": "Michigan", "updated": "Jun 30, 2026", "gradFilter": "local", "mathStatusOverride": "", "statewide": "Yes"}, {"name": "Minnesota", "tiers": ["Tier 3: Standards Adoption", "Tier 1: State Course Code", "Tier 2: Course Pilot or Teacher Professional Development Program"], "goals": ["Tier 3: Standards Adoption"], "icon": "Minnesota", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "", "statewide": "Pending"}, {"name": "Mississippi", "tiers": ["None"], "goals": ["None"], "icon": "Mississippi", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "", "statewide": "No"}, {"name": "Missouri", "tiers": ["Tier 0: Research and/or Development"], "goals": ["Tier 0: Research and/or Development"], "icon": "Missouri", "updated": "Jun 30, 2026", "gradFilter": "local", "mathStatusOverride": "", "statewide": "No"}, {"name": "Montana", "tiers": ["Tier 3: Standards Adoption", "Tier 1: State Course Code"], "goals": ["Tier 3: Standards Adoption"], "icon": "Montana", "updated": "Jun 30, 2026", "gradFilter": "local", "mathStatusOverride": "", "statewide": "Yes"}, {"name": "Nebraska", "tiers": ["Tier 2: Course Pilot or Teacher Professional Development Program", "Tier 1: State Course Code"], "goals": ["Tier 2: Course Pilot or Teacher Professional Development Program"], "icon": "Nebraska", "updated": "Jun 30, 2026", "gradFilter": "local", "mathStatusOverride": "", "statewide": "Yes"}, {"name": "Nevada", "tiers": ["None"], "goals": ["Tier 0: Research and/or Development"], "icon": "Nevada", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "", "statewide": "No"}, {"name": "New Hampshire", "tiers": ["Tier 4: Graduation Requirement", "Tier 0: Research and/or Development"], "goals": ["Tier 2: Course Pilot or Teacher Professional Development Program"], "icon": "New_Hampshire", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "", "statewide": "Development"}, {"name": "New Jersey", "tiers": ["Tier 3: Standards Adoption", "Tier 1: State Course Code"], "goals": ["Tier 3: Standards Adoption"], "icon": "New_Jersey", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "", "statewide": "Yes"}, {"name": "New Mexico", "tiers": ["Tier 1: State Course Code"], "goals": ["Tier 1: State Course Code"], "icon": "New_Mexico", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "", "statewide": "Yes"}, {"name": "New York", "tiers": ["Tier 1: State Course Code"], "goals": ["Tier 1: State Course Code"], "icon": "New_York", "updated": "Jun 30, 2026", "gradFilter": "local", "mathStatusOverride": "", "statewide": "Yes"}, {"name": "North Carolina", "tiers": ["Tier 2: Course Pilot or Teacher Professional Development Program", "Tier 1: State Course Code"], "goals": ["Tier 3: Standards Adoption"], "icon": "North_Carolina", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "Draft / Public Comment", "statewide": "Yes"}, {"name": "North Dakota", "tiers": ["None"], "goals": ["None"], "icon": "North_Dakota", "updated": "Jun 30, 2026", "gradFilter": "local", "mathStatusOverride": "", "statewide": "No"}, {"name": "Ohio", "tiers": ["Tier 2: Course Pilot or Teacher Professional Development Program", "Tier 1: State Course Code"], "goals": ["Tier 2: Course Pilot or Teacher Professional Development Program"], "icon": "Ohio", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "", "statewide": "Yes"}, {"name": "Oklahoma", "tiers": ["Tier 2: Course Pilot or Teacher Professional Development Program"], "goals": ["Tier 2: Course Pilot or Teacher Professional Development Program"], "icon": "Oklahoma", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "", "statewide": "Yes"}, {"name": "Oregon", "tiers": ["Tier 4: Graduation Requirement", "Tier 3: Standards Adoption"], "goals": ["Tier 4: Graduation Requirement"], "icon": "Oregon", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "", "statewide": "Yes"}, {"name": "Pennsylvania", "tiers": ["Tier 1: State Course Code"], "goals": ["Tier 1: State Course Code"], "icon": "Pennsylvania", "updated": "Jun 30, 2026", "gradFilter": "local", "mathStatusOverride": "", "statewide": "Pending"}, {"name": "Rhode Island", "tiers": ["Tier 0: Research and/or Development"], "goals": ["Tier 2: Course Pilot or Teacher Professional Development Program"], "icon": "Rhode_Island", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "Pause", "statewide": "Development"}, {"name": "South Carolina", "tiers": ["Tier 0: Research and/or Development"], "goals": ["Tier 0: Research and/or Development"], "icon": "South_Carolina", "updated": "Jun 30, 2026", "gradFilter": "local", "mathStatusOverride": "", "statewide": "No"}, {"name": "South Dakota", "tiers": ["Tier 1: State Course Code"], "goals": ["Tier 1: State Course Code"], "icon": "South_Dakota", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "Finalized", "statewide": "No"}, {"name": "Tennessee", "tiers": ["Tier 1: State Course Code"], "goals": ["Tier 3: Standards Adoption"], "icon": "Tennessee_", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "In Process", "statewide": "Yes"}, {"name": "Texas", "tiers": ["None"], "goals": ["Tier 2: Course Pilot or Teacher Professional Development Program"], "icon": "Texas", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "", "statewide": "No"}, {"name": "Utah", "tiers": ["Tier 2: Course Pilot or Teacher Professional Development Program"], "goals": ["Tier 3: Standards Adoption"], "icon": "Utah", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "Pause", "statewide": "Yes"}, {"name": "Vermont", "tiers": ["None"], "goals": ["None"], "icon": "Vermont", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "", "statewide": "No"}, {"name": "Virginia", "tiers": ["Tier 3: Standards Adoption", "Tier 1: State Course Code"], "goals": ["Tier 3: Standards Adoption"], "icon": "Virginia_", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "", "statewide": "Yes"}, {"name": "Washington", "tiers": ["Tier 2: Course Pilot or Teacher Professional Development Program", "Tier 1: State Course Code"], "goals": ["Tier 2: Course Pilot or Teacher Professional Development Program"], "icon": "Washington", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "", "statewide": "Development"}, {"name": "West Virginia", "tiers": ["Tier 3: Standards Adoption", "Tier 1: State Course Code"], "goals": ["Tier 3: Standards Adoption"], "icon": "West_Virginia_", "updated": "Jun 30, 2026", "gradFilter": "has_req", "mathStatusOverride": "", "statewide": "Yes"}, {"name": "Wisconsin", "tiers": ["Tier 1: State Course Code"], "goals": ["Tier 2: Course Pilot or Teacher Professional Development Program"], "icon": "Wisconsin", "updated": "Jun 30, 2026", "gradFilter": "local", "mathStatusOverride": "", "statewide": "No"}, {"name": "Wyoming", "tiers": ["Tier 1: State Course Code"], "goals": ["Tier 1: State Course Code"], "icon": "Wyoming_", "updated": "Jun 30, 2026", "gradFilter": "local", "mathStatusOverride": "", "statewide": "Yes"}];
+var STATES = [{"name": "Alabama", "icon": "Alabama", "updated": "Jun 30, 2026"}, {"name": "Alaska", "icon": "Alaska", "updated": "Jun 30, 2026"}, {"name": "Arizona", "icon": "Arizona", "updated": "Jun 30, 2026"}, {"name": "Arkansas", "icon": "Arkansas", "updated": "Jun 30, 2026"}, {"name": "California", "icon": "California", "updated": "Jun 30, 2026"}, {"name": "Colorado", "icon": "Colorado", "updated": "Jun 30, 2026"}, {"name": "Connecticut", "icon": "Connecticut", "updated": "Jun 30, 2026"}, {"name": "Delaware", "icon": "Delaware", "updated": "Jun 30, 2026"}, {"name": "District of Columbia", "icon": null, "updated": "Jun 30, 2026"}, {"name": "Florida", "icon": "Florida", "updated": "Jun 30, 2026"}, {"name": "Georgia", "icon": "Georgia", "updated": "Jun 30, 2026"}, {"name": "Hawaii", "icon": "Hawaii", "updated": "Jun 30, 2026"}, {"name": "Idaho", "icon": "Idaho", "updated": "Jun 30, 2026"}, {"name": "Illinois", "icon": "Illinois", "updated": "Jun 30, 2026"}, {"name": "Indiana", "icon": "Indiana", "updated": "Jun 30, 2026"}, {"name": "Iowa", "icon": "Iowa", "updated": "Jun 30, 2026"}, {"name": "Kansas", "icon": "Kansas", "updated": "Jun 30, 2026"}, {"name": "Kentucky", "icon": "Kentucky", "updated": "Jun 30, 2026"}, {"name": "Louisiana", "icon": "Louisiana_", "updated": "Jun 30, 2026"}, {"name": "Maine", "icon": "Maine", "updated": "Jun 30, 2026"}, {"name": "Maryland", "icon": "Maryland", "updated": "Jun 30, 2026"}, {"name": "Massachusetts", "icon": "Massachusetts", "updated": "Jun 30, 2026"}, {"name": "Michigan", "icon": "Michigan", "updated": "Jun 30, 2026"}, {"name": "Minnesota", "icon": "Minnesota", "updated": "Jun 30, 2026"}, {"name": "Mississippi", "icon": "Mississippi", "updated": "Jun 30, 2026"}, {"name": "Missouri", "icon": "Missouri", "updated": "Jun 30, 2026"}, {"name": "Montana", "icon": "Montana", "updated": "Jun 30, 2026"}, {"name": "Nebraska", "icon": "Nebraska", "updated": "Jun 30, 2026"}, {"name": "Nevada", "icon": "Nevada", "updated": "Jun 30, 2026"}, {"name": "New Hampshire", "icon": "New_Hampshire", "updated": "Jun 30, 2026"}, {"name": "New Jersey", "icon": "New_Jersey", "updated": "Jun 30, 2026"}, {"name": "New Mexico", "icon": "New_Mexico", "updated": "Jun 30, 2026"}, {"name": "New York", "icon": "New_York", "updated": "Jun 30, 2026"}, {"name": "North Carolina", "icon": "North_Carolina", "updated": "Jun 30, 2026"}, {"name": "North Dakota", "icon": "North_Dakota", "updated": "Jun 30, 2026"}, {"name": "Ohio", "icon": "Ohio", "updated": "Jun 30, 2026"}, {"name": "Oklahoma", "icon": "Oklahoma", "updated": "Jun 30, 2026"}, {"name": "Oregon", "icon": "Oregon", "updated": "Jun 30, 2026"}, {"name": "Pennsylvania", "icon": "Pennsylvania", "updated": "Jun 30, 2026"}, {"name": "Rhode Island", "icon": "Rhode_Island", "updated": "Jun 30, 2026"}, {"name": "South Carolina", "icon": "South_Carolina", "updated": "Jun 30, 2026"}, {"name": "South Dakota", "icon": "South_Dakota", "updated": "Jun 30, 2026"}, {"name": "Tennessee", "icon": "Tennessee_", "updated": "Jun 30, 2026"}, {"name": "Texas", "icon": "Texas", "updated": "Jun 30, 2026"}, {"name": "Utah", "icon": "Utah", "updated": "Jun 30, 2026"}, {"name": "Vermont", "icon": "Vermont", "updated": "Jun 30, 2026"}, {"name": "Virginia", "icon": "Virginia_", "updated": "Jun 30, 2026"}, {"name": "Washington", "icon": "Washington", "updated": "Jun 30, 2026"}, {"name": "West Virginia", "icon": "West_Virginia_", "updated": "Jun 30, 2026"}, {"name": "Wisconsin", "icon": "Wisconsin", "updated": "Jun 30, 2026"}, {"name": "Wyoming", "icon": "Wyoming_", "updated": "Jun 30, 2026"}];
 
 // ── Runtime cache ────────────────────────────────────────────────────────────
 var STATE_CACHE = {};      // stateName -> parsed public sheet data
@@ -357,9 +358,9 @@ function parseCSV(text) {
 function parsePublicSheet(csv) {
   var rows = parseCSV(csv);
   var d = {
-    updated:"", agency:"", typeAdoption:"", contentAreas:"", gradeBand:"",
+    updated:"", agency:"", agencyUrl:"", implementationTier:"", typeAdoption:"", contentAreas:"", gradeBand:"",
     comments:"", usefulLinks:"", usefulLinksUrl:"",
-    superintendent:"", party:"", rural:"", strategicPlan:"",
+    superintendent:"", electedAppointed:"", termEnd:"", party:"", rural:"", strategicPlan:"",
     mathStd:"", mathStdUrl:"", elaStd:"", ssStd:"",
     scienceStd:"", csStd:"", cteStd:"",
     linkStandards:"", revisionCycle:"", stdComments:"", stdResources:"",
@@ -385,7 +386,8 @@ function parsePublicSheet(csv) {
     }
     if (section === "adoption") {
       if (c0 === "Date Updated")               d.updated = c1;
-      else if (c0 === "State K-12 Education Agency") d.agency = c1;
+      else if (c0 === "State K-12 Education Agency") { d.agency = c1; d.agencyUrl = c2; }
+      else if (c0 === "Implementation Tier")   d.implementationTier = c1;
       else if (c0 === "Type of Adoption")      d.typeAdoption = c1;
       else if (c0 === "Content Areas")         d.contentAreas = c1;
       else if (c0 === "Grade Band")            d.gradeBand = c1;
@@ -393,6 +395,8 @@ function parsePublicSheet(csv) {
       else if (c0 === "Useful Links")          { d.usefulLinks = c1; d.usefulLinksUrl = c2; }
     } else if (section === "landscape") {
       if      (c0 === "Superintendent / Commissioner") d.superintendent = c1;
+      else if (c0 === "Elected or Appointed")          d.electedAppointed = c1;
+      else if (c0 === "Term End")                      d.termEnd = c1;
       else if (c0 === "Political Party")               d.party = c1;
       else if (c0 === "Rural (30%+ population)")       d.rural = c1;
       else if (c0 === "Current Strategic Plan")        d.strategicPlan = c1;
@@ -578,10 +582,16 @@ function buildFilters() {
   });
 }
 function filterStates() { searchQuery = document.getElementById("search-input").value.toLowerCase(); renderList(); }
+function getStateTiers(s) {
+  var abbr = NAME_TO_ABBR[s.name];
+  if (abbr && STATE_ABBR_DATA[abbr]) return STATE_ABBR_DATA[abbr].tiers || [];
+  return [];
+}
 function stateMatchesTier(s) {
   if (activeFilter === "all") return true;
-  if (activeFilter === "tnone") return s.tiers.length === 0 || s.tiers.every(function(t) { return !t || t === "None"; });
-  return s.tiers.some(function(t) { return tierKey(t) === activeFilter; });
+  var tiers = getStateTiers(s);
+  if (activeFilter === "tnone") return tiers.length === 0 || tiers.every(function(t) { return !t || t === "None" || tierNum(t) === 4; });
+  return tiers.some(function(t) { return tierKey(t) === activeFilter; });
 }
 
 // ── Render list ───────────────────────────────────────────────────────────────
@@ -617,23 +627,23 @@ function renderList() {
     var updSpan = document.createElement("span"); updSpan.className = "state-updated"; updSpan.textContent = s.updated;
     nameRow.appendChild(nameSpan); nameRow.appendChild(updSpan);
     var tierRowDiv = document.createElement("div"); tierRowDiv.className = "tier-row";
-    var validTiers = s.tiers.filter(function(t) { return t && t !== "None"; });
-    var uniqueTierKeys = uniqueMap(validTiers, tierKey);
-    if (uniqueTierKeys.length === 0) { var dot = document.createElement("span"); dot.className = "tdot dtnone"; tierRowDiv.appendChild(dot); }
-    else { uniqueTierKeys.forEach(function(tk) { var dot = document.createElement("span"); dot.className = "tdot d" + tk; tierRowDiv.appendChild(dot); }); }
-    var sep = document.createElement("span"); sep.className = "goal-sep"; sep.textContent = "\u2192"; tierRowDiv.appendChild(sep);
-    var validGoals = s.goals.filter(function(g) { return g && g !== "None"; });
-    var uniqueGoalKeys = uniqueMap(validGoals, tierKey);
-    if (uniqueGoalKeys.length === 0) { var gdot = document.createElement("span"); gdot.className = "goal-dot"; gdot.style.borderColor = "#aaa"; gdot.style.marginLeft = "4px"; tierRowDiv.appendChild(gdot); }
-    else { uniqueGoalKeys.forEach(function(gk) { var gdot = document.createElement("span"); gdot.className = "goal-dot"; gdot.style.borderColor = goalDotColor(gk); gdot.style.marginLeft = "4px"; tierRowDiv.appendChild(gdot); }); }
-    var tierTexts = validTiers.length > 0 ? uniqueMap(validTiers, tierLabel).join(" + ") : "None";
-    var goalTexts = validGoals.length > 0 ? uniqueMap(validGoals, tierLabel).join(" + ") : "None";
-    var txtSpan = document.createElement("span"); txtSpan.className = "tier-text"; txtSpan.textContent = " " + tierTexts + " \u2192 " + goalTexts; tierRowDiv.appendChild(txtSpan);
-    if (s.mathStatusOverride) {
-      var badge = document.createElement("span");
-      badge.className = "std-status-badge " + stdBadgeClass(s.mathStatusOverride);
-      badge.textContent = mathStatusLabel(s.mathStatusOverride);
-      tierRowDiv.appendChild(badge);
+    var validTiers = getStateTiers(s).filter(function(t) { return t && t !== "None"; });
+    var hasNonTier4 = validTiers.some(function(t) { return tierNum(t) < 4; });
+    if (validTiers.length === 0) {
+      var dot = document.createElement("span"); dot.className = "tdot dtnone"; tierRowDiv.appendChild(dot);
+      var txtSpan = document.createElement("span"); txtSpan.className = "tier-text"; txtSpan.textContent = " None"; tierRowDiv.appendChild(txtSpan);
+    } else {
+      for (var ti = 0; ti < validTiers.length; ti++) {
+        var tk = tierKey(validTiers[ti]);
+        var dot = document.createElement("span"); dot.className = "tdot d" + tk; tierRowDiv.appendChild(dot);
+        var lbl = document.createElement("span"); lbl.className = "tier-text"; lbl.textContent = " " + tierLabel(validTiers[ti]); tierRowDiv.appendChild(lbl);
+        if (ti < validTiers.length - 1) { var sep = document.createElement("span"); sep.textContent = " "; tierRowDiv.appendChild(sep); }
+      }
+      if (!hasNonTier4) {
+        var sep2 = document.createElement("span"); sep2.textContent = " "; tierRowDiv.appendChild(sep2);
+        var dot2 = document.createElement("span"); dot2.className = "tdot dtnone"; tierRowDiv.appendChild(dot2);
+        var lbl2 = document.createElement("span"); lbl2.className = "tier-text"; lbl2.textContent = " None"; tierRowDiv.appendChild(lbl2);
+      }
     }
     info.appendChild(nameRow); info.appendChild(tierRowDiv);
     var chev = document.createElement("div"); chev.className = "chevron";
@@ -698,7 +708,7 @@ function renderDetailHero(s, fetched) {
   area.innerHTML = '<div class="detail-hero">' + iconHtml
     + '<div class="detail-state-name">' + esc(s.name) + "</div>"
     + '<div class="detail-agency">' + esc(agency) + "</div>"
-    + '<div class="detail-updated"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#f9c6a4" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Updated ' + esc(s.updated) + "</div>"
+    + '<div class="detail-updated"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#f9c6a4" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Updated ' + esc((fetched && fetched.updated) ? fetched.updated : s.updated) + "</div>"
     + "</div>";
 }
 
@@ -743,19 +753,10 @@ function renderOverview(s, fetched) {
   var h = "";
 
   h += '<div class="card"><div class="card-header">At a Glance</div>';
-  // Tiers (slim)
-  var vt = s.tiers.filter(function(t) { return t && t !== "None"; });
-  h += '<div class="card-row"><div class="row-label">Implementation tier(s)</div><div class="pills">';
-  if (vt.length === 0) h += '<span class="pill pill-tnone">None</span>';
-  else vt.forEach(function(t) { h += '<span class="pill pill-' + tierKey(t) + '">' + esc(t) + "</span>"; });
-  h += "</div></div>";
-  // Statewide adoption (slim)
-  if (s.statewide) h += '<div class="card-row"><div class="row-label">Statewide adoption</div><div class="row-value">' + esc(s.statewide) + "</div></div>";
-  // Type/content/grade (fetched)
+  if (fetched && fetched.implementationTier) h += '<div class="card-row"><div class="row-label">Implementation tier</div><div class="row-value">' + esc(fetched.implementationTier).replace(/\n/g,"<br>") + "</div></div>";
   if (fetched && fetched.typeAdoption) h += '<div class="card-row"><div class="row-label">Type of adoption</div><div class="row-value">' + esc(fetched.typeAdoption).replace(/\n/g,"<br>") + "</div></div>";
   if (fetched && fetched.contentAreas) h += '<div class="card-row"><div class="row-label">Content areas</div><div class="row-value">' + esc(fetched.contentAreas).replace(/\n/g,"<br>") + "</div></div>";
   if (fetched && fetched.gradeBand)    h += '<div class="card-row"><div class="row-label">Grade band</div><div class="row-value">' + esc(fetched.gradeBand) + "</div></div>";
-  // Grad req (fetched)
   if (fetched && (fetched.gradCredits || fetched.gradCoursework)) {
     h += '<div class="card-row"><div class="row-label">Graduation requirements</div><div class="row-value">';
     if (fetched.gradCredits) h += esc(fetched.gradCredits) + " math credits";
@@ -765,20 +766,22 @@ function renderOverview(s, fetched) {
   }
   h += "</div>";
 
-  // Math standards status (slim override)
-  if (s.mathStatusOverride) {
-    h += '<div class="card"><div class="card-header">Math Standards Status</div>';
-    var siClass = stdStatusClass(s.mathStatusOverride);
-    h += '<div class="card-row"><div style="display:flex;align-items:center;gap:8px;">';
-    h += '<span class="ov-status-dot ' + siClass + '"></span>';
-    h += '<div class="ov-status-label">' + esc(s.mathStatusOverride) + "</div></div></div>";
-    h += "</div>";
-  }
-
   // Internal notes (private)
   if (priv && priv.internal) {
     h += '<div class="card card-private"><div class="card-header"><span class="private-badge">&#x1F512; Internal Notes</span></div>';
     h += '<div class="card-row"><div class="row-value">' + esc(priv.internal).replace(/\n/g,"<br>") + "</div></div></div>";
+  }
+
+  // Educational landscape (fetched)
+  if (fetched && (fetched.superintendent || fetched.party || fetched.rural)) {
+    h += '<div class="card"><div class="card-header">Educational Landscape</div>';
+    if (fetched.superintendent) h += '<div class="card-row"><div class="row-label">Superintendent / Commissioner</div><div class="row-value">' + esc(fetched.superintendent) + "</div></div>";
+    if (fetched.electedAppointed) h += '<div class="card-row"><div class="row-label">Elected or Appointed</div><div class="row-value">' + esc(fetched.electedAppointed) + "</div></div>";
+    if (fetched.termEnd) h += '<div class="card-row"><div class="row-label">Term End</div><div class="row-value">' + esc(fetched.termEnd) + "</div></div>";
+    if (fetched.party) h += '<div class="card-row"><div class="row-label">Political Party</div><div class="row-value">' + esc(fetched.party) + "</div></div>";
+    if (fetched.rural) h += '<div class="card-row"><div class="row-label">Rural (30%+ population)</div><div class="row-value">' + esc(fetched.rural) + "</div></div>";
+    if (fetched.strategicPlan) h += '<div class="card-row"><div class="row-label">Strategic Plan</div><div class="row-value">' + esc(fetched.strategicPlan) + "</div></div>";
+    h += "</div>";
   }
 
   // Additional comments (fetched)
@@ -806,19 +809,14 @@ function renderAdoption(s, fetched) {
   var h = "";
 
   h += '<div class="card"><div class="card-header">Adoption Overview</div>';
-  var vt = s.tiers.filter(function(t) { return t && t !== "None"; });
-  h += '<div class="card-row"><div class="row-label">Current tier(s)</div><div class="pills">';
-  if (vt.length === 0) h += '<span class="pill pill-tnone">None</span>';
-  else vt.forEach(function(t) { h += '<span class="pill pill-' + tierKey(t) + '">' + esc(t) + "</span>"; });
-  h += "</div></div>";
-  var vg = s.goals.filter(function(g) { return g && g !== "None"; });
-  h += '<div class="card-row"><div class="row-label">Goal by Oct 2026</div><div class="pills">';
-  if (vg.length === 0) h += '<span class="pill pill-tnone">None</span>';
-  else vg.forEach(function(g) { h += '<span class="pill pill-goal">' + esc(g) + "</span>"; });
-  h += "</div></div>";
+  if (fetched && fetched.implementationTier) h += '<div class="card-row"><div class="row-label">Implementation tier</div><div class="row-value">' + esc(fetched.implementationTier).replace(/\n/g,"<br>") + "</div></div>";
   if (fetched && fetched.typeAdoption) h += '<div class="card-row"><div class="row-label">Type of adoption</div><div class="row-value">' + esc(fetched.typeAdoption).replace(/\n/g,"<br>") + "</div></div>";
   if (fetched && fetched.contentAreas) h += '<div class="card-row"><div class="row-label">Content areas</div><div class="row-value">' + esc(fetched.contentAreas).replace(/\n/g,"<br>") + "</div></div>";
   if (fetched && fetched.gradeBand)    h += '<div class="card-row"><div class="row-label">Grade band</div><div class="row-value">' + esc(fetched.gradeBand) + "</div></div>";
+  if (fetched && fetched.agency) {
+    var agencyVal = fetched.agencyUrl ? '<a class="useful-link" href="' + esc(fetched.agencyUrl) + '" target="_blank" rel="noopener">' + esc(fetched.agency) + "</a>" : esc(fetched.agency);
+    h += '<div class="card-row"><div class="row-label">State agency</div><div class="row-value">' + agencyVal + "</div></div>";
+  }
   h += "</div>";
 
   // Course codes
@@ -993,17 +991,50 @@ var ABBR_TO_NAME = {
   "WA":"Washington","WV":"West Virginia","WI":"Wisconsin","WY":"Wyoming"
 };
 function tierNum(t) { if (!t || t === "None") return -1; var m = t.match(/Tier (\d)/); return m ? parseInt(m[1]) : -1; }
-var STATE_ABBR_DATA = {};
-STATES.forEach(function(s) {
-  var abbr = null;
-  var keys = Object.keys(ABBR_TO_NAME);
-  for (var i = 0; i < keys.length; i++) { if (ABBR_TO_NAME[keys[i]] === s.name) { abbr = keys[i]; break; } }
-  if (abbr) {
-    var nums = s.tiers.map(tierNum); nums.push(-1);
+// Build reverse lookup: state name → abbreviation
+var NAME_TO_ABBR = {};
+var _abbrKeys = Object.keys(ABBR_TO_NAME);
+for (var _i = 0; _i < _abbrKeys.length; _i++) { NAME_TO_ABBR[ABBR_TO_NAME[_abbrKeys[_i]]] = _abbrKeys[_i]; }
+
+var STATE_ABBR_DATA = {"AL":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program","Tier 1: State Course Code"],"name":"Alabama"},"AK":{"tier":0,"tiers":[],"name":"Alaska"},"AZ":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program","Tier 1: State Course Code"],"name":"Arizona"},"AR":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program","Tier 1: State Course Code"],"name":"Arkansas"},"CA":{"tier":3,"tiers":["Tier 3: Standards Adoption"],"name":"California"},"CO":{"tier":2,"tiers":["Tier 1: State Course Code","Tier 2: Course Pilot or Teacher Professional Development Program"],"name":"Colorado"},"CT":{"tier":1,"tiers":["Tier 1: State Course Code"],"name":"Connecticut"},"DE":{"tier":0,"tiers":[],"name":"Delaware"},"DC":{"tier":1,"tiers":["Tier 1: State Course Code"],"name":"District of Columbia"},"FL":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program","Tier 1: State Course Code"],"name":"Florida"},"GA":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program","Tier 1: State Course Code"],"name":"Georgia"},"HI":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program"],"name":"Hawaii"},"ID":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program","Tier 1: State Course Code"],"name":"Idaho"},"IL":{"tier":1,"tiers":["Tier 1: State Course Code"],"name":"Illinois"},"IN":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program"],"name":"Indiana"},"IA":{"tier":1,"tiers":["Tier 1: State Course Code"],"name":"Iowa"},"KS":{"tier":0,"tiers":[],"name":"Kansas"},"KY":{"tier":1,"tiers":["Tier 1: State Course Code"],"name":"Kentucky"},"LA":{"tier":0,"tiers":[],"name":"Louisiana"},"ME":{"tier":0,"tiers":[],"name":"Maine"},"MD":{"tier":0,"tiers":[],"name":"Maryland"},"MA":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program","Tier 1: State Course Code"],"name":"Massachusetts"},"MI":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program","Tier 1: State Course Code"],"name":"Michigan"},"MN":{"tier":3,"tiers":["Tier 3: Standards Adoption","Tier 1: State Course Code","Tier 2: Course Pilot or Teacher Professional Development Program"],"name":"Minnesota"},"MS":{"tier":0,"tiers":[],"name":"Mississippi"},"MO":{"tier":0,"tiers":[],"name":"Missouri"},"MT":{"tier":3,"tiers":["Tier 3: Standards Adoption","Tier 1: State Course Code"],"name":"Montana"},"NE":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program","Tier 1: State Course Code"],"name":"Nebraska"},"NV":{"tier":0,"tiers":[],"name":"Nevada"},"NH":{"tier":4,"tiers":["Tier 4: Graduation Requirement"],"name":"New Hampshire"},"NJ":{"tier":3,"tiers":["Tier 3: Standards Adoption","Tier 1: State Course Code"],"name":"New Jersey"},"NM":{"tier":1,"tiers":["Tier 1: State Course Code"],"name":"New Mexico"},"NY":{"tier":1,"tiers":["Tier 1: State Course Code"],"name":"New York"},"NC":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program","Tier 1: State Course Code"],"name":"North Carolina"},"ND":{"tier":0,"tiers":[],"name":"North Dakota"},"OH":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program","Tier 1: State Course Code"],"name":"Ohio"},"OK":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program"],"name":"Oklahoma"},"OR":{"tier":4,"tiers":["Tier 4: Graduation Requirement","Tier 3: Standards Adoption"],"name":"Oregon"},"PA":{"tier":1,"tiers":["Tier 1: State Course Code"],"name":"Pennsylvania"},"RI":{"tier":0,"tiers":[],"name":"Rhode Island"},"SC":{"tier":0,"tiers":[],"name":"South Carolina"},"SD":{"tier":1,"tiers":["Tier 1: State Course Code"],"name":"South Dakota"},"VT":{"tier":0,"tiers":[],"name":"Vermont"},"TN":{"tier":1,"tiers":["Tier 1: State Course Code"],"name":"Tennessee"},"TX":{"tier":0,"tiers":[],"name":"Texas"},"UT":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program"],"name":"Utah"},"VA":{"tier":3,"tiers":["Tier 3: Standards Adoption","Tier 1: State Course Code"],"name":"Virginia"},"WA":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program","Tier 1: State Course Code"],"name":"Washington"},"WV":{"tier":3,"tiers":["Tier 3: Standards Adoption","Tier 1: State Course Code"],"name":"West Virginia"},"WI":{"tier":1,"tiers":["Tier 1: State Course Code"],"name":"Wisconsin"},"WY":{"tier":1,"tiers":["Tier 1: State Course Code"],"name":"Wyoming"}};
+
+// Parse the "State Tiers" CSV tab into STATE_ABBR_DATA
+function parseStateTiersCSV(csv) {
+  var rows = parseCSV(csv);
+  for (var i = 1; i < rows.length; i++) {
+    var name = (rows[i][0] || "").trim();
+    var tiersStr = (rows[i][1] || "").trim();
+    if (!name) continue;
+    var abbr = NAME_TO_ABBR[name];
+    if (!abbr) continue;
+    var tiers = [];
+    if (tiersStr && tiersStr !== "None") {
+      var parts = tiersStr.split(", Tier ");
+      for (var j = 0; j < parts.length; j++) {
+        var p = (j === 0 ? parts[j] : "Tier " + parts[j]).trim();
+        if (p && p !== "None") tiers.push(p);
+      }
+    }
+    var nums = tiers.map(tierNum); nums.push(-1);
     var highest = Math.max.apply(null, nums);
-    STATE_ABBR_DATA[abbr] = {tier:highest, name:s.name};
+    STATE_ABBR_DATA[abbr] = {tier: highest, tiers: tiers, name: name};
   }
-});
+}
+
+// Fetch tier data from Google Sheet to refresh baked-in data (optional — page renders from baked data immediately)
+function loadTierData() {
+  var url = PUBLIC_SHEET_BASE + "State%20Tiers";
+  fetch(url)
+    .then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
+    .then(function(csv) {
+      parseStateTiersCSV(csv);
+      initMap();
+      renderList();
+    })
+    .catch(function(err) {
+      console.log("Tier sheet unavailable, using baked-in data:", err.message);
+    });
+}
 
 function applyMapColors() {
   var container = document.getElementById("us-map-container");
@@ -1011,7 +1042,10 @@ function applyMapColors() {
     var abbr = el.id;
     var d = STATE_ABBR_DATA[abbr];
     if (!d) return;
-    el.setAttribute("fill", TIER_FILL[d.tier] || "#b8b6b6");
+    var mapTier = 0;
+    var tiers = d.tiers || [];
+    for (var ti = 0; ti < tiers.length; ti++) { var tn = tierNum(tiers[ti]); if (tn < 4 && tn > mapTier) mapTier = tn; }
+    el.setAttribute("fill", TIER_FILL[mapTier] || "#b8b6b6");
     el.setAttribute("stroke", "#ffffff");
     el.setAttribute("stroke-width", "0.8");
     el.style.cursor = "pointer";
@@ -1070,8 +1104,9 @@ function switchTab(tab) {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 buildFilters();
-renderList();
 initMap();
+renderList();
+loadTierData(); // refreshes from Google Sheet if reachable
 </script>
 
 <!-- ═══════════════════════════ PASSWORD MODAL ═══════════════════════════ -->
