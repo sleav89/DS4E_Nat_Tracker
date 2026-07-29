@@ -173,6 +173,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .contact-title{font-size:12px;color:#666;margin-top:2px;}
 .contact-email{font-size:12px;color:#6290c8;margin-top:2px;}
 .contact-role{display:inline-block;font-size:11px;background:#f2f2f7;color:#666;border-radius:10px;padding:2px 8px;margin-top:4px;}
+.contact-vip{display:inline-block;font-size:10px;font-weight:700;background:#7c2d12;color:#fff;border-radius:10px;padding:2px 8px;margin-left:6px;letter-spacing:0.3px;vertical-align:middle;}
 .contact-notes{font-size:12px;color:#444;margin-top:4px;padding-top:4px;border-top:0.5px solid #f0f0f0;}
 
 /* ── LOCK BUTTON ── */
@@ -196,7 +197,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .modal-btn-submit:disabled{opacity:0.5;cursor:not-allowed;}
 
 /* ── CONF EVENT ── */
-.tl-conf{border-left:3px solid #66c2a4;padding-left:8px;margin-top:4px;}
+.tl-conf{grid-column:2;border-left:3px solid #66c2a4;padding-left:8px;margin-top:4px;}
 .tl-conf-label{font-size:11px;color:#4c8c7a;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
 
 /* ── USEFUL LINKS ── */
@@ -439,7 +440,7 @@ function parsePrivateSheet(rows) {
     var r = rows[i];
     var c0 = r[0] ? String(r[0]).trim() : "";
     if (c0 === "INTERNAL INFORMATION")        { section = "internal"; continue; }
-    if (c0 === "Data")                         { section = "data"; inData = false; continue; }
+    if (c0.toUpperCase() === "DATA")           { section = "data"; inData = false; continue; }
     if (c0 === "POINTS OF CONTACT")           { section = "contacts"; inContacts = false; continue; }
     if (c0 === "CONFIDENTIAL EVENTS TRACKER") { section = "events"; inEvents = false; continue; }
     if (section === "internal" && c0 === "Internal Notes") d.internal = String(r[1] || "").trim();
@@ -461,7 +462,8 @@ function parsePrivateSheet(rows) {
           first: c0, last: String(r[1]||"").trim(),
           title: String(r[2]||"").trim(), org: String(r[3]||"").trim(),
           email: String(r[4]||"").trim(), role: String(r[5]||"").trim(),
-          notes: String(r[6]||"").trim()
+          vip: String(r[6]||"").trim().toLowerCase() === "yes",
+          notes: String(r[7]||"").trim()
         });
       }
     }
@@ -575,6 +577,32 @@ function uniqueMap(arr, fn) {
 function esc(s) {
   if (!s) return "";
   return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+// Extract "Label (https://url)" or "Label (www.url)" → {display, url}
+function extractEmbeddedUrl(text) {
+  if (!text) return {display: "", url: ""};
+  var m = text.match(/^(.*?)\s*\(((?:https?:\/\/|www\.)[^)]+)\)\s*$/);
+  if (m) return {display: m[1].trim() || text, url: m[2].trim()};
+  return {display: text, url: ""};
+}
+
+// Render raw text as safe HTML, converting embedded (URL) patterns to clickable links
+function renderWithInlineLinks(rawText) {
+  if (!rawText) return "";
+  var urlRe = /\(((?:https?:\/\/|www\.)[^)]+)\)/g;
+  var result = "";
+  var lastIndex = 0;
+  var m;
+  while ((m = urlRe.exec(rawText)) !== null) {
+    result += esc(rawText.slice(lastIndex, m.index));
+    var url = m[1];
+    var href = url.indexOf("http") === 0 ? url : "http://" + url;
+    result += '(<a href="' + esc(href) + '" target="_blank" rel="noopener" style="color:#ef4a23;text-decoration:underline;">' + esc(url) + '</a>)';
+    lastIndex = urlRe.lastIndex;
+  }
+  result += esc(rawText.slice(lastIndex));
+  return result;
 }
 
 // ── Standards status helpers ──────────────────────────────────────────────────
@@ -841,8 +869,10 @@ function goBack() {
 
 function renderDetailHero(s, fetched) {
   var area = document.getElementById("detail-hero-area");
-  var agency = (fetched && fetched.agency) ? fetched.agency : "";
-  var agencyUrl = (fetched && fetched.agencyUrl) ? fetched.agencyUrl : "";
+  var agencyRaw = (fetched && fetched.agency) ? fetched.agency : "";
+  var agencyParsed = extractEmbeddedUrl(agencyRaw);
+  var agency = agencyParsed.display || agencyRaw;
+  var agencyUrl = agencyParsed.url || ((fetched && fetched.agencyUrl) ? fetched.agencyUrl : "");
   var agencyHtml = agency
     ? (agencyUrl
         ? '<a href="' + esc(agencyUrl) + '" target="_blank" rel="noopener" style="color:#b8b6b6;font-size:11px;margin-top:2px;display:block;text-decoration:underline;">' + esc(agency) + "</a>"
@@ -928,7 +958,13 @@ function renderOverview(s, fetched) {
     if (fetched.termEnd) h += '<div class="card-row"><div class="row-label">Term End</div><div class="row-value">' + esc(fetched.termEnd) + "</div></div>";
     if (fetched.party) h += '<div class="card-row"><div class="row-label">Political Party</div><div class="row-value">' + esc(fetched.party) + "</div></div>";
     if (fetched.rural) h += '<div class="card-row"><div class="row-label">Rural (30%+ population)</div><div class="row-value">' + esc(fetched.rural) + "</div></div>";
-    if (fetched.strategicPlan) h += '<div class="card-row"><div class="row-label">Strategic Plan</div><div class="row-value">' + esc(fetched.strategicPlan) + "</div></div>";
+    if (fetched.strategicPlan) {
+      var spParsed = extractEmbeddedUrl(fetched.strategicPlan);
+      var spHtml = spParsed.url
+        ? '<a class="useful-link" href="' + esc(spParsed.url) + '" target="_blank" rel="noopener">' + esc(spParsed.display) + '</a>'
+        : esc(spParsed.display);
+      h += '<div class="card-row"><div class="row-label">Strategic Plan</div><div class="row-value">' + spHtml + "</div></div>";
+    }
     h += "</div>";
   }
 
@@ -941,11 +977,21 @@ function renderOverview(s, fetched) {
   // Useful links (fetched)
   if (fetched && fetched.usefulLinks) {
     h += '<div class="card"><div class="card-header">Useful Links</div><div class="card-row"><div class="row-value">';
-    if (fetched.usefulLinksUrl) {
-      h += '<a class="useful-link" href="' + esc(fetched.usefulLinksUrl) + '" target="_blank" rel="noopener">' + esc(fetched.usefulLinks) + "</a>";
-    } else {
-      h += esc(fetched.usefulLinks).replace(/\n/g,"<br>");
+    var ulLines = fetched.usefulLinks.split("\n");
+    var ulParts = [];
+    for (var uli = 0; uli < ulLines.length; uli++) {
+      var ulLine = ulLines[uli].trim();
+      if (!ulLine) continue;
+      var ulParsed = extractEmbeddedUrl(ulLine);
+      if (ulParsed.url) {
+        ulParts.push('<a class="useful-link" href="' + esc(ulParsed.url) + '" target="_blank" rel="noopener">' + esc(ulParsed.display || ulLine) + '</a>');
+      } else if (fetched.usefulLinksUrl) {
+        ulParts.push('<a class="useful-link" href="' + esc(fetched.usefulLinksUrl) + '" target="_blank" rel="noopener">' + esc(ulLine) + '</a>');
+      } else {
+        ulParts.push(esc(ulLine));
+      }
     }
+    h += ulParts.join("<br>");
     h += "</div></div></div>";
   }
   return h;
@@ -988,7 +1034,12 @@ function renderAdoption(s, fetched) {
         codes.forEach(function(cc) { h += '<div class="code-row"><div class="code-num">' + esc(cc.code) + '</div><div class="code-title">' + esc(cc.title) + "</div></div>"; });
       }
       if (fetched.courseCategory) h += '<div class="card-row"><div class="row-label">Category</div><div class="row-value">' + esc(fetched.courseCategory).replace(/\n/g,", ") + "</div></div>";
-      if (fetched.linkCatalog) h += '<div class="card-row"><div class="row-label">Course catalog</div><div class="row-value"><a class="useful-link" href="' + esc(fetched.linkCatalog) + '" target="_blank" rel="noopener">View catalog</a></div></div>';
+      if (fetched.linkCatalog) {
+        var catParsed = extractEmbeddedUrl(fetched.linkCatalog);
+        var catUrl = catParsed.url || fetched.linkCatalog;
+        var catLabel = catParsed.url ? catParsed.display : "View catalog";
+        h += '<div class="card-row"><div class="row-label">Course catalog</div><div class="row-value"><a class="useful-link" href="' + esc(catUrl) + '" target="_blank" rel="noopener">' + esc(catLabel) + '</a></div></div>';
+      }
       h += "</div>";
     }
   }
@@ -998,7 +1049,16 @@ function renderAdoption(s, fetched) {
     h += '<div class="card"><div class="card-header">Graduation Requirements</div>';
     if (fetched.gradCredits) h += '<div class="card-row"><div class="row-label">Math credits required</div><div class="row-value">' + esc(fetched.gradCredits) + "</div></div>";
     if (fetched.gradCoursework) h += '<div class="card-row"><div class="row-label">Required coursework</div><div class="row-value">' + esc(fetched.gradCoursework).replace(/\n/g,"<br>") + "</div></div>";
-    if (fetched.gradReqResources) h += '<div class="card-row"><div class="row-label">Resources</div><div class="row-value">' + esc(fetched.gradReqResources).replace(/\n/g,"<br>") + "</div></div>";
+    if (fetched.gradReqResources) {
+      var grLines = fetched.gradReqResources.split("\n");
+      var grParts = [];
+      for (var gri = 0; gri < grLines.length; gri++) {
+        var grLine = grLines[gri].trim();
+        if (!grLine) continue;
+        grParts.push(renderWithInlineLinks(grLine));
+      }
+      h += '<div class="card-row"><div class="row-label">Resources</div><div class="row-value">' + grParts.join("<br>") + "</div></div>";
+    }
     h += "</div>";
   }
 
@@ -1022,19 +1082,45 @@ function renderAdoption(s, fetched) {
       if (yrParts.length > 1) { yrHtml += '<span class="tl-year-sub">' + yrParts.slice(1).map(esc).join(" ") + '</span>'; }
       h += '<div class="timeline-item"><div class="tl-year">' + yrHtml + "</div>";
       if (entry.pub) {
-        h += '<div class="tl-text">' + entry.pub.event.split("\n").map(function(line) { var ci = line.indexOf(":"); return ci > 0 ? "<strong>" + esc(line.slice(0,ci+1)) + "</strong>" + esc(line.slice(ci+1)) : esc(line); }).join("<br>");
+        var tlEventLines = entry.pub.event.split("\n");
+        var tlPendingLinks = [];
+        var tlTextParts = [];
+        for (var tei = 0; tei < tlEventLines.length; tei++) {
+          var eline = tlEventLines[tei].trim();
+          if (!eline) continue;
+          if (eline.toLowerCase().indexOf("links:") === 0) {
+            // "Links: Label (https://url)" — extract pill link
+            var linkText = eline.slice(eline.indexOf(":") + 1).trim();
+            var linkParsed = extractEmbeddedUrl(linkText);
+            if (linkParsed.url) {
+              tlPendingLinks.push({label: linkParsed.display || linkText, url: linkParsed.url});
+            } else if (linkText.indexOf("http") === 0) {
+              tlPendingLinks.push({label: "View source", url: linkText});
+            }
+          } else {
+            var ci = eline.indexOf(":");
+            if (ci > 0 && ci < 50) {
+              tlTextParts.push("<strong>" + esc(eline.slice(0, ci + 1)) + "</strong>" + renderWithInlineLinks(eline.slice(ci + 1)));
+            } else {
+              tlTextParts.push(renderWithInlineLinks(eline));
+            }
+          }
+        }
+        h += '<div class="tl-text">' + tlTextParts.join("<br>");
+        // Combine column-C links (old format) with "Links:" line links (new format)
         var tlLinks = parseTimelineLinks(entry.pub.url);
-        if (tlLinks.length > 0) {
+        var allTlLinks = tlPendingLinks.concat(tlLinks);
+        if (allTlLinks.length > 0) {
           h += '<br>';
-          for (var tli = 0; tli < tlLinks.length; tli++) {
-            h += '<a class="std-link-pill" style="margin-top:4px;margin-right:4px;display:inline-block;" href="' + esc(tlLinks[tli].url) + '" target="_blank" rel="noopener">' + esc(tlLinks[tli].label) + ' ↗</a>';
+          for (var tli = 0; tli < allTlLinks.length; tli++) {
+            h += '<a class="std-link-pill" style="margin-top:4px;margin-right:4px;display:inline-block;" href="' + esc(allTlLinks[tli].url) + '" target="_blank" rel="noopener">' + esc(allTlLinks[tli].label) + ' ↗</a>';
           }
         }
         h += "</div>";
       }
       if (entry.conf) {
         h += '<div class="tl-conf"><div class="tl-conf-label">&#x1F512; Confidential</div>';
-        h += '<div class="tl-text">' + esc(entry.conf.notes).replace(/\n/g,"<br>") + "</div></div>";
+        h += '<div class="tl-text">' + renderWithInlineLinks(entry.conf.notes).replace(/\n/g,"<br>") + "</div></div>";
       }
       h += "</div>";
     });
@@ -1083,12 +1169,12 @@ function renderContacts(s) {
   var h = '<div class="card"><div class="card-header">Points of Contact</div>';
   priv.contacts.forEach(function(c) {
     h += '<div class="contact-row">';
-    if (c.first || c.last) h += '<div class="contact-name">' + esc((c.first + " " + c.last).trim()) + "</div>";
+    if (c.first || c.last) h += '<div class="contact-name">' + esc((c.first + " " + c.last).trim()) + (c.vip ? '<span class="contact-vip">★ VIP</span>' : '') + "</div>";
     if (c.title) h += '<div class="contact-title">' + esc(c.title) + "</div>";
     if (c.org) h += '<div class="contact-title" style="color:#888;">' + esc(c.org) + "</div>";
     if (c.email) h += '<div class="contact-email"><a href="mailto:' + esc(c.email) + '">' + esc(c.email) + "</a></div>";
     if (c.role) h += '<div><span class="contact-role">' + esc(c.role) + "</span></div>";
-    if (c.notes) h += '<div class="contact-notes">' + esc(c.notes).replace(/\n/g,"<br>") + "</div>";
+    if (c.notes) h += '<div class="contact-notes">' + renderWithInlineLinks(c.notes).replace(/\n/g,"<br>") + "</div>";
     h += "</div>";
   });
   h += "</div>";
@@ -1119,14 +1205,14 @@ function renderStandards(s, fetched) {
     for (var li = 0; li < lines.length; li++) {
       var line = lines[li].trim();
       if (!line) continue;
-      if (line.toLowerCase().indexOf("link to") === 0 || line.toLowerCase().indexOf("link:") === 0) {
-        // URL may be embedded in parens at end of line: "Link to 2020 Math Standards (https://...)"
+      var stdParenMatch = line.match(/\(https?:\/\/[^)]+\)/);
+      if (line.toLowerCase().indexOf("link to") === 0 || line.toLowerCase().indexOf("link:") === 0 || stdParenMatch) {
+        // Any line starting with "link to"/"link:" OR containing an embedded (URL) → render as pill
         var embeddedUrl = null;
         var lineDisplay = line;
-        var parenMatch = line.match(/\(https?:\/\/[^)]+\)/);
-        if (parenMatch) {
-          embeddedUrl = parenMatch[0].slice(1, -1);
-          lineDisplay = line.replace(parenMatch[0], "").trim();
+        if (stdParenMatch) {
+          embeddedUrl = stdParenMatch[0].slice(1, -1);
+          lineDisplay = line.replace(stdParenMatch[0], "").trim();
         }
         var href = embeddedUrl || ((sub.url && !linkUsed) ? (linkUsed = true, sub.url) : "");
         if (!embeddedUrl) linkUsed = true;
@@ -1145,8 +1231,11 @@ function renderStandards(s, fetched) {
   h += "</div>";
 
   if (fetched.linkStandards) {
+    var lsParsed = extractEmbeddedUrl(fetched.linkStandards);
+    var lsUrl = lsParsed.url || fetched.linkStandards;
+    var lsLabel = lsParsed.url ? lsParsed.display : "State Standards Page";
     h += '<div class="card"><div class="card-header">Standards Resources</div>';
-    h += '<div class="card-row"><div class="row-value"><a class="useful-link" href="' + esc(fetched.linkStandards) + '" target="_blank" rel="noopener">State Standards Page</a></div></div>';
+    h += '<div class="card-row"><div class="row-value"><a class="useful-link" href="' + esc(lsUrl) + '" target="_blank" rel="noopener">' + esc(lsLabel) + '</a></div></div>';
     h += "</div>";
   }
   if (fetched.revisionCycle) {
