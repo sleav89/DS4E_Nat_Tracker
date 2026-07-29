@@ -152,7 +152,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .std-row:last-child{border-bottom:none;}
 .std-subj{font-size:11px;font-weight:600;color:#555;padding-top:1px;}
 .std-detail{font-size:12px;color:#444;line-height:1.6;}
-.std-link-pill{display:inline-block;margin-top:3px;padding:3px 10px;border-radius:12px;background:#eef3fa;color:#185fa5;font-size:11px;font-weight:500;text-decoration:none;border:0.5px solid #b8d0ef;}
+.std-link-pill{display:inline-block;margin-top:3px;margin-right:4px;padding:3px 10px;border-radius:12px;background:#eef3fa;color:#185fa5;font-size:11px;font-weight:500;text-decoration:none;border:0.5px solid #b8d0ef;}
 .std-link-pill:hover{background:#ddeaf8;}
 .std-revision-tag{display:inline-block;margin-top:3px;font-size:10px;font-weight:600;color:#92400e;background:#fef3e2;border:0.5px solid #f59e0b;border-radius:10px;padding:2px 9px;letter-spacing:0.1px;}
 .std-year{color:#ef4a23;font-weight:600;}
@@ -579,27 +579,42 @@ function esc(s) {
   return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
 
-// Extract "Label (https://url)" or "Label (www.url)" → {display, url}
+// Extract a single link from text.
+// Handles: "[Label (URL)]" bracket format and "Label (URL)" inline format.
+// Returns {display, url, trailing} — trailing is any text after the bracket (if bracket format).
 function extractEmbeddedUrl(text) {
-  if (!text) return {display: "", url: ""};
-  var m = text.match(/^(.*?)\s*\(((?:https?:\/\/|www\.)[^)]+)\)\s*$/);
-  if (m) return {display: m[1].trim() || text, url: m[2].trim()};
-  return {display: text, url: ""};
+  if (!text) return {display: "", url: "", trailing: ""};
+  // [Label (URL)] format — may have trailing text after the closing bracket
+  var m1 = text.match(/^\[([^\]]*?)\s*\((https?:\/\/[^)]+)\)\s*\](.*)/);
+  if (m1) return {display: m1[1].trim(), url: m1[2].trim(), trailing: m1[3].trim()};
+  // Label (URL) format — URL at end of string
+  var m2 = text.match(/^(.*?)\s*\(((?:https?:\/\/|www\.)[^)]+)\)\s*$/);
+  if (m2) return {display: m2[1].trim() || text, url: m2[2].trim(), trailing: ""};
+  return {display: text, url: "", trailing: ""};
 }
 
-// Render raw text as safe HTML, converting embedded (URL) patterns to clickable links
+// Render raw text as safe HTML.
+// Converts "[Label (URL)]" and "(URL)" patterns to std-link-pill buttons.
+// Surrounding text is HTML-escaped.
 function renderWithInlineLinks(rawText) {
   if (!rawText) return "";
-  var urlRe = /\(((?:https?:\/\/|www\.)[^)]+)\)/g;
+  // Matches: [Label (URL)] OR (URL) OR (www.url)
+  var combinedRe = /\[([^\]]*?)\s*\((https?:\/\/[^)]+)\)\s*\]|\(((?:https?:\/\/|www\.)[^)]+)\)/g;
   var result = "";
   var lastIndex = 0;
   var m;
-  while ((m = urlRe.exec(rawText)) !== null) {
+  while ((m = combinedRe.exec(rawText)) !== null) {
     result += esc(rawText.slice(lastIndex, m.index));
-    var url = m[1];
-    var href = url.indexOf("http") === 0 ? url : "http://" + url;
-    result += '(<a href="' + esc(href) + '" target="_blank" rel="noopener" style="color:#ef4a23;text-decoration:underline;">' + esc(url) + '</a>)';
-    lastIndex = urlRe.lastIndex;
+    if (m[1] !== undefined) {
+      // [Label (URL)] bracket format
+      result += '<a class="std-link-pill" href="' + esc(m[2]) + '" target="_blank" rel="noopener">' + esc(m[1].trim()) + ' ↗</a>';
+    } else {
+      // (URL) or (www.url) inline format
+      var url = m[3];
+      var href = url.indexOf("http") === 0 ? url : "http://" + url;
+      result += '<a class="std-link-pill" href="' + esc(href) + '" target="_blank" rel="noopener">' + esc(url) + ' ↗</a>';
+    }
+    lastIndex = combinedRe.lastIndex;
   }
   result += esc(rawText.slice(lastIndex));
   return result;
@@ -961,7 +976,7 @@ function renderOverview(s, fetched) {
     if (fetched.strategicPlan) {
       var spParsed = extractEmbeddedUrl(fetched.strategicPlan);
       var spHtml = spParsed.url
-        ? '<a class="useful-link" href="' + esc(spParsed.url) + '" target="_blank" rel="noopener">' + esc(spParsed.display) + '</a>'
+        ? '<a class="std-link-pill" href="' + esc(spParsed.url) + '" target="_blank" rel="noopener">' + esc(spParsed.display) + ' ↗</a>'
         : esc(spParsed.display);
       h += '<div class="card-row"><div class="row-label">Strategic Plan</div><div class="row-value">' + spHtml + "</div></div>";
     }
@@ -984,9 +999,9 @@ function renderOverview(s, fetched) {
       if (!ulLine) continue;
       var ulParsed = extractEmbeddedUrl(ulLine);
       if (ulParsed.url) {
-        ulParts.push('<a class="useful-link" href="' + esc(ulParsed.url) + '" target="_blank" rel="noopener">' + esc(ulParsed.display || ulLine) + '</a>');
+        ulParts.push('<a class="std-link-pill" href="' + esc(ulParsed.url) + '" target="_blank" rel="noopener">' + esc(ulParsed.display || ulLine) + ' ↗</a>');
       } else if (fetched.usefulLinksUrl) {
-        ulParts.push('<a class="useful-link" href="' + esc(fetched.usefulLinksUrl) + '" target="_blank" rel="noopener">' + esc(ulLine) + '</a>');
+        ulParts.push('<a class="std-link-pill" href="' + esc(fetched.usefulLinksUrl) + '" target="_blank" rel="noopener">' + esc(ulLine) + ' ↗</a>');
       } else {
         ulParts.push(esc(ulLine));
       }
@@ -1038,7 +1053,7 @@ function renderAdoption(s, fetched) {
         var catParsed = extractEmbeddedUrl(fetched.linkCatalog);
         var catUrl = catParsed.url || fetched.linkCatalog;
         var catLabel = catParsed.url ? catParsed.display : "View catalog";
-        h += '<div class="card-row"><div class="row-label">Course catalog</div><div class="row-value"><a class="useful-link" href="' + esc(catUrl) + '" target="_blank" rel="noopener">' + esc(catLabel) + '</a></div></div>';
+        h += '<div class="card-row"><div class="row-label">Course catalog</div><div class="row-value"><a class="std-link-pill" href="' + esc(catUrl) + '" target="_blank" rel="noopener">' + esc(catLabel) + ' ↗</a></div></div>';
       }
       h += "</div>";
     }
@@ -1113,7 +1128,7 @@ function renderAdoption(s, fetched) {
         if (allTlLinks.length > 0) {
           h += '<br>';
           for (var tli = 0; tli < allTlLinks.length; tli++) {
-            h += '<a class="std-link-pill" style="margin-top:4px;margin-right:4px;display:inline-block;" href="' + esc(allTlLinks[tli].url) + '" target="_blank" rel="noopener">' + esc(allTlLinks[tli].label) + ' ↗</a>';
+            h += '<a class="std-link-pill" href="' + esc(allTlLinks[tli].url) + '" target="_blank" rel="noopener">' + esc(allTlLinks[tli].label) + ' ↗</a>';
           }
         }
         h += "</div>";
@@ -1235,7 +1250,7 @@ function renderStandards(s, fetched) {
     var lsUrl = lsParsed.url || fetched.linkStandards;
     var lsLabel = lsParsed.url ? lsParsed.display : "State Standards Page";
     h += '<div class="card"><div class="card-header">Standards Resources</div>';
-    h += '<div class="card-row"><div class="row-value"><a class="useful-link" href="' + esc(lsUrl) + '" target="_blank" rel="noopener">' + esc(lsLabel) + '</a></div></div>';
+    h += '<div class="card-row"><div class="row-value"><a class="std-link-pill" href="' + esc(lsUrl) + '" target="_blank" rel="noopener">' + esc(lsLabel) + ' ↗</a></div></div>';
     h += "</div>";
   }
   if (fetched.revisionCycle) {
