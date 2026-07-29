@@ -318,7 +318,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <script>
 // ── Config ───────────────────────────────────────────────────────────────────
 var PUBLIC_SHEET_BASE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRU0_I99UuZvfBam8y_Z2wGwbDfsL5A0CB5MYNogbPfSWnnLIpSQP-sCtgR3Uwz2vByq7thFBIp-MbB/pub?output=csv&sheet=";
-var PROXY_URL = "https://script.google.com/macros/s/AKfycbzTYTxxArvCMikz6-1TR7QR3YMdxkGdJopg1Tuf9v_62pv_RIrd1MS8sEuQgfT_7lYn/exec";
+var PROXY_URL = "https://script.google.com/macros/s/AKfycbz7B4_Z8UW4WZPLzeP_e49VKbutti-FGboWk-6IqsKWwtNbVXs1HWTKLQPw6vH3gVs/exec";
 
 // ── Slim state data (map + list only) ────────────────────────────────────────
 var STATES = [{"name": "Alabama", "icon": "Alabama", "updated": "Jun 30, 2026"}, {"name": "Alaska", "icon": "Alaska", "updated": "Jun 30, 2026"}, {"name": "Arizona", "icon": "Arizona", "updated": "Jun 30, 2026"}, {"name": "Arkansas", "icon": "Arkansas", "updated": "Jun 30, 2026"}, {"name": "California", "icon": "California", "updated": "Jun 30, 2026"}, {"name": "Colorado", "icon": "Colorado", "updated": "Jun 30, 2026"}, {"name": "Connecticut", "icon": "Connecticut", "updated": "Jun 30, 2026"}, {"name": "Delaware", "icon": "Delaware", "updated": "Jun 30, 2026"}, {"name": "District of Columbia", "icon": null, "updated": "Jun 30, 2026"}, {"name": "Florida", "icon": "Florida", "updated": "Jun 30, 2026"}, {"name": "Georgia", "icon": "Georgia", "updated": "Jun 30, 2026"}, {"name": "Hawaii", "icon": "Hawaii", "updated": "Jun 30, 2026"}, {"name": "Idaho", "icon": "Idaho", "updated": "Jun 30, 2026"}, {"name": "Illinois", "icon": "Illinois", "updated": "Jun 30, 2026"}, {"name": "Indiana", "icon": "Indiana", "updated": "Jun 30, 2026"}, {"name": "Iowa", "icon": "Iowa", "updated": "Jun 30, 2026"}, {"name": "Kansas", "icon": "Kansas", "updated": "Jun 30, 2026"}, {"name": "Kentucky", "icon": "Kentucky", "updated": "Jun 30, 2026"}, {"name": "Louisiana", "icon": "Louisiana_", "updated": "Jun 30, 2026"}, {"name": "Maine", "icon": "Maine", "updated": "Jun 30, 2026"}, {"name": "Maryland", "icon": "Maryland", "updated": "Jun 30, 2026"}, {"name": "Massachusetts", "icon": "Massachusetts", "updated": "Jun 30, 2026"}, {"name": "Michigan", "icon": "Michigan", "updated": "Jun 30, 2026"}, {"name": "Minnesota", "icon": "Minnesota", "updated": "Jun 30, 2026"}, {"name": "Mississippi", "icon": "Mississippi", "updated": "Jun 30, 2026"}, {"name": "Missouri", "icon": "Missouri", "updated": "Jun 30, 2026"}, {"name": "Montana", "icon": "Montana", "updated": "Jun 30, 2026"}, {"name": "Nebraska", "icon": "Nebraska", "updated": "Jun 30, 2026"}, {"name": "Nevada", "icon": "Nevada", "updated": "Jun 30, 2026"}, {"name": "New Hampshire", "icon": "New_Hampshire", "updated": "Jun 30, 2026"}, {"name": "New Jersey", "icon": "New_Jersey", "updated": "Jun 30, 2026"}, {"name": "New Mexico", "icon": "New_Mexico", "updated": "Jun 30, 2026"}, {"name": "New York", "icon": "New_York", "updated": "Jun 30, 2026"}, {"name": "North Carolina", "icon": "North_Carolina", "updated": "Jun 30, 2026"}, {"name": "North Dakota", "icon": "North_Dakota", "updated": "Jun 30, 2026"}, {"name": "Ohio", "icon": "Ohio", "updated": "Jun 30, 2026"}, {"name": "Oklahoma", "icon": "Oklahoma", "updated": "Jun 30, 2026"}, {"name": "Oregon", "icon": "Oregon", "updated": "Jun 30, 2026"}, {"name": "Pennsylvania", "icon": "Pennsylvania", "updated": "Jun 30, 2026"}, {"name": "Rhode Island", "icon": "Rhode_Island", "updated": "Jun 30, 2026"}, {"name": "South Carolina", "icon": "South_Carolina", "updated": "Jun 30, 2026"}, {"name": "South Dakota", "icon": "South_Dakota", "updated": "Jun 30, 2026"}, {"name": "Tennessee", "icon": "Tennessee_", "updated": "Jun 30, 2026"}, {"name": "Texas", "icon": "Texas", "updated": "Jun 30, 2026"}, {"name": "Utah", "icon": "Utah", "updated": "Jun 30, 2026"}, {"name": "Vermont", "icon": "Vermont", "updated": "Jun 30, 2026"}, {"name": "Virginia", "icon": "Virginia_", "updated": "Jun 30, 2026"}, {"name": "Washington", "icon": "Washington", "updated": "Jun 30, 2026"}, {"name": "West Virginia", "icon": "West_Virginia_", "updated": "Jun 30, 2026"}, {"name": "Wisconsin", "icon": "Wisconsin", "updated": "Jun 30, 2026"}, {"name": "Wyoming", "icon": "Wyoming_", "updated": "Jun 30, 2026"}];
@@ -480,7 +480,7 @@ function parseCourseCodesRaw(raw) {
 
 // ── Fetch: public sheet ───────────────────────────────────────────────────────
 function fetchStateData(stateName, callback) {
-  var url = PUBLIC_SHEET_BASE + encodeURIComponent(stateName);
+  var url = PROXY_URL + "?state=" + encodeURIComponent(stateName);
   fetch(url)
     .then(function(r) {
       if (!r.ok) throw new Error("HTTP " + r.status);
@@ -1038,7 +1038,7 @@ function parseStateTiersCSV(csv) {
 
 // Fetch tier data from Google Sheet to refresh baked-in data (optional — page renders from baked data immediately)
 function loadTierData() {
-  var url = PUBLIC_SHEET_BASE + "State%20Tiers";
+  var url = PROXY_URL + "?state=State%20Tiers";
   fetch(url)
     .then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
     .then(function(csv) {
