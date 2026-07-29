@@ -470,6 +470,8 @@ function parseCourseCodesRaw(raw) {
   for (var i = 0; i < lines.length; i++) {
     var line = lines[i].trim();
     if (!line) continue;
+    // Skip header lines like "Current" or "Archived"
+    if (/^(current|archived)$/i.test(line)) continue;
     var spaceIdx = line.indexOf(" ");
     if (spaceIdx > 0) {
       var code = line.substring(0, spaceIdx);
@@ -996,9 +998,17 @@ function renderStandards(s, fetched) {
       var line = lines[li].trim();
       if (!line) continue;
       if (line.toLowerCase().indexOf("link to") === 0 || line.toLowerCase().indexOf("link:") === 0) {
-        var href = (sub.url && !linkUsed) ? sub.url : "";
-        linkUsed = true;
-        if (href) h += '<br><a class="std-link-pill" href="' + esc(href) + '" target="_blank" rel="noopener">' + esc(line) + ' ↗</a>';
+        // URL may be embedded in parens at end of line: "Link to 2020 Math Standards (https://...)"
+        var embeddedUrl = null;
+        var lineDisplay = line;
+        var parenMatch = line.match(/\(https?:\/\/[^)]+\)/);
+        if (parenMatch) {
+          embeddedUrl = parenMatch[0].slice(1, -1);
+          lineDisplay = line.replace(parenMatch[0], "").trim();
+        }
+        var href = embeddedUrl || ((sub.url && !linkUsed) ? (linkUsed = true, sub.url) : "");
+        if (!embeddedUrl) linkUsed = true;
+        if (href) h += '<br><a class="std-link-pill" href="' + esc(href) + '" target="_blank" rel="noopener">' + esc(lineDisplay) + ' ↗</a>';
         // if no URL, skip the line entirely
       } else if (line.toLowerCase().indexOf("revision") >= 0) {
         h += '<br><span class="std-revision-tag">' + esc(line) + '</span>';
