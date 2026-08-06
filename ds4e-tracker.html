@@ -1628,8 +1628,11 @@ buildFilters();
 initMap();
 renderList();
 loadTierData(); // refreshes from Google Sheet if reachable
-// Silently pre-warm private data cache so unlock is fast when user needs it
-fetch(PROXY_URL + "?warm=1").catch(function() {});
+// Pre-warm the Apps Script proxy on load, then keep it warm every 4 minutes
+// so it never cold-starts when the user clicks Unlock
+function warmProxy() { fetch(PROXY_URL + "?warm=1").catch(function() {}); }
+warmProxy();
+setInterval(warmProxy, 4 * 60 * 1000);
 </script>
 
 <!-- ═══════════════════════════ PASSWORD MODAL ═══════════════════════════ -->
