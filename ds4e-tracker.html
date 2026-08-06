@@ -1295,8 +1295,11 @@ function submitPassword() {
   var btn = document.getElementById("pw-submit");
   btn.disabled = true; btn.textContent = "Checking...";
   document.getElementById("pw-error").textContent = "";
-  // Fetch only the current state's private data — much faster than all 51 states at once
+  // Fire both fetches in parallel so unlock time = max(t1,t2) not t1+t2
   var stateName = currentDetailState ? currentDetailState.name : null;
+  var stagePromise = fetch(PROXY_URL + "?password=" + encodeURIComponent(pw) + "&state=State%20Maps")
+    .then(function(r) { return r.json(); })
+    .catch(function() { return null; });
   fetchPrivateData(pw, stateName, function(data, err) {
     if (err || !data) {
       document.getElementById("pw-error").textContent = err === "Invalid password" ? "Incorrect password." : "Could not connect. Try again.";
@@ -1309,7 +1312,19 @@ function submitPassword() {
     PRIVATE_UNLOCKED = true;
     hidePasswordModal();
     updateLockUI();
-    loadStageData(pw);
+    // Apply stage map data from the parallel fetch (may already be resolved)
+    stagePromise.then(function(stageJson) {
+      if (!stageJson || stageJson.error || !stageJson.states) return;
+      var rows = stageJson.states["State Maps"];
+      if (!rows) return;
+      STATE_STAGE_DATA = {};
+      for (var i = 0; i < rows.length; i++) {
+        var abbr = String(rows[i][0] || "").trim().toUpperCase();
+        var stage = parseInt(rows[i][1]);
+        if (abbr && stage >= 1 && stage <= 3) STATE_STAGE_DATA[abbr] = stage;
+      }
+      if (currentMapView === "stage") applyMapColors();
+    });
     // If unlock was triggered by clicking the Stage map toggle, switch to it now
     if (pendingStageView) { setMapView("stage"); }
     // Re-render current state detail if one is open
@@ -1333,24 +1348,6 @@ function updateLockUI() {
   }
 }
 
-function loadStageData(password) {
-  var url = PROXY_URL + "?password=" + encodeURIComponent(password) + "&state=State%20Maps";
-  fetch(url)
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      if (data.error || !data.states) return;
-      var rows = data.states["State Maps"];
-      if (!rows) return;
-      STATE_STAGE_DATA = {};
-      for (var i = 0; i < rows.length; i++) {
-        var abbr  = String(rows[i][0] || "").trim().toUpperCase();
-        var stage = parseInt(rows[i][1]);
-        if (abbr && stage >= 1 && stage <= 3) STATE_STAGE_DATA[abbr] = stage;
-      }
-      if (currentMapView === "stage") applyMapColors();
-    })
-    .catch(function() {});
-}
 
 // ── Map ───────────────────────────────────────────────────────────────────────
 var TIER_FILL  = {4:"#7c2d12",3:"#ef4a23",2:"#f9c6a4",1:"#6290c8",0:"#b8b6b6"};
