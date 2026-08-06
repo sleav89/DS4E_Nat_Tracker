@@ -225,7 +225,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <span>Tap a state to view details</span>
     <div class="map-view-toggle">
       <button class="map-view-btn active" id="mvbtn-tier" onclick="setMapView('tier')">Tier</button>
-      <button class="map-view-btn" id="mvbtn-stage" onclick="setMapView('stage')">Stage</button>
+      <button class="map-view-btn" id="mvbtn-mathrev" onclick="setMapView('mathrev')">Math Revision</button>
+      <button class="map-view-btn" id="mvbtn-stage" onclick="setMapView('stage')">&#x1F512; Stage</button>
     </div>
   </div>
   <div class="map-container">
@@ -1308,6 +1309,9 @@ function submitPassword() {
     PRIVATE_UNLOCKED = true;
     hidePasswordModal();
     updateLockUI();
+    loadStageData(pw);
+    // If unlock was triggered by clicking the Stage map toggle, switch to it now
+    if (pendingStageView) { setMapView("stage"); }
     // Re-render current state detail if one is open
     if (currentDetailState && STATE_CACHE[currentDetailState.name]) {
       renderDetailTabs(currentDetailState, STATE_CACHE[currentDetailState.name]);
@@ -1329,9 +1333,42 @@ function updateLockUI() {
   }
 }
 
+function loadStageData(password) {
+  var url = PROXY_URL + "?password=" + encodeURIComponent(password) + "&state=State%20Stages";
+  fetch(url)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.error || !data.states) return;
+      var rows = data.states["State Stages"];
+      if (!rows) return;
+      STATE_STAGE_DATA = {};
+      for (var i = 0; i < rows.length; i++) {
+        var abbr  = String(rows[i][0] || "").trim().toUpperCase();
+        var stage = parseInt(rows[i][1]);
+        if (abbr && stage >= 1 && stage <= 3) STATE_STAGE_DATA[abbr] = stage;
+      }
+      if (currentMapView === "stage") applyMapColors();
+    })
+    .catch(function() {});
+}
+
 // ── Map ───────────────────────────────────────────────────────────────────────
 var TIER_FILL  = {4:"#7c2d12",3:"#ef4a23",2:"#f9c6a4",1:"#6290c8",0:"#b8b6b6"};
 var STAGE_FILL = {1:"#6290c8",2:"#16a34a",3:"#f9c6a4"};
+
+// Math Standards Revision map
+// 1 = Currently revising  2 = Next 5 yrs (by 2031)  3 = Next 10 yrs (2032-2036)  4 = No revision cycle / unknown
+var MATH_REV_FILL = {1:"#ef4a23",2:"#f59e0b",3:"#6290c8",4:"#b8b6b6"};
+var MATH_REV_DATA = {
+  "AL":2,"AK":4,"AZ":1,"AR":2,"CA":4,"CO":1,"CT":4,
+  "DC":4,"DE":4,"FL":4,"GA":2,"HI":1,"ID":1,"IL":4,
+  "IN":2,"IA":4,"KS":4,"KY":1,"LA":1,"ME":2,"MD":4,
+  "MA":4,"MI":4,"MN":3,"MS":4,"MO":4,"MT":4,"NE":2,
+  "NV":4,"NH":4,"NJ":4,"NM":4,"NY":4,"NC":1,"ND":4,
+  "OH":4,"OK":2,"OR":2,"PA":4,"RI":2,"SC":4,"SD":1,
+  "TN":1,"TX":2,"UT":1,"VT":4,"VA":4,"WA":4,"WV":2,
+  "WI":2,"WY":3
+};
 
 // ── Stage data ─────────────────────────────────────────────────────────────────
 // Set each state to 1, 2, or 3; leave null if not yet assigned.
@@ -1340,20 +1377,13 @@ var STAGE_FILL = {1:"#6290c8",2:"#16a34a",3:"#f9c6a4"};
 // Stage 3: Post-standards implementation and PD
 // Stage 1 = Socialization/grassroots, Stage 2 = Standards revision, Stage 3 = Implementation & PD
 // Update individual values as states progress. Set to null to show as unassigned (gray).
+// Stage data is loaded from the private Google Sheet ("State Stages" tab) after unlock.
+// Format: Col A = state abbreviation, Col B = stage number (1, 2, or 3).
 // Stage 1 = Socialization/grassroots, Stage 2 = Standards revision, Stage 3 = Implementation & PD
-// Update individual values as states progress. Set to null to show as unassigned (gray).
-var STATE_STAGE_DATA = {
-  "AL":1,"AK":null,"AZ":2,"AR":1,"CA":3,"CO":3,"CT":null,
-  "DC":1,"DE":1,"FL":2,"GA":2,"HI":null,"ID":1,"IL":3,
-  "IN":1,"IA":1,"KS":null,"KY":2,"LA":1,"ME":1,"MD":2,
-  "MA":3,"MI":2,"MN":2,"MS":null,"MO":1,"MT":1,"NE":1,
-  "NV":1,"NH":1,"NJ":1,"NM":null,"NY":3,"NC":3,"ND":1,
-  "OH":2,"OK":1,"OR":2,"PA":2,"RI":null,"SC":1,"SD":1,
-  "TN":1,"TX":3,"UT":2,"VT":1,"VA":2,"WA":3,"WV":1,
-  "WI":1,"WY":1
-};
+var STATE_STAGE_DATA = {};
 
 var currentMapView = "tier";
+var pendingStageView = false;
 var ABBR_TO_NAME = {
   "AL":"Alabama","AK":"Alaska","AZ":"Arizona","AR":"Arkansas","CA":"California",
   "CO":"Colorado","CT":"Connecticut","DE":"Delaware","DC":"District of Columbia",
@@ -1495,6 +1525,9 @@ function applyMapColors() {
     if (currentMapView === "stage") {
       var stage = STATE_STAGE_DATA[abbr];
       fill = stage ? (STAGE_FILL[stage] || "#b8b6b6") : "#b8b6b6";
+    } else if (currentMapView === "mathrev") {
+      var cat = MATH_REV_DATA[abbr];
+      fill = cat ? (MATH_REV_FILL[cat] || "#b8b6b6") : "#b8b6b6";
     } else {
       var mapTier = 0;
       var tiers = d.tiers || [];
@@ -1516,6 +1549,12 @@ function updateMapLegend() {
       '<div class="map-legend-item"><div class="map-legend-dot" style="background:#16a34a;"></div>Stage 2: Standards revision</div>' +
       '<div class="map-legend-item"><div class="map-legend-dot" style="background:#f9c6a4;border:1px solid #d97a4a;"></div>Stage 3: Implementation &amp; PD</div>' +
       '<div class="map-legend-item"><div class="map-legend-dot" style="background:#b8b6b6;"></div>Not assigned</div>';
+  } else if (currentMapView === "mathrev") {
+    legend.innerHTML =
+      '<div class="map-legend-item"><div class="map-legend-dot" style="background:#ef4a23;"></div>Currently revising</div>' +
+      '<div class="map-legend-item"><div class="map-legend-dot" style="background:#f59e0b;"></div>Next 5 years</div>' +
+      '<div class="map-legend-item"><div class="map-legend-dot" style="background:#6290c8;"></div>Next 10 years</div>' +
+      '<div class="map-legend-item"><div class="map-legend-dot" style="background:#b8b6b6;"></div>No revision cycle</div>';
   } else {
     legend.innerHTML =
       '<div class="map-legend-item"><div class="map-legend-dot" style="background:#ef4a23;"></div>Tier 3</div>' +
@@ -1526,11 +1565,17 @@ function updateMapLegend() {
 }
 
 function setMapView(view) {
+  if (view === "stage" && !PRIVATE_UNLOCKED) {
+    pendingStageView = true;
+    showPasswordModal();
+    return;  // stay on tier view until unlocked
+  }
+  pendingStageView = false;
   currentMapView = view;
-  var tierBtn  = document.getElementById("mvbtn-tier");
-  var stageBtn = document.getElementById("mvbtn-stage");
-  if (tierBtn)  tierBtn.className  = "map-view-btn" + (view === "tier"  ? " active" : "");
-  if (stageBtn) stageBtn.className = "map-view-btn" + (view === "stage" ? " active" : "");
+  ["tier","mathrev","stage"].forEach(function(v) {
+    var btn = document.getElementById("mvbtn-" + v);
+    if (btn) btn.className = "map-view-btn" + (v === view ? " active" : "");
+  });
   applyMapColors();
   updateMapLegend();
 }
