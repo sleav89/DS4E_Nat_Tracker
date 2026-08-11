@@ -480,26 +480,52 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
     <!-- Sections -->
     <div class="report-section-card">
-      <div class="report-section-title">Report Sections</div>
+      <div class="report-section-title">Fields to Include</div>
+      <div style="font-size:11px;color:#aaa;margin-bottom:8px;">Only fields with available data will appear in the report. Private fields require the reports password.</div>
+
+      <div style="font-size:10px;font-weight:700;color:#ef4a23;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px;">Public Data</div>
       <label class="report-check-row">
-        <input type="checkbox" id="rpt-tiers" checked>
+        <input type="checkbox" id="rpt-tier" checked>
         <div>
-          <div class="report-check-label">State Summary</div>
-          <div class="report-check-sub">Current DS4E tier, DS4E goal, math revision cycle per state</div>
+          <div class="report-check-label">DS4E Tier</div>
+          <div class="report-check-sub">Current implementation tier(s) per state</div>
+        </div>
+      </label>
+      <label class="report-check-row">
+        <input type="checkbox" id="rpt-mathrev" checked>
+        <div>
+          <div class="report-check-label">Math Revision Cycle</div>
+          <div class="report-check-sub">Where each state is in their math standards revision</div>
         </div>
       </label>
       <label class="report-check-row">
         <input type="checkbox" id="rpt-updates" checked>
         <div>
-          <div class="report-check-label">Updates Log</div>
-          <div class="report-check-sub">Chronological history of state changes and milestones</div>
+          <div class="report-check-label">State Updates</div>
+          <div class="report-check-sub">Chronological history of changes and milestones</div>
+        </div>
+      </label>
+
+      <div style="font-size:10px;font-weight:700;color:#4c4c4c;text-transform:uppercase;letter-spacing:0.5px;padding:10px 0 4px;">&#x1F512; Private Data</div>
+      <label class="report-check-row">
+        <input type="checkbox" id="rpt-goal">
+        <div>
+          <div class="report-check-label">DS4E Goal</div>
+          <div class="report-check-sub">Target tier set by DS4E for each state</div>
         </div>
       </label>
       <label class="report-check-row">
-        <input type="checkbox" id="rpt-private">
+        <input type="checkbox" id="rpt-notes">
         <div>
-          <div class="report-check-label">Private State Details</div>
-          <div class="report-check-sub">Internal notes, contacts, and events from private records</div>
+          <div class="report-check-label">Internal Notes</div>
+          <div class="report-check-sub">Private notes and messaging on file</div>
+        </div>
+      </label>
+      <label class="report-check-row">
+        <input type="checkbox" id="rpt-contacts">
+        <div>
+          <div class="report-check-label">Points of Contact</div>
+          <div class="report-check-sub">Contacts, emails, and relationship notes</div>
         </div>
       </label>
     </div>
@@ -1716,7 +1742,7 @@ var TIER_FILL  = {4:"#7c2d12",3:"#ef4a23",2:"#f9c6a4",1:"#6290c8",0:"#b8b6b6"};
 // 1 = Currently revising  2 = Next 5 yrs (by 2031)  3 = Next 10 yrs (2032-2036)  4 = No revision cycle / unknown
 // Math Rev categories: 0=Recently completed (last 2 yrs), 1=Currently revising, 2=Next 5 yrs, 3=Next 10 yrs, 4=No cycle/unknown
 var MATH_REV_FILL = {0:"#ef4a23",1:"#f9c6a4",2:"#6290c8",3:"#66c2a4",4:"#b8b6b6"};
-// Math Rev data loaded from "State Tiers" tab of the public sheet (Col D: 0–4)
+// Math Rev data loaded from "State Maps" tab of the public sheet
 // 0=Recently completed, 1=Currently revising, 2=Next 5 yrs, 3=Next 10 yrs, 4=No cycle/unknown
 var MATH_REV_DATA = {};
 
@@ -1746,7 +1772,7 @@ for (var _i = 0; _i < _abbrKeys.length; _i++) { NAME_TO_ABBR[ABBR_TO_NAME[_abbrK
 // Populated at runtime from STATES array (names/icons) and filled in by loadTierData()
 var STATE_ABBR_DATA = {};
 
-// Parse the "State Tiers" CSV tab into STATE_ABBR_DATA
+// Parse the "State Maps" CSV tab into STATE_ABBR_DATA
 function parseMathRevText(val) {
   if (!val) return 4;
   var s = String(val).trim().toLowerCase();
@@ -1804,23 +1830,23 @@ function seedStateAbbrData() {
   }
 }
 
-// Fetch tier + math revision data from the public "State Tiers" sheet tab via GAS proxy
+// Fetch tier + math revision data from the public "State Maps" sheet tab via GAS proxy
 function loadTierData() {
-  var url = PROXY_URL + "?state=State%20Tiers";
+  var url = PROXY_URL + "?state=State%20Maps";
   fetch(url)
     .then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
     .then(function(csv) {
-      console.log("State Tiers CSV first 200 chars:", csv ? csv.substring(0,200) : "empty");
+      console.log("State Maps CSV first 200 chars:", csv ? csv.substring(0,200) : "empty");
       if (!csv || csv.trim().length < 10) throw new Error("Empty or invalid CSV");
       parseStateTiersCSV(csv);
-      console.log("State Tiers parsed. STATE_ABBR_DATA keys:", Object.keys(STATE_ABBR_DATA).length, "MATH_REV_DATA keys:", Object.keys(MATH_REV_DATA).length);
+      console.log("State Maps parsed. STATE_ABBR_DATA keys:", Object.keys(STATE_ABBR_DATA).length, "MATH_REV_DATA keys:", Object.keys(MATH_REV_DATA).length);
       applyMapColors();
       updateMapLabels();
       updateMapLegend();
       renderList();
     })
     .catch(function(err) {
-      console.warn("State Tiers fetch failed:", err.message);
+      console.warn("State Maps fetch failed:", err.message);
     });
 }
 
@@ -2283,7 +2309,7 @@ seedStateAbbrData(); // seed STATE_ABBR_DATA from STATES so list renders immedia
 buildFilters();
 initMap();
 renderList();
-loadTierData(); // fetches tier + math rev data from public "State Tiers" sheet tab
+loadTierData(); // fetches tier + math rev data from public "State Maps" sheet tab
 // On load: warm the cache (reads all sheets, fills CacheService)
 fetch(PROXY_URL + "?warm=1").catch(function() {});
 // Every 4 min: lightweight ping to keep the Apps Script runtime alive
@@ -2412,65 +2438,62 @@ function getReportSelectedStates() {
 }
 
 function buildReportData() {
-  var stateNames = getReportSelectedStates();
-  var includeTiers   = document.getElementById("rpt-tiers").checked;
-  var includeUpdates = document.getElementById("rpt-updates").checked;
-  var includePrivate = document.getElementById("rpt-private").checked;
-  var reportDate = new Date().toLocaleDateString("en-US", {year:"numeric",month:"long",day:"numeric"});
+  var stateNames  = getReportSelectedStates();
+  var fTier       = document.getElementById("rpt-tier").checked;
+  var fMathrev    = document.getElementById("rpt-mathrev").checked;
+  var fUpdates    = document.getElementById("rpt-updates").checked;
+  var fGoal       = document.getElementById("rpt-goal").checked;
+  var fNotes      = document.getElementById("rpt-notes").checked;
+  var fContacts   = document.getElementById("rpt-contacts").checked;
+  var reportDate  = new Date().toLocaleDateString("en-US", {year:"numeric",month:"long",day:"numeric"});
 
-  // State summary rows
-  var summaryRows = [];
-  if (includeTiers) {
-    for (var i = 0; i < stateNames.length; i++) {
-      var sn = stateNames[i];
-      // find abbr
-      var abbr = "";
-      for (var k in ABBR_TO_NAME) { if (ABBR_TO_NAME[k] === sn) { abbr = k; break; } }
-      var d = STATE_ABBR_DATA[abbr] || {};
-      var tiers = d.tiers || [];
-      var highTier = 0;
-      for (var t = 0; t < tiers.length; t++) { var tn = tierNum(tiers[t]); if (tn < 4 && tn > highTier) highTier = tn; }
-      var goal = STATE_GOALS_DATA[abbr] ? "Tier " + STATE_GOALS_DATA[abbr] : "—";
-      var mr = MATH_REV_DATA[abbr] ? MATH_REV_LABELS[MATH_REV_DATA[abbr]] : "—";
-      var tierLabel = highTier > 0 ? "Tier " + highTier : "None";
-      summaryRows.push({state: sn, abbr: abbr, tier: tierLabel, tierNum: highTier, goal: goal, mathrev: mr, tierList: tiers.join(", ") || "None"});
-    }
+  // Build per-state rows — only include columns that were selected AND have data
+  var stateRows = [];
+  for (var i = 0; i < stateNames.length; i++) {
+    var sn = stateNames[i];
+    var abbr = "";
+    for (var k in ABBR_TO_NAME) { if (ABBR_TO_NAME[k] === sn) { abbr = k; break; } }
+    var sd = STATE_ABBR_DATA[abbr] || {};
+    var tiers = sd.tiers || [];
+    var highTier = 0;
+    for (var t = 0; t < tiers.length; t++) { var tn = tierNum(tiers[t]); if (tn < 4 && tn > highTier) highTier = tn; }
+    var tierVal   = fTier    ? (tiers.filter(function(x){return x&&x!=="None";}).join(", ") || null) : undefined;
+    var mrVal     = fMathrev ? ((MATH_REV_DATA[abbr] !== undefined) ? MATH_REV_LABELS[MATH_REV_DATA[abbr]] : null) : undefined;
+    var goalVal   = fGoal    ? (STATE_GOALS_DATA[abbr] ? "Tier " + STATE_GOALS_DATA[abbr] : null) : undefined;
+    var priv      = (PRIVATE_DATA && PRIVATE_DATA[sn]) || {};
+    var notesVal  = fNotes   ? (priv.internal || null) : undefined;
+    stateRows.push({state: sn, abbr: abbr, tierNum: highTier, tier: tierVal, mathrev: mrVal, goal: goalVal, notes: notesVal});
   }
 
   // Updates filtered to selected states
   var updateRows = [];
-  if (includeUpdates && ALL_UPDATES && ALL_UPDATES.length) {
+  if (fUpdates && ALL_UPDATES && ALL_UPDATES.length) {
     var stateSet = {};
     for (var s = 0; s < stateNames.length; s++) stateSet[stateNames[s]] = true;
     for (var u = 0; u < ALL_UPDATES.length; u++) {
-      var upd = ALL_UPDATES[u];
-      if (stateSet[upd.state]) updateRows.push(upd);
+      if (stateSet[ALL_UPDATES[u].state]) updateRows.push(ALL_UPDATES[u]);
     }
   }
 
-  // Private data filtered
-  var privateRows = [];
-  if (includePrivate && PRIVATE_DATA) {
-    for (var si = 0; si < stateNames.length; si++) {
-      var psn = stateNames[si];
-      var pd = PRIVATE_DATA[psn];
-      if (pd && pd.length) {
-        for (var pi = 0; pi < pd.length; pi++) {
-          privateRows.push({state: psn, data: pd[pi]});
+  // Contacts filtered to selected states
+  var contactRows = [];
+  if (fContacts && PRIVATE_DATA) {
+    for (var ci = 0; ci < stateNames.length; ci++) {
+      var csn = stateNames[ci];
+      var cp = PRIVATE_DATA[csn];
+      if (cp && cp.contacts && cp.contacts.length) {
+        for (var cj = 0; cj < cp.contacts.length; cj++) {
+          contactRows.push({state: csn, contact: cp.contacts[cj]});
         }
       }
     }
   }
 
   return {
-    date: reportDate,
-    states: stateNames,
-    summaryRows: summaryRows,
-    updateRows: updateRows,
-    privateRows: privateRows,
-    includeTiers: includeTiers,
-    includeUpdates: includeUpdates,
-    includePrivate: includePrivate
+    date: reportDate, states: stateNames,
+    stateRows: stateRows, updateRows: updateRows, contactRows: contactRows,
+    fTier: fTier, fMathrev: fMathrev, fGoal: fGoal,
+    fUpdates: fUpdates, fNotes: fNotes, fContacts: fContacts
   };
 }
 
@@ -2486,67 +2509,87 @@ function downloadReportPDF() {
   setTimeout(function() { win.print(); }, 600);
 }
 
+function esc(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
 function buildPrintHTML(d) {
   var tierColors = {4:"#7c2d12",3:"#ef4a23",2:"#d97a4a",1:"#185fa5",0:"#888"};
-  var rows = "";
-  if (d.includeTiers) {
-    for (var i = 0; i < d.summaryRows.length; i++) {
-      var r = d.summaryRows[i];
+  var hasPrivate = d.fGoal || d.fNotes || d.fContacts;
+
+  // State data table — build headers + rows only for selected fields that have any data
+  var hasAnyStateField = d.fTier || d.fMathrev || d.fGoal || d.fNotes;
+  var stateSection = "";
+  if (hasAnyStateField) {
+    var thead = "<tr><th>State</th>";
+    if (d.fTier)    thead += "<th>DS4E Tier</th>";
+    if (d.fMathrev) thead += "<th>Math Revision</th>";
+    if (d.fGoal)    thead += "<th>DS4E Goal</th>";
+    if (d.fNotes)   thead += "<th>Internal Notes</th>";
+    thead += "</tr>";
+    var tbody = "";
+    for (var i = 0; i < d.stateRows.length; i++) {
+      var r = d.stateRows[i];
+      var hasData = (d.fTier && r.tier) || (d.fMathrev && r.mathrev) || (d.fGoal && r.goal) || (d.fNotes && r.notes);
       var col = tierColors[r.tierNum] || "#888";
-      rows += "<tr><td>" + r.state + "</td><td style='color:" + col + ";font-weight:600;'>" + r.tier + "</td><td>" + r.goal + "</td><td>" + r.mathrev + "</td></tr>";
+      tbody += "<tr><td>" + esc(r.state) + "</td>";
+      if (d.fTier)    tbody += "<td style='color:" + col + ";font-weight:600;'>" + esc(r.tier || "—") + "</td>";
+      if (d.fMathrev) tbody += "<td>" + esc(r.mathrev || "—") + "</td>";
+      if (d.fGoal)    tbody += "<td>" + esc(r.goal || "—") + "</td>";
+      if (d.fNotes)   tbody += "<td>" + esc(r.notes || "—") + "</td>";
+      tbody += "</tr>";
     }
+    stateSection = "<h2>State Data</h2><table><thead>" + thead + "</thead><tbody>" + tbody + "</tbody></table>";
   }
+
+  // Updates
   var updateSection = "";
-  if (d.includeUpdates && d.updateRows.length) {
+  if (d.fUpdates && d.updateRows.length) {
     var uRows = "";
     for (var u = 0; u < d.updateRows.length; u++) {
       var upd = d.updateRows[u];
-      var dLabel = upd.dateRaw || "Date Unknown";
-      uRows += "<tr><td>" + dLabel + "</td><td>" + (upd.state || "") + "</td><td>" + (upd.text || "") + "</td></tr>";
+      uRows += "<tr><td>" + esc(upd.dateRaw||"Date Unknown") + "</td><td>" + esc(upd.state||"") + "</td><td>" + esc(upd.text||"") + "</td><td>" + esc(upd.tier||"") + "</td></tr>";
     }
-    updateSection = "<h2>Updates Log</h2><table><thead><tr><th>Date</th><th>State</th><th>Update</th></tr></thead><tbody>" + uRows + "</tbody></table>";
+    updateSection = "<h2>State Updates</h2><table><thead><tr><th>Date</th><th>State</th><th>Update</th><th>Tier Change</th></tr></thead><tbody>" + uRows + "</tbody></table>";
   }
-  var privateSection = "";
-  if (d.includePrivate && d.privateRows.length) {
-    var pRows = "";
-    for (var p = 0; p < d.privateRows.length; p++) {
-      var pr = d.privateRows[p];
-      var dataStr = Array.isArray(pr.data) ? pr.data.join(" | ") : String(pr.data);
-      pRows += "<tr><td>" + pr.state + "</td><td>" + dataStr + "</td></tr>";
+
+  // Contacts
+  var contactSection = "";
+  if (d.fContacts && d.contactRows.length) {
+    var cRows = "";
+    for (var ci = 0; ci < d.contactRows.length; ci++) {
+      var cr = d.contactRows[ci]; var c = cr.contact;
+      cRows += "<tr><td>" + esc(cr.state) + "</td><td>" + esc((c.first||"") + " " + (c.last||"")).trim() + (c.vip ? " ★" : "") + "</td><td>" + esc(c.title||"") + "</td><td>" + esc(c.org||"") + "</td><td>" + esc(c.email||"") + "</td><td>" + esc(c.notes||"") + "</td></tr>";
     }
-    privateSection = "<h2>Private State Details</h2><p style='color:#b45309;font-size:12px;margin-bottom:12px;'>&#128274; Confidential — for internal use only.</p><table><thead><tr><th>State</th><th>Details</th></tr></thead><tbody>" + pRows + "</tbody></table>";
+    contactSection = "<h2>Points of Contact</h2><table><thead><tr><th>State</th><th>Name</th><th>Title/Role</th><th>Organization</th><th>Email</th><th>Notes</th></tr></thead><tbody>" + cRows + "</tbody></table>";
   }
-  var summarySection = d.includeTiers ? ("<h2>State Summary</h2><table><thead><tr><th>State</th><th>Current Tier</th><th>DS4E Goal</th><th>Math Revision</th></tr></thead><tbody>" + rows + "</tbody></table>") : "";
-  return "<!DOCTYPE html><html><head><meta charset='UTF-8'><title>DS4E National Tracker Report " + d.date + "</title><style>" +
-    "body{font-family:Georgia,serif;color:#1c1c1e;margin:0;padding:0;}" +
+
+  var css = "body{font-family:Georgia,serif;color:#1c1c1e;margin:0;padding:0;}" +
     "@media print{body{margin:0;}@page{margin:1.2cm 1.5cm;size:letter portrait;}}" +
     ".cover{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:80px 60px;page-break-after:always;}" +
-    ".cover-badge{display:inline-flex;gap:0;margin-bottom:24px;}" +
-    ".badge-l{background:#ef4a23;color:#fff;font-weight:700;font-size:18px;padding:8px 12px;border-radius:4px 0 0 4px;}" +
-    ".badge-r{background:#1c1c1e;color:#fff;font-weight:700;font-size:11px;padding:8px 10px;border-radius:0 4px 4px 0;line-height:1.3;text-transform:uppercase;letter-spacing:0.5px;}" +
-    "h1{font-size:32px;font-weight:700;color:#1c1c1e;margin:0 0 12px;}" +
+    ".badge-l{background:#ef4a23;color:#fff;font-weight:700;font-size:18px;padding:8px 12px;border-radius:4px 0 0 4px;display:inline-block;}" +
+    ".badge-r{background:#1c1c1e;color:#fff;font-weight:700;font-size:11px;padding:8px 10px;border-radius:0 4px 4px 0;line-height:1.3;text-transform:uppercase;letter-spacing:0.5px;display:inline-block;vertical-align:top;}" +
+    "h1{font-size:32px;font-weight:700;color:#1c1c1e;margin:24px 0 12px;}" +
     ".cover-sub{font-size:16px;color:#555;margin-bottom:8px;}" +
     ".cover-date{font-size:13px;color:#aaa;}" +
-    ".cover-states{margin-top:32px;font-size:13px;color:#888;line-height:1.6;}" +
-    ".section{padding:60px 60px 0;page-break-inside:avoid;}" +
-    "h2{font-size:20px;font-weight:600;color:#1c1c1e;border-bottom:2px solid #ef4a23;padding-bottom:8px;margin-bottom:20px;margin-top:0;}" +
-    "table{width:100%;border-collapse:collapse;margin-bottom:40px;font-size:13px;}" +
-    "th{text-align:left;padding:8px 12px;background:#f2f2f7;font-weight:600;color:#555;font-size:11px;text-transform:uppercase;letter-spacing:0.4px;border-bottom:1px solid #ddd;}" +
-    "td{padding:8px 12px;border-bottom:0.5px solid #f0f0f0;vertical-align:top;}" +
+    ".cover-states{margin-top:32px;font-size:12px;color:#888;line-height:1.8;}" +
+    ".section{padding:60px 60px 0;}" +
+    "h2{font-size:18px;font-weight:600;color:#1c1c1e;border-bottom:2px solid #ef4a23;padding-bottom:8px;margin-bottom:20px;margin-top:0;}" +
+    "table{width:100%;border-collapse:collapse;margin-bottom:40px;font-size:12px;}" +
+    "th{text-align:left;padding:7px 10px;background:#f2f2f7;font-weight:600;color:#555;font-size:10px;text-transform:uppercase;letter-spacing:0.4px;border-bottom:1px solid #ddd;}" +
+    "td{padding:7px 10px;border-bottom:0.5px solid #f0f0f0;vertical-align:top;}" +
     "tr:last-child td{border-bottom:none;}" +
-    ".confidential{background:#fef9ec;border:1px solid #f59e0b;border-radius:6px;padding:12px 16px;font-size:12px;color:#92400e;margin:40px 60px 0;}" +
-    "</style></head><body>" +
-    "<div class='cover'>" +
-    "<div class='cover-badge'><div class='badge-l'>DS4E</div><div class='badge-r'>National<br>Tracker</div></div>" +
+    ".conf{background:#fef9ec;border:1px solid #f59e0b;border-radius:6px;padding:10px 14px;font-size:11px;color:#92400e;margin:0 60px 20px;}";
+
+  return "<!DOCTYPE html><html><head><meta charset='UTF-8'><title>DS4E Report " + d.date + "</title><style>" + css + "</style></head><body>" +
+    "<div class='cover'><div><span class='badge-l'>DS4E</span><span class='badge-r'>National<br>Tracker</span></div>" +
     "<h1>National Report</h1>" +
     "<div class='cover-sub'>" + d.states.length + " state" + (d.states.length !== 1 ? "s" : "") + " included</div>" +
     "<div class='cover-date'>Generated " + d.date + "</div>" +
-    "<div class='cover-states'>" + d.states.join(" &bull; ") + "</div>" +
-    "</div>" +
-    (d.includeTiers ? "<div class='section'>" + summarySection + "</div>" : "") +
-    (d.includeUpdates && d.updateRows.length ? "<div class='section'>" + updateSection + "</div>" : "") +
-    (d.includePrivate && d.privateRows.length ? "<div class='confidential'>&#128274; The following section contains confidential internal information.</div><div class='section'>" + privateSection + "</div>" : "") +
-    "<div style='padding:40px 60px;font-size:11px;color:#aaa;border-top:0.5px solid #eee;margin-top:40px;'>Data Science 4 Everyone &bull; " + d.date + " &bull; ds4everyone.org</div>" +
+    "<div class='cover-states'>" + d.states.join(" &bull; ") + "</div></div>" +
+    (hasAnyStateField ? "<div class='section'>" + stateSection + "</div>" : "") +
+    (d.fUpdates && d.updateRows.length ? "<div class='section'>" + updateSection + "</div>" : "") +
+    (hasPrivate ? "<div class='conf'>&#128274; The following information is confidential — for internal use only.</div>" : "") +
+    (d.fContacts && d.contactRows.length ? "<div class='section'>" + contactSection + "</div>" : "") +
+    "<div style='padding:40px 60px;font-size:11px;color:#aaa;border-top:0.5px solid #eee;margin-top:20px;'>Data Science 4 Everyone &bull; " + d.date + " &bull; ds4everyone.org</div>" +
     "</body></html>";
 }
 
@@ -2568,49 +2611,63 @@ function _doXLSX() {
   var d = buildReportData();
   var wb = XLSX.utils.book_new();
 
-  if (d.includeTiers && d.summaryRows.length) {
-    var rows = [["State","Abbreviation","Current Tier","DS4E Goal","Math Revision","All Tiers"]];
-    for (var i = 0; i < d.summaryRows.length; i++) {
-      var r = d.summaryRows[i];
-      rows.push([r.state, r.abbr, r.tier, r.goal, r.mathrev, r.tierList]);
+  // State Data sheet — only include selected columns
+  var hasStateSheet = d.fTier || d.fMathrev || d.fGoal || d.fNotes;
+  if (hasStateSheet && d.stateRows.length) {
+    var header = ["State", "Abbreviation"];
+    if (d.fTier)    header.push("DS4E Tier");
+    if (d.fMathrev) header.push("Math Revision");
+    if (d.fGoal)    header.push("DS4E Goal");
+    if (d.fNotes)   header.push("Internal Notes");
+    var sRows = [header];
+    for (var i = 0; i < d.stateRows.length; i++) {
+      var r = d.stateRows[i];
+      var row = [r.state, r.abbr];
+      if (d.fTier)    row.push(r.tier || "—");
+      if (d.fMathrev) row.push(r.mathrev || "—");
+      if (d.fGoal)    row.push(r.goal || "—");
+      if (d.fNotes)   row.push(r.notes || "");
+      sRows.push(row);
     }
-    var ws = XLSX.utils.aoa_to_sheet(rows);
-    ws["!cols"] = [{wch:22},{wch:5},{wch:12},{wch:12},{wch:28},{wch:30}];
-    XLSX.utils.book_append_sheet(wb, ws, "State Summary");
+    var sws = XLSX.utils.aoa_to_sheet(sRows);
+    sws["!cols"] = [{wch:24},{wch:5},{wch:30},{wch:28},{wch:14},{wch:60}].slice(0, header.length);
+    XLSX.utils.book_append_sheet(wb, sws, "State Data");
   }
 
-  if (d.includeUpdates && d.updateRows.length) {
+  // Updates sheet
+  if (d.fUpdates && d.updateRows.length) {
     var uRows = [["Date","State","Update","Tier Change"]];
     for (var u = 0; u < d.updateRows.length; u++) {
       var upd = d.updateRows[u];
       uRows.push([upd.dateRaw || "Date Unknown", upd.state || "", upd.text || "", upd.tier || ""]);
     }
-    var uwS = XLSX.utils.aoa_to_sheet(uRows);
-    uwS["!cols"] = [{wch:20},{wch:22},{wch:60},{wch:30}];
-    XLSX.utils.book_append_sheet(wb, uwS, "Updates Log");
+    var uws = XLSX.utils.aoa_to_sheet(uRows);
+    uws["!cols"] = [{wch:20},{wch:22},{wch:60},{wch:30}];
+    XLSX.utils.book_append_sheet(wb, uws, "Updates");
   }
 
-  if (d.includePrivate && d.privateRows.length) {
-    var pRows = [["State","Details"]];
-    for (var p = 0; p < d.privateRows.length; p++) {
-      var pr = d.privateRows[p];
-      var dataStr = Array.isArray(pr.data) ? pr.data.join(" | ") : String(pr.data);
-      pRows.push([pr.state, dataStr]);
+  // Contacts sheet
+  if (d.fContacts && d.contactRows.length) {
+    var cRows = [["State","First Name","Last Name","Title/Role","Organization","Email","VIP","Notes","URL"]];
+    for (var ci = 0; ci < d.contactRows.length; ci++) {
+      var cr = d.contactRows[ci]; var c = cr.contact;
+      cRows.push([cr.state, c.first||"", c.last||"", c.title||"", c.org||"", c.email||"", c.vip?"Yes":"", c.notes||"", c.url||""]);
     }
-    var pwS = XLSX.utils.aoa_to_sheet(pRows);
-    pwS["!cols"] = [{wch:22},{wch:80}];
-    XLSX.utils.book_append_sheet(wb, pwS, "Private Details");
+    var cws = XLSX.utils.aoa_to_sheet(cRows);
+    cws["!cols"] = [{wch:22},{wch:14},{wch:14},{wch:24},{wch:28},{wch:30},{wch:5},{wch:50},{wch:40}];
+    XLSX.utils.book_append_sheet(wb, cws, "Contacts");
   }
 
-  // Metadata sheet
+  // Report info sheet
   var meta = [
     ["DS4E National Tracker Report"],
     ["Generated", d.date],
     ["States included", d.states.length],
+    ["Fields included", [d.fTier&&"DS4E Tier",d.fMathrev&&"Math Revision",d.fGoal&&"DS4E Goal",d.fUpdates&&"Updates",d.fNotes&&"Internal Notes",d.fContacts&&"Contacts"].filter(Boolean).join(", ")],
     ["State list", d.states.join(", ")]
   ];
-  var mwS = XLSX.utils.aoa_to_sheet(meta);
-  XLSX.utils.book_append_sheet(wb, mwS, "Report Info");
+  var mws = XLSX.utils.aoa_to_sheet(meta);
+  XLSX.utils.book_append_sheet(wb, mws, "Report Info");
 
   var filename = "DS4E_Report_" + new Date().toISOString().slice(0,10) + ".xlsx";
   XLSX.writeFile(wb, filename);
