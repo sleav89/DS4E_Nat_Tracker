@@ -35,6 +35,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .map-legend-item{display:flex;align-items:center;gap:5px;}
 .map-legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
 
+/* ── SUBMIT VIEW ── */
+#submit-view{display:none;min-height:100vh;background:#f2f2f7;}
+.form-label{font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:6px;display:block;}
+.form-input{width:100%;border:1px solid #e0e0e0;border-radius:8px;padding:10px 12px;font-size:15px;color:#1c1c1e;background:#f9f9f9;outline:none;font-family:inherit;-webkit-appearance:none;}
+.form-input:focus{border-color:#4c4c4c;background:#fff;}
+.form-textarea{width:100%;border:1px solid #e0e0e0;border-radius:8px;padding:10px 12px;font-size:15px;color:#1c1c1e;background:#f9f9f9;outline:none;font-family:inherit;resize:vertical;min-height:120px;}
+.form-textarea:focus{border-color:#4c4c4c;background:#fff;}
+.form-field{margin-bottom:14px;}
+.form-field:last-child{margin-bottom:0;}
+.submit-btn{width:100%;background:#ef4a23;color:#fff;border:none;border-radius:10px;padding:13px;font-size:16px;font-weight:600;cursor:pointer;}
+.submit-btn:disabled{opacity:0.5;cursor:default;}
+
 /* ── LIST VIEW ── */
 #list-view{display:none;min-height:100vh;}
 .search-section{background:#fff;border-bottom:0.5px solid #e0e0e0;padding:10px 12px 8px;position:sticky;top:56px;z-index:99;}
@@ -271,6 +283,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
       States
     </div>
+    <div class="nav-tab" id="nav-submit" onclick="switchTab('submit')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      Submit
+    </div>
   </div>
 </div>
 
@@ -307,6 +323,70 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
       States
     </div>
+    <div class="nav-tab" id="nav-submit2" onclick="switchTab('submit')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      Submit
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ SUBMIT VIEW ═══════════════════════════ -->
+<div id="submit-view">
+  <div class="app-header">
+    <div class="ds4e-badge">
+      <div class="ds4e-badge-l">DS4E</div>
+      <div class="ds4e-badge-r">National<br>Tracker</div>
+    </div>
+  </div>
+  <div style="background:#4c4c4c;padding:20px 16px;">
+    <div style="color:#fff;font-size:18px;font-weight:600;">Share Information</div>
+    <div style="color:#b8b6b6;font-size:13px;margin-top:4px;">Have updates, contacts, or data science education info from your state? Send it directly to the DS4E team.</div>
+  </div>
+  <div id="submit-success" style="display:none;margin:20px 16px 0;background:#e1f5ee;border-radius:12px;padding:20px;text-align:center;">
+    <div style="font-size:32px;margin-bottom:8px;">&#10003;</div>
+    <div style="font-size:16px;font-weight:600;color:#0f6e56;margin-bottom:4px;">Message sent!</div>
+    <div style="font-size:13px;color:#555;">Thanks for sharing. We'll follow up if we have questions.</div>
+    <button onclick="resetSubmitForm()" style="margin-top:14px;background:#4c4c4c;color:#fff;border:none;border-radius:8px;padding:9px 20px;font-size:14px;cursor:pointer;">Send another</button>
+  </div>
+  <div id="submit-form-wrap" style="padding:16px 16px 100px;">
+    <div style="background:#fff;border-radius:12px;padding:16px;margin-bottom:12px;">
+      <div class="form-field">
+        <label class="form-label" for="sf-name">Your name *</label>
+        <input class="form-input" id="sf-name" type="text" placeholder="Full name">
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="sf-email">Your email *</label>
+        <input class="form-input" id="sf-email" type="email" placeholder="you@example.com">
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="sf-state">State (optional)</label>
+        <select class="form-input" id="sf-state">
+          <option value="">&#8212; Select a state &#8212;</option>
+          <option>Alabama</option><option>Alaska</option><option>Arizona</option><option>Arkansas</option><option>California</option><option>Colorado</option><option>Connecticut</option><option>Delaware</option><option>District of Columbia</option><option>Florida</option><option>Georgia</option><option>Hawaii</option><option>Idaho</option><option>Illinois</option><option>Indiana</option><option>Iowa</option><option>Kansas</option><option>Kentucky</option><option>Louisiana</option><option>Maine</option><option>Maryland</option><option>Massachusetts</option><option>Michigan</option><option>Minnesota</option><option>Mississippi</option><option>Missouri</option><option>Montana</option><option>Nebraska</option><option>Nevada</option><option>New Hampshire</option><option>New Jersey</option><option>New Mexico</option><option>New York</option><option>North Carolina</option><option>North Dakota</option><option>Ohio</option><option>Oklahoma</option><option>Oregon</option><option>Pennsylvania</option><option>Rhode Island</option><option>South Carolina</option><option>South Dakota</option><option>Tennessee</option><option>Texas</option><option>Utah</option><option>Vermont</option><option>Virginia</option><option>Washington</option><option>West Virginia</option><option>Wisconsin</option><option>Wyoming</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="sf-message">Message *</label>
+        <textarea class="form-textarea" id="sf-message" placeholder="Share what you know &#8212; updates, contacts, initiatives, or anything relevant to data science education in your state..."></textarea>
+      </div>
+    </div>
+    <div id="sf-error" style="font-size:12px;color:#e05252;margin-bottom:10px;min-height:16px;"></div>
+    <button class="submit-btn" id="sf-submit" onclick="submitContactForm()">Send to DS4E</button>
+    <div style="font-size:11px;color:#aaa;text-align:center;margin-top:10px;">Your message goes directly to the DS4E team.</div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-tab" id="nav-map3" onclick="switchTab('map')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3V6z"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+      Map
+    </div>
+    <div class="nav-tab" id="nav-states3" onclick="switchTab('states')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      States
+    </div>
+    <div class="nav-tab active" id="nav-submit3" onclick="switchTab('submit')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      Submit
+    </div>
   </div>
 </div>
 
@@ -332,7 +412,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <script>
 // ── Config ───────────────────────────────────────────────────────────────────
 var PUBLIC_SHEET_BASE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRU0_I99UuZvfBam8y_Z2wGwbDfsL5A0CB5MYNogbPfSWnnLIpSQP-sCtgR3Uwz2vByq7thFBIp-MbB/pub?output=csv&sheet=";
-var PROXY_URL = "https://script.google.com/macros/s/AKfycbzRPVz3grppdD8exZ_KHJ4hn2wAnpqHaC4u_IoA8u1IQm2nn6IUdvoF_v-VWc25ANav/exec";
+var PROXY_URL = "https://script.google.com/macros/s/AKfycbxz8owMlS4FE0lnSfOl_AQv8lxJaPqoRQi4UXOCzOxckIAyCX5OEx31V7FLrEgm9k4k/exec";
 
 // ── Slim state data (map + list only) ────────────────────────────────────────
 var STATES = [{"name": "Alabama", "icon": "Alabama", "updated": "Jun 30, 2026"}, {"name": "Alaska", "icon": "Alaska", "updated": "Jun 30, 2026"}, {"name": "Arizona", "icon": "Arizona", "updated": "Jun 30, 2026"}, {"name": "Arkansas", "icon": "Arkansas", "updated": "Jun 30, 2026"}, {"name": "California", "icon": "California", "updated": "Jun 30, 2026"}, {"name": "Colorado", "icon": "Colorado", "updated": "Jun 30, 2026"}, {"name": "Connecticut", "icon": "Connecticut", "updated": "Jun 30, 2026"}, {"name": "Delaware", "icon": "Delaware", "updated": "Jun 30, 2026"}, {"name": "District of Columbia", "icon": null, "updated": "Jun 30, 2026"}, {"name": "Florida", "icon": "Florida", "updated": "Jun 30, 2026"}, {"name": "Georgia", "icon": "Georgia", "updated": "Jun 30, 2026"}, {"name": "Hawaii", "icon": "Hawaii", "updated": "Jun 30, 2026"}, {"name": "Idaho", "icon": "Idaho", "updated": "Jun 30, 2026"}, {"name": "Illinois", "icon": "Illinois", "updated": "Jun 30, 2026"}, {"name": "Indiana", "icon": "Indiana", "updated": "Jun 30, 2026"}, {"name": "Iowa", "icon": "Iowa", "updated": "Jun 30, 2026"}, {"name": "Kansas", "icon": "Kansas", "updated": "Jun 30, 2026"}, {"name": "Kentucky", "icon": "Kentucky", "updated": "Jun 30, 2026"}, {"name": "Louisiana", "icon": "Louisiana_", "updated": "Jun 30, 2026"}, {"name": "Maine", "icon": "Maine", "updated": "Jun 30, 2026"}, {"name": "Maryland", "icon": "Maryland", "updated": "Jun 30, 2026"}, {"name": "Massachusetts", "icon": "Massachusetts", "updated": "Jun 30, 2026"}, {"name": "Michigan", "icon": "Michigan", "updated": "Jun 30, 2026"}, {"name": "Minnesota", "icon": "Minnesota", "updated": "Jun 30, 2026"}, {"name": "Mississippi", "icon": "Mississippi", "updated": "Jun 30, 2026"}, {"name": "Missouri", "icon": "Missouri", "updated": "Jun 30, 2026"}, {"name": "Montana", "icon": "Montana", "updated": "Jun 30, 2026"}, {"name": "Nebraska", "icon": "Nebraska", "updated": "Jun 30, 2026"}, {"name": "Nevada", "icon": "Nevada", "updated": "Jun 30, 2026"}, {"name": "New Hampshire", "icon": "New_Hampshire", "updated": "Jun 30, 2026"}, {"name": "New Jersey", "icon": "New_Jersey", "updated": "Jun 30, 2026"}, {"name": "New Mexico", "icon": "New_Mexico", "updated": "Jun 30, 2026"}, {"name": "New York", "icon": "New_York", "updated": "Jun 30, 2026"}, {"name": "North Carolina", "icon": "North_Carolina", "updated": "Jun 30, 2026"}, {"name": "North Dakota", "icon": "North_Dakota", "updated": "Jun 30, 2026"}, {"name": "Ohio", "icon": "Ohio", "updated": "Jun 30, 2026"}, {"name": "Oklahoma", "icon": "Oklahoma", "updated": "Jun 30, 2026"}, {"name": "Oregon", "icon": "Oregon", "updated": "Jun 30, 2026"}, {"name": "Pennsylvania", "icon": "Pennsylvania", "updated": "Jun 30, 2026"}, {"name": "Rhode Island", "icon": "Rhode_Island", "updated": "Jun 30, 2026"}, {"name": "South Carolina", "icon": "South_Carolina", "updated": "Jun 30, 2026"}, {"name": "South Dakota", "icon": "South_Dakota", "updated": "Jun 30, 2026"}, {"name": "Tennessee", "icon": "Tennessee_", "updated": "Jun 30, 2026"}, {"name": "Texas", "icon": "Texas", "updated": "Jun 30, 2026"}, {"name": "Utah", "icon": "Utah", "updated": "Jun 30, 2026"}, {"name": "Vermont", "icon": "Vermont", "updated": "Jun 30, 2026"}, {"name": "Virginia", "icon": "Virginia_", "updated": "Jun 30, 2026"}, {"name": "Washington", "icon": "Washington", "updated": "Jun 30, 2026"}, {"name": "West Virginia", "icon": "West_Virginia_", "updated": "Jun 30, 2026"}, {"name": "Wisconsin", "icon": "Wisconsin", "updated": "Jun 30, 2026"}, {"name": "Wyoming", "icon": "Wyoming_", "updated": "Jun 30, 2026"}];
@@ -1675,20 +1755,75 @@ function initMap() {
 
 // ── Nav ───────────────────────────────────────────────────────────────────────
 function switchTab(tab) {
-  var mapV = document.getElementById("map-view");
+  var mapV  = document.getElementById("map-view");
   var listV = document.getElementById("list-view");
-  var nm = document.getElementById("nav-map"), ns = document.getElementById("nav-states");
-  var nm2 = document.getElementById("nav-map2"), ns2 = document.getElementById("nav-states2");
+  var subV  = document.getElementById("submit-view");
+  // all nav buttons
+  var ids = ["nav-map","nav-states","nav-submit","nav-map2","nav-states2","nav-submit2","nav-map3","nav-states3","nav-submit3"];
+  for (var i = 0; i < ids.length; i++) {
+    var el = document.getElementById(ids[i]);
+    if (el) el.className = "nav-tab";
+  }
   if (tab === "map") {
-    mapV.style.display = "flex"; listV.style.display = "none";
-    if (nm) nm.className = "nav-tab active"; if (ns) ns.className = "nav-tab";
-    if (nm2) nm2.className = "nav-tab active"; if (ns2) ns2.className = "nav-tab";
+    mapV.style.display = "flex"; listV.style.display = "none"; if (subV) subV.style.display = "none";
+    var nm = document.getElementById("nav-map"); if (nm) nm.className = "nav-tab active";
+    var nm2 = document.getElementById("nav-map2"); if (nm2) nm2.className = "nav-tab active";
+    var nm3 = document.getElementById("nav-map3"); if (nm3) nm3.className = "nav-tab active";
+  } else if (tab === "submit") {
+    mapV.style.display = "none"; listV.style.display = "none"; if (subV) subV.style.display = "block";
+    var ns = document.getElementById("nav-submit"); if (ns) ns.className = "nav-tab active";
+    var ns2 = document.getElementById("nav-submit2"); if (ns2) ns2.className = "nav-tab active";
+    var ns3 = document.getElementById("nav-submit3"); if (ns3) ns3.className = "nav-tab active";
   } else {
-    mapV.style.display = "none"; listV.style.display = "block";
-    if (nm) nm.className = "nav-tab"; if (ns) ns.className = "nav-tab active";
-    if (nm2) nm2.className = "nav-tab"; if (ns2) ns2.className = "nav-tab active";
+    mapV.style.display = "none"; listV.style.display = "block"; if (subV) subV.style.display = "none";
+    var nst = document.getElementById("nav-states"); if (nst) nst.className = "nav-tab active";
+    var nst2 = document.getElementById("nav-states2"); if (nst2) nst2.className = "nav-tab active";
+    var nst3 = document.getElementById("nav-states3"); if (nst3) nst3.className = "nav-tab active";
   }
   window.scrollTo(0, 0);
+}
+
+// ── Contact Form ──────────────────────────────────────────────────────────────
+function submitContactForm() {
+  var name    = (document.getElementById("sf-name").value    || "").trim();
+  var email   = (document.getElementById("sf-email").value   || "").trim();
+  var state   = (document.getElementById("sf-state").value   || "").trim();
+  var message = (document.getElementById("sf-message").value || "").trim();
+  var errEl   = document.getElementById("sf-error");
+  errEl.textContent = "";
+  if (!name)    { errEl.textContent = "Please enter your name."; return; }
+  if (!email || email.indexOf("@") < 0) { errEl.textContent = "Please enter a valid email address."; return; }
+  if (!message) { errEl.textContent = "Please enter a message."; return; }
+  var btn = document.getElementById("sf-submit");
+  btn.disabled = true; btn.textContent = "Sending...";
+  var body = JSON.stringify({ name: name, email: email, state: state, message: message });
+  fetch(PROXY_URL, { method: "POST", body: body, headers: { "Content-Type": "application/json" } })
+    .then(function(r) { return r.json(); })
+    .then(function(json) {
+      if (json && json.ok) {
+        document.getElementById("submit-form-wrap").style.display = "none";
+        document.getElementById("submit-success").style.display = "block";
+      } else {
+        errEl.textContent = (json && json.error) ? json.error : "Something went wrong. Please try again.";
+        btn.disabled = false; btn.textContent = "Send to DS4E";
+      }
+    })
+    .catch(function() {
+      errEl.textContent = "Could not connect. Please try again.";
+      btn.disabled = false; btn.textContent = "Send to DS4E";
+    });
+}
+
+function resetSubmitForm() {
+  document.getElementById("sf-name").value    = "";
+  document.getElementById("sf-email").value   = "";
+  document.getElementById("sf-state").value   = "";
+  document.getElementById("sf-message").value = "";
+  document.getElementById("sf-error").textContent = "";
+  var btn = document.getElementById("sf-submit");
+  btn.disabled = false; btn.textContent = "Send to DS4E";
+  document.getElementById("submit-form-wrap").style.display = "block";
+  document.getElementById("submit-success").style.display = "none";
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
