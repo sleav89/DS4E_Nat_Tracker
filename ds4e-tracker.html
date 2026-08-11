@@ -258,7 +258,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <button class="map-view-btn active" id="mvbtn-tier" onclick="setMapView('tier')">Tier</button>
       <button class="map-view-btn" id="mvbtn-goals" onclick="setMapView('goals')">&#x1F512; DS4E Goals</button>
       <button class="map-view-btn" id="mvbtn-mathrev" onclick="setMapView('mathrev')">Math Revision</button>
-      <button class="map-view-btn" id="mvbtn-stage" onclick="setMapView('stage')">&#x1F512; Stage</button>
     </div>
   </div>
   <div class="map-container">
@@ -1485,8 +1484,7 @@ function submitPassword() {
       PRIVATE_UNLOCKED = true;
       hidePasswordModal();
       updateLockUI();
-      if (pendingStageView) { setMapView("stage"); }
-      else if (pendingGoalsView) { setMapView("goals"); }
+      if (pendingGoalsView) { setMapView("goals"); }
 
       // Phase 2: load actual data in background (non-blocking)
       var stateName = currentDetailState ? currentDetailState.name : null;
@@ -1498,16 +1496,19 @@ function submitPassword() {
           if (!stageJson || stageJson.error || !stageJson.states) return;
           var rows = stageJson.states["State Maps"];
           if (!rows) return;
-          STATE_STAGE_DATA = {};
           STATE_GOALS_DATA = {};
           for (var i = 0; i < rows.length; i++) {
-            var abbr = String(rows[i][0] || "").trim().toUpperCase();
-            var stage = parseInt(rows[i][1]);
-            var goals = parseInt(rows[i][2]);
-            if (abbr && stage >= 1 && stage <= 3) STATE_STAGE_DATA[abbr] = stage;
-            if (abbr && goals >= 1 && goals <= 3) STATE_GOALS_DATA[abbr] = goals;
+            var stateName = String(rows[i][0] || "").trim();
+            if (!stateName || stateName === "State") continue;
+            var abbr = NAME_TO_ABBR[stateName];
+            if (!abbr) continue;
+            // Goals: stored as full tier string e.g. "Tier 2: Course Pilot..."
+            var goalsRaw = String(rows[i][2] || "").trim();
+            var goalsMatch = goalsRaw.match(/Tier\s*(\d)/i);
+            var goals = goalsMatch ? parseInt(goalsMatch[1]) : 0;
+            if (goals >= 1 && goals <= 4) STATE_GOALS_DATA[abbr] = goals;
           }
-          if (currentMapView === "stage" || currentMapView === "goals") { applyMapColors(); updateMapLegend(); }
+          if (currentMapView === "goals") { applyMapColors(); updateMapLegend(); }
         }).catch(function() {});
 
       // State private data (contacts, notes, events)
@@ -1544,7 +1545,6 @@ function updateLockUI() {
 
 // ── Map ───────────────────────────────────────────────────────────────────────
 var TIER_FILL  = {4:"#7c2d12",3:"#ef4a23",2:"#f9c6a4",1:"#6290c8",0:"#b8b6b6"};
-var STAGE_FILL = {1:"#6290c8",2:"#16a34a",3:"#f9c6a4"};
 
 // Math Standards Revision map
 // 1 = Currently revising  2 = Next 5 yrs (by 2031)  3 = Next 10 yrs (2032-2036)  4 = No revision cycle / unknown
@@ -1560,21 +1560,9 @@ var MATH_REV_DATA = {
   "WI":2,"WY":3
 };
 
-// ── Stage data ─────────────────────────────────────────────────────────────────
-// Set each state to 1, 2, or 3; leave null if not yet assigned.
-// Stage 1: Pre-standards / socialization / grassroots engagement
-// Stage 2: Standards revision in-progress
-// Stage 3: Post-standards implementation and PD
-// Stage 1 = Socialization/grassroots, Stage 2 = Standards revision, Stage 3 = Implementation & PD
-// Update individual values as states progress. Set to null to show as unassigned (gray).
-// Stage data is loaded from the private Google Sheet ("State Maps" tab) after unlock.
-// Format: Col A = state abbreviation, Col B = stage number (1, 2, or 3).
-// Stage 1 = Socialization/grassroots, Stage 2 = Standards revision, Stage 3 = Implementation & PD
-var STATE_STAGE_DATA = {};
 var STATE_GOALS_DATA = {};  // DS4E Goal Tier per state (col C of State Maps tab), loaded after unlock
 
 var currentMapView = "tier";
-var pendingStageView = false;
 var pendingGoalsView = false;
 var ABBR_TO_NAME = {
   "AL":"Alabama","AK":"Alaska","AZ":"Arizona","AR":"Arkansas","CA":"California",
@@ -1669,6 +1657,8 @@ function parseStateTiersCSV(csv) {
     var nums = tiers.map(tierNum); nums.push(-1);
     var highest = Math.max.apply(null, nums);
     var mc = (rows[i][2] || "").trim() || (STATE_ABBR_DATA[abbr] ? STATE_ABBR_DATA[abbr].mc : "");
+    var mrCycle = parseInt(rows[i][3] || "");
+    if (abbr && mrCycle >= 1 && mrCycle <= 4) MATH_REV_DATA[abbr] = mrCycle;
     STATE_ABBR_DATA[abbr] = {tier: highest, tiers: tiers, name: name, mc: mc};
   }
 }
@@ -1682,6 +1672,7 @@ function loadTierData() {
       parseStateTiersCSV(csv);
       applyMapColors();
       updateMapLabels();
+      updateMapLegend();
       renderList();
     })
     .catch(function(err) {
@@ -1714,10 +1705,7 @@ function applyMapColors() {
     var d = STATE_ABBR_DATA[abbr];
     if (!d) return;
     var fill;
-    if (currentMapView === "stage") {
-      var stage = STATE_STAGE_DATA[abbr];
-      fill = stage ? (STAGE_FILL[stage] || "#b8b6b6") : "#b8b6b6";
-    } else if (currentMapView === "goals") {
+    if (currentMapView === "goals") {
       var gt = STATE_GOALS_DATA[abbr];
       fill = gt ? (TIER_FILL[gt] || "#b8b6b6") : "#b8b6b6";
     } else if (currentMapView === "mathrev") {
@@ -1755,15 +1743,6 @@ function updateMapLegend() {
       legendItem("#f9c6a4", "Goal Tier 2", gc[2], "#d97a4a") +
       legendItem("#6290c8", "Goal Tier 1", gc[1]) +
       legendItem("#b8b6b6", "Not assigned", gnone);
-  } else if (currentMapView === "stage") {
-    var sc = {1:0, 2:0, 3:0};
-    for (var sa in STATE_STAGE_DATA) { var sv = STATE_STAGE_DATA[sa]; if (sc[sv] !== undefined) sc[sv]++; }
-    var snone = total - sc[1] - sc[2] - sc[3];
-    legend.innerHTML =
-      legendItem("#6290c8",  "Stage 1: Socialization",        sc[1]) +
-      legendItem("#16a34a",  "Stage 2: Standards revision",   sc[2]) +
-      legendItem("#f9c6a4",  "Stage 3: Implementation &amp; PD", sc[3], "#d97a4a") +
-      legendItem("#b8b6b6",  "Not assigned",                  snone);
   } else if (currentMapView === "mathrev") {
     var mc = {1:0, 2:0, 3:0, 4:0};
     for (var ma in MATH_REV_DATA) { var mv = MATH_REV_DATA[ma]; if (mc[mv] !== undefined) mc[mv]++; }
@@ -1790,16 +1769,14 @@ function updateMapLegend() {
 }
 
 function setMapView(view) {
-  if ((view === "stage" || view === "goals") && !PRIVATE_UNLOCKED) {
-    if (view === "stage") pendingStageView = true;
-    if (view === "goals") pendingGoalsView = true;
+  if (view === "goals" && !PRIVATE_UNLOCKED) {
+    pendingGoalsView = true;
     showPasswordModal();
     return;
   }
-  pendingStageView = false;
   pendingGoalsView = false;
   currentMapView = view;
-  ["tier","goals","mathrev","stage"].forEach(function(v) {
+  ["tier","goals","mathrev"].forEach(function(v) {
     var btn = document.getElementById("mvbtn-" + v);
     if (btn) btn.className = "map-view-btn" + (v === view ? " active" : "");
   });
