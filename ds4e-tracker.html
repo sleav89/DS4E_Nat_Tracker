@@ -54,6 +54,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .updates-filter-option:hover{background:#f2f2f7;}
 .updates-filter-option input[type=checkbox]{width:16px;height:16px;accent-color:#ef4a23;cursor:pointer;flex-shrink:0;}
 
+/* ── REPORTS VIEW ── */
+#reports-view{display:none;min-height:100vh;background:#f2f2f7;}
+.report-section-card{background:#fff;border-radius:12px;padding:14px 16px;margin-bottom:10px;}
+.report-section-title{font-size:13px;font-weight:600;color:#1c1c1e;margin-bottom:10px;}
+.report-check-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:0.5px solid #f5f5f5;cursor:pointer;}
+.report-check-row:last-child{border-bottom:none;}
+.report-check-row input[type=checkbox]{width:18px;height:18px;accent-color:#ef4a23;cursor:pointer;flex-shrink:0;}
+.report-check-label{font-size:14px;color:#1c1c1e;}
+.report-check-sub{font-size:11px;color:#888;margin-top:1px;}
+.report-dl-btn{flex:1;padding:12px;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;}
+.report-dl-pdf{background:#ef4a23;color:#fff;}
+.report-dl-xlsx{background:#66c2a4;color:#fff;}
+.report-dl-btn:disabled{opacity:0.45;cursor:default;}
+.report-lock-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 32px;text-align:center;}
+.report-lock-icon{font-size:48px;margin-bottom:16px;}
+.report-lock-title{font-size:18px;font-weight:600;color:#1c1c1e;margin-bottom:6px;}
+.report-lock-sub{font-size:14px;color:#888;margin-bottom:24px;line-height:1.5;}
+.report-unlock-btn{background:#4c4c4c;color:#fff;border:none;border-radius:10px;padding:12px 28px;font-size:15px;font-weight:600;cursor:pointer;}
+
 /* ── SUBMIT VIEW ── */
 #submit-view{display:none;min-height:100vh;background:#f2f2f7;}
 .form-label{font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:6px;display:block;}
@@ -305,6 +324,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       Updates
     </div>
+    <div class="nav-tab" id="nav-reports" onclick="switchTab('reports')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      Reports
+    </div>
     <div class="nav-tab" id="nav-submit" onclick="switchTab('submit')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
       Submit
@@ -349,6 +372,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       Updates
     </div>
+    <div class="nav-tab" id="nav-reports2" onclick="switchTab('reports')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      Reports
+    </div>
     <div class="nav-tab" id="nav-submit2" onclick="switchTab('submit')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
       Submit
@@ -366,7 +393,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
   <div style="background:#fff;border-bottom:0.5px solid #e5e5e5;padding:10px 16px;">
     <div style="display:flex;flex-wrap:wrap;gap:10px 18px;margin-bottom:6px;">
-      <span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#555;"><span style="font-size:12px;font-weight:600;color:#16a34a;">+</span><span style="display:inline-flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:50%;background:#6290c8;display:inline-block;"></span><span>Tier added</span></span></span>
+      <span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#555;"><span style="font-size:12px;font-weight:600;color:#66c2a4;">+</span><span style="display:inline-flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:50%;background:#6290c8;display:inline-block;"></span><span>Tier added</span></span></span>
       <span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#555;"><span style="font-size:12px;color:#aaa;">=</span><span style="display:inline-flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:50%;background:#6290c8;display:inline-block;"></span><span>Tier unchanged</span></span></span>
       <span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#555;"><span style="display:inline-flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:50%;background:#6290c8;display:inline-block;"></span></span><span style="color:#ccc;">&#8594;</span><span style="display:inline-flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:50%;background:#ef4a23;display:inline-block;"></span><span>Tier changed</span></span></span>
     </div>
@@ -400,10 +427,139 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       Updates
     </div>
+    <div class="nav-tab" id="nav-reports4" onclick="switchTab('reports')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      Reports
+    </div>
     <div class="nav-tab" id="nav-submit4" onclick="switchTab('submit')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
       Submit
     </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ REPORTS VIEW ═══════════════════════════ -->
+<div id="reports-view">
+  <div class="app-header">
+    <div class="ds4e-badge">
+      <div class="ds4e-badge-l">DS4E</div>
+      <div class="ds4e-badge-r">National<br>Tracker</div>
+    </div>
+    <div class="header-title">Reports</div>
+  </div>
+
+  <!-- Lock screen -->
+  <div id="reports-lock" class="report-lock-screen">
+    <div class="report-lock-icon">&#x1F4CA;</div>
+    <div class="report-lock-title">Executive Reports</div>
+    <div class="report-lock-sub">This section is restricted to DS4E leadership. Enter the reports password to build and export funder reports.</div>
+    <button class="report-unlock-btn" onclick="showReportModal()">Unlock Reports</button>
+  </div>
+
+  <!-- Report builder (shown after unlock) -->
+  <div id="reports-builder" style="display:none;padding:16px 16px 100px;">
+
+    <!-- State filter -->
+    <div class="report-section-card">
+      <div class="report-section-title">States to Include</div>
+      <div style="position:relative;" id="report-state-filter-wrap">
+        <button id="report-state-btn" onclick="toggleReportStateDropdown(event)"
+          style="width:100%;border:0.5px solid #ddd;border-radius:8px;padding:9px 12px;font-size:13px;background:#f2f2f7;color:#1c1c1e;text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center;outline:none;">
+          <span id="report-state-label">All States &amp; DC (51)</span>
+          <span style="color:#aaa;font-size:10px;">&#9660;</span>
+        </button>
+        <div id="report-state-dropdown" class="updates-filter-dropdown" style="display:none;">
+          <div style="padding:8px 14px;border-bottom:0.5px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#fff;">
+            <span style="font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.4px;">Select States</span>
+            <button onclick="clearReportStateFilter()" style="font-size:12px;color:#ef4a23;background:none;border:none;cursor:pointer;padding:0;font-weight:500;">All states</button>
+          </div>
+          <div id="report-state-options"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sections -->
+    <div class="report-section-card">
+      <div class="report-section-title">Report Sections</div>
+      <label class="report-check-row">
+        <input type="checkbox" id="rpt-tiers" checked>
+        <div>
+          <div class="report-check-label">State Summary</div>
+          <div class="report-check-sub">Current DS4E tier, DS4E goal, math revision cycle per state</div>
+        </div>
+      </label>
+      <label class="report-check-row">
+        <input type="checkbox" id="rpt-updates" checked>
+        <div>
+          <div class="report-check-label">Updates Log</div>
+          <div class="report-check-sub">Chronological history of state changes and milestones</div>
+        </div>
+      </label>
+      <label class="report-check-row">
+        <input type="checkbox" id="rpt-private">
+        <div>
+          <div class="report-check-label">Private State Details</div>
+          <div class="report-check-sub">Internal notes, contacts, and events from private records</div>
+        </div>
+      </label>
+    </div>
+
+    <!-- Download -->
+    <div class="report-section-card">
+      <div class="report-section-title">Download Report</div>
+      <div id="rpt-generating" style="display:none;text-align:center;padding:10px 0;font-size:13px;color:#888;">Building report&#8230;</div>
+      <div style="display:flex;gap:10px;">
+        <button class="report-dl-btn report-dl-pdf" id="rpt-pdf-btn" onclick="downloadReportPDF()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          PDF
+        </button>
+        <button class="report-dl-btn report-dl-xlsx" id="rpt-xlsx-btn" onclick="downloadReportXLSX()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          Excel
+        </button>
+      </div>
+      <div style="font-size:11px;color:#aaa;margin-top:10px;">PDF opens a print dialog — choose "Save as PDF". Excel downloads directly.</div>
+    </div>
+
+  </div>
+
+  <div class="bottom-nav">
+    <div class="nav-tab" id="nav-map5" onclick="switchTab('map')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3V6z"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+      Map
+    </div>
+    <div class="nav-tab" id="nav-states5" onclick="switchTab('states')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      States
+    </div>
+    <div class="nav-tab" id="nav-updates5" onclick="switchTab('updates')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Updates
+    </div>
+    <div class="nav-tab active" id="nav-reports5" onclick="switchTab('reports')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      Reports
+    </div>
+    <div class="nav-tab" id="nav-submit5" onclick="switchTab('submit')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      Submit
+    </div>
+  </div>
+</div>
+
+<!-- Report password modal -->
+<div id="report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;border-radius:16px;padding:24px 20px;width:100%;max-width:360px;box-shadow:0 10px 40px rgba(0,0,0,0.2);">
+    <div style="font-size:17px;font-weight:600;color:#1c1c1e;margin-bottom:6px;">&#x1F512; Reports Access</div>
+    <div style="font-size:13px;color:#888;margin-bottom:18px;">Enter the executive reports password to continue.</div>
+    <input id="rpt-pw-input" type="password" placeholder="Reports password"
+      style="width:100%;border:1px solid #e0e0e0;border-radius:8px;padding:10px 12px;font-size:15px;color:#1c1c1e;background:#f9f9f9;outline:none;font-family:inherit;margin-bottom:10px;"
+      onkeydown="if(event.key==='Enter')submitReportPassword()">
+    <div id="rpt-pw-error" style="font-size:12px;color:#e05252;min-height:16px;margin-bottom:10px;"></div>
+    <button id="rpt-pw-btn" onclick="submitReportPassword()"
+      style="width:100%;background:#4c4c4c;color:#fff;border:none;border-radius:10px;padding:12px;font-size:16px;font-weight:600;cursor:pointer;">Unlock</button>
+    <button onclick="hideReportModal()"
+      style="width:100%;background:none;border:none;color:#888;font-size:14px;margin-top:10px;cursor:pointer;padding:6px;">Cancel</button>
   </div>
 </div>
 
@@ -464,6 +620,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       Updates
     </div>
+    <div class="nav-tab" id="nav-reports3" onclick="switchTab('reports')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      Reports
+    </div>
     <div class="nav-tab active" id="nav-submit3" onclick="switchTab('submit')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
       Submit
@@ -493,7 +653,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <script>
 // ── Config ───────────────────────────────────────────────────────────────────
 var PUBLIC_SHEET_BASE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRU0_I99UuZvfBam8y_Z2wGwbDfsL5A0CB5MYNogbPfSWnnLIpSQP-sCtgR3Uwz2vByq7thFBIp-MbB/pub?output=csv&sheet=";
-var PROXY_URL = "https://script.google.com/macros/s/AKfycbzxhQvcDZs0_o4iFUzznCEKN5gG0BcbZT7JVZg0q_rCKYA13X5lABHvrpA9ygqdfBHz/exec";
+var PROXY_URL = "https://script.google.com/macros/s/AKfycbyfuftBY9_bLAUZaZhqM-VD0mZhVhAVu5dO42gSoHAdHbEHx-zjbjTpDhql5qG1Pogc/exec";
 
 // ── Slim state data (map + list only) ────────────────────────────────────────
 var STATES = [{"name": "Alabama", "icon": "Alabama", "updated": "Jun 30, 2026"}, {"name": "Alaska", "icon": "Alaska", "updated": "Jun 30, 2026"}, {"name": "Arizona", "icon": "Arizona", "updated": "Jun 30, 2026"}, {"name": "Arkansas", "icon": "Arkansas", "updated": "Jun 30, 2026"}, {"name": "California", "icon": "California", "updated": "Jun 30, 2026"}, {"name": "Colorado", "icon": "Colorado", "updated": "Jun 30, 2026"}, {"name": "Connecticut", "icon": "Connecticut", "updated": "Jun 30, 2026"}, {"name": "Delaware", "icon": "Delaware", "updated": "Jun 30, 2026"}, {"name": "District of Columbia", "icon": null, "updated": "Jun 30, 2026"}, {"name": "Florida", "icon": "Florida", "updated": "Jun 30, 2026"}, {"name": "Georgia", "icon": "Georgia", "updated": "Jun 30, 2026"}, {"name": "Hawaii", "icon": "Hawaii", "updated": "Jun 30, 2026"}, {"name": "Idaho", "icon": "Idaho", "updated": "Jun 30, 2026"}, {"name": "Illinois", "icon": "Illinois", "updated": "Jun 30, 2026"}, {"name": "Indiana", "icon": "Indiana", "updated": "Jun 30, 2026"}, {"name": "Iowa", "icon": "Iowa", "updated": "Jun 30, 2026"}, {"name": "Kansas", "icon": "Kansas", "updated": "Jun 30, 2026"}, {"name": "Kentucky", "icon": "Kentucky", "updated": "Jun 30, 2026"}, {"name": "Louisiana", "icon": "Louisiana_", "updated": "Jun 30, 2026"}, {"name": "Maine", "icon": "Maine", "updated": "Jun 30, 2026"}, {"name": "Maryland", "icon": "Maryland", "updated": "Jun 30, 2026"}, {"name": "Massachusetts", "icon": "Massachusetts", "updated": "Jun 30, 2026"}, {"name": "Michigan", "icon": "Michigan", "updated": "Jun 30, 2026"}, {"name": "Minnesota", "icon": "Minnesota", "updated": "Jun 30, 2026"}, {"name": "Mississippi", "icon": "Mississippi", "updated": "Jun 30, 2026"}, {"name": "Missouri", "icon": "Missouri", "updated": "Jun 30, 2026"}, {"name": "Montana", "icon": "Montana", "updated": "Jun 30, 2026"}, {"name": "Nebraska", "icon": "Nebraska", "updated": "Jun 30, 2026"}, {"name": "Nevada", "icon": "Nevada", "updated": "Jun 30, 2026"}, {"name": "New Hampshire", "icon": "New_Hampshire", "updated": "Jun 30, 2026"}, {"name": "New Jersey", "icon": "New_Jersey", "updated": "Jun 30, 2026"}, {"name": "New Mexico", "icon": "New_Mexico", "updated": "Jun 30, 2026"}, {"name": "New York", "icon": "New_York", "updated": "Jun 30, 2026"}, {"name": "North Carolina", "icon": "North_Carolina", "updated": "Jun 30, 2026"}, {"name": "North Dakota", "icon": "North_Dakota", "updated": "Jun 30, 2026"}, {"name": "Ohio", "icon": "Ohio", "updated": "Jun 30, 2026"}, {"name": "Oklahoma", "icon": "Oklahoma", "updated": "Jun 30, 2026"}, {"name": "Oregon", "icon": "Oregon", "updated": "Jun 30, 2026"}, {"name": "Pennsylvania", "icon": "Pennsylvania", "updated": "Jun 30, 2026"}, {"name": "Rhode Island", "icon": "Rhode_Island", "updated": "Jun 30, 2026"}, {"name": "South Carolina", "icon": "South_Carolina", "updated": "Jun 30, 2026"}, {"name": "South Dakota", "icon": "South_Dakota", "updated": "Jun 30, 2026"}, {"name": "Tennessee", "icon": "Tennessee_", "updated": "Jun 30, 2026"}, {"name": "Texas", "icon": "Texas", "updated": "Jun 30, 2026"}, {"name": "Utah", "icon": "Utah", "updated": "Jun 30, 2026"}, {"name": "Vermont", "icon": "Vermont", "updated": "Jun 30, 2026"}, {"name": "Virginia", "icon": "Virginia_", "updated": "Jun 30, 2026"}, {"name": "Washington", "icon": "Washington", "updated": "Jun 30, 2026"}, {"name": "West Virginia", "icon": "West_Virginia_", "updated": "Jun 30, 2026"}, {"name": "Wisconsin", "icon": "Wisconsin", "updated": "Jun 30, 2026"}, {"name": "Wyoming", "icon": "Wyoming_", "updated": "Jun 30, 2026"}];
@@ -637,10 +797,12 @@ function parsePrivateSheet(rows) {
       if (inContacts && c0 && c0 !== "[First]") {
         d.contacts.push({
           first: c0, last: String(r[1]||"").trim(),
-          title: String(r[2]||"").trim(), org: String(r[3]||"").trim(),
-          email: String(r[4]||"").trim(), role: String(r[5]||"").trim(),
-          vip: String(r[6]||"").trim().toLowerCase() === "yes",
-          notes: String(r[7]||"").trim()
+          title: String(r[2]||"").trim(),
+          org:   String(r[3]||"").trim(),
+          email: String(r[4]||"").trim(),
+          vip:   String(r[5]||"").trim().toLowerCase() === "yes",
+          notes: String(r[6]||"").trim(),
+          url:   String(r[7]||"").trim()
         });
       }
     }
@@ -838,7 +1000,7 @@ var CREDITS_FILTERS = ["all","4","3","2","Local Control","N/A"];
 var CREDITS_LABELS = {"all":"All","4":"4 Credits","3":"3 Credits","2":"2 Credits","Local Control":"Local Control","N/A":"N/A"};
 var MATHREV_FILTERS = ["all","revision","revision-future","adopted"];
 var MATHREV_LABELS = {"all":"All","revision":"In Revision","revision-future":"Revision Soon","adopted":"Adopted"};
-var MATHREV_COLORS = {"revision":"#dc2626","revision-future":"#d97706","adopted":"#16a34a"};
+var MATHREV_COLORS = {"revision":"#dc2626","revision-future":"#d97706","adopted":"#66c2a4"};
 
 function buildFilters() {
   var row = document.getElementById("filter-row");
@@ -1376,7 +1538,7 @@ function renderContacts(s) {
     if (c.title) h += '<div class="contact-title">' + esc(c.title) + "</div>";
     if (c.org) h += '<div class="contact-title" style="color:#888;">' + esc(c.org) + "</div>";
     if (c.email) h += '<div class="contact-email"><a href="mailto:' + esc(c.email) + '">' + esc(c.email) + "</a></div>";
-    if (c.role) h += '<div><span class="contact-role">' + esc(c.role) + "</span></div>";
+    if (c.url) h += '<div class="contact-email"><a href="' + esc(c.url) + '" target="_blank" rel="noopener">' + esc(c.url) + "</a></div>";
     if (c.notes) h += '<div class="contact-notes">' + renderWithInlineLinks(c.notes).replace(/\n/g,"<br>") + "</div>";
     h += "</div>";
   });
@@ -1548,17 +1710,11 @@ var TIER_FILL  = {4:"#7c2d12",3:"#ef4a23",2:"#f9c6a4",1:"#6290c8",0:"#b8b6b6"};
 
 // Math Standards Revision map
 // 1 = Currently revising  2 = Next 5 yrs (by 2031)  3 = Next 10 yrs (2032-2036)  4 = No revision cycle / unknown
-var MATH_REV_FILL = {1:"#f9c6a4",2:"#6290c8",3:"#16a34a",4:"#b8b6b6"};
-var MATH_REV_DATA = {
-  "AL":2,"AK":4,"AZ":1,"AR":2,"CA":4,"CO":1,"CT":4,
-  "DC":4,"DE":4,"FL":4,"GA":2,"HI":1,"ID":1,"IL":4,
-  "IN":2,"IA":4,"KS":4,"KY":1,"LA":1,"ME":2,"MD":4,
-  "MA":4,"MI":4,"MN":3,"MS":4,"MO":4,"MT":4,"NE":2,
-  "NV":4,"NH":4,"NJ":4,"NM":4,"NY":4,"NC":1,"ND":4,
-  "OH":4,"OK":2,"OR":2,"PA":4,"RI":2,"SC":4,"SD":1,
-  "TN":1,"TX":2,"UT":1,"VT":4,"VA":4,"WA":4,"WV":2,
-  "WI":2,"WY":3
-};
+// Math Rev categories: 0=Recently completed (last 2 yrs), 1=Currently revising, 2=Next 5 yrs, 3=Next 10 yrs, 4=No cycle/unknown
+var MATH_REV_FILL = {0:"#ef4a23",1:"#f9c6a4",2:"#6290c8",3:"#66c2a4",4:"#b8b6b6"};
+// Math Rev data loaded from "State Tiers" tab of the public sheet (Col D: 0–4)
+// 0=Recently completed, 1=Currently revising, 2=Next 5 yrs, 3=Next 10 yrs, 4=No cycle/unknown
+var MATH_REV_DATA = {};
 
 var STATE_GOALS_DATA = {};  // DS4E Goal Tier per state (col C of State Maps tab), loaded after unlock
 
@@ -1583,61 +1739,29 @@ var NAME_TO_ABBR = {};
 var _abbrKeys = Object.keys(ABBR_TO_NAME);
 for (var _i = 0; _i < _abbrKeys.length; _i++) { NAME_TO_ABBR[ABBR_TO_NAME[_abbrKeys[_i]]] = _abbrKeys[_i]; }
 
-var STATE_ABBR_DATA = {
-"AL":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program","Tier 1: State Course Code"],"name":"Alabama","mc":"4","mr":"revision-future"},
-"AK":{"tier":0,"tiers":[],"name":"Alaska","mc":"3","mr":"adopted"},
-"AZ":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program","Tier 1: State Course Code"],"name":"Arizona","mc":"4","mr":"revision"},
-"AR":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program","Tier 1: State Course Code"],"name":"Arkansas","mc":"4","mr":"adopted"},
-"CA":{"tier":3,"tiers":["Tier 3: Standards Adoption"],"name":"California","mc":"2","mr":"adopted"},
-"CO":{"tier":2,"tiers":["Tier 1: State Course Code","Tier 2: Course Pilot or Teacher Professional Development Program"],"name":"Colorado","mc":"Local Control","mr":"revision"},
-"CT":{"tier":1,"tiers":["Tier 1: State Course Code"],"name":"Connecticut","mc":"4","mr":"adopted"},
-"DE":{"tier":0,"tiers":[],"name":"Delaware","mc":"4","mr":"adopted"},
-"DC":{"tier":1,"tiers":["Tier 1: State Course Code"],"name":"District of Columbia","mc":"4","mr":"adopted"},
-"FL":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program","Tier 1: State Course Code"],"name":"Florida","mc":"4","mr":"adopted"},
-"GA":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program","Tier 1: State Course Code"],"name":"Georgia","mc":"4","mr":"adopted"},
-"HI":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program"],"name":"Hawaii","mc":"3","mr":"revision"},
-"ID":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program","Tier 1: State Course Code"],"name":"Idaho","mc":"3","mr":"revision"},
-"IL":{"tier":1,"tiers":["Tier 1: State Course Code"],"name":"Illinois","mc":"3","mr":"adopted"},
-"IN":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program"],"name":"Indiana","mc":"4","mr":"adopted"},
-"IA":{"tier":1,"tiers":["Tier 1: State Course Code"],"name":"Iowa","mc":"3","mr":"adopted"},
-"KS":{"tier":0,"tiers":[],"name":"Kansas","mc":"3","mr":"adopted"},
-"KY":{"tier":1,"tiers":["Tier 1: State Course Code"],"name":"Kentucky","mc":"3","mr":"revision"},
-"LA":{"tier":0,"tiers":[],"name":"Louisiana","mc":"4","mr":"revision"},
-"ME":{"tier":0,"tiers":[],"name":"Maine","mc":"2","mr":"adopted"},
-"MD":{"tier":0,"tiers":[],"name":"Maryland","mc":"4","mr":"adopted"},
-"MA":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program","Tier 1: State Course Code"],"name":"Massachusetts","mc":"Local Control","mr":"adopted"},
-"MI":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program","Tier 1: State Course Code"],"name":"Michigan","mc":"3","mr":"adopted"},
-"MN":{"tier":3,"tiers":["Tier 3: Standards Adoption","Tier 1: State Course Code","Tier 2: Course Pilot or Teacher Professional Development Program"],"name":"Minnesota","mc":"3","mr":"adopted"},
-"MS":{"tier":0,"tiers":[],"name":"Mississippi","mc":"4","mr":"adopted"},
-"MO":{"tier":0,"tiers":[],"name":"Missouri","mc":"3","mr":"adopted"},
-"MT":{"tier":3,"tiers":["Tier 3: Standards Adoption","Tier 1: State Course Code"],"name":"Montana","mc":"2","mr":"adopted"},
-"NE":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program","Tier 1: State Course Code"],"name":"Nebraska","mc":"3","mr":"revision-future"},
-"NV":{"tier":0,"tiers":[],"name":"Nevada","mc":"3","mr":"adopted"},
-"NH":{"tier":4,"tiers":["Tier 4: Graduation Requirement"],"name":"New Hampshire","mc":"3","mr":"adopted"},
-"NJ":{"tier":3,"tiers":["Tier 3: Standards Adoption","Tier 1: State Course Code"],"name":"New Jersey","mc":"3","mr":"adopted"},
-"NM":{"tier":1,"tiers":["Tier 1: State Course Code"],"name":"New Mexico","mc":"4","mr":"adopted"},
-"NY":{"tier":1,"tiers":["Tier 1: State Course Code"],"name":"New York","mc":"3","mr":"adopted"},
-"NC":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program","Tier 1: State Course Code"],"name":"North Carolina","mc":"4","mr":"revision"},
-"ND":{"tier":0,"tiers":[],"name":"North Dakota","mc":"3","mr":"adopted"},
-"OH":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program","Tier 1: State Course Code"],"name":"Ohio","mc":"4","mr":"adopted"},
-"OK":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program"],"name":"Oklahoma","mc":"3","mr":"adopted"},
-"OR":{"tier":4,"tiers":["Tier 4: Graduation Requirement","Tier 3: Standards Adoption"],"name":"Oregon","mc":"3","mr":"revision-future"},
-"PA":{"tier":1,"tiers":["Tier 1: State Course Code"],"name":"Pennsylvania","mc":"4","mr":"adopted"},
-"RI":{"tier":0,"tiers":[],"name":"Rhode Island","mc":"4","mr":"adopted"},
-"SC":{"tier":0,"tiers":[],"name":"South Carolina","mc":"4","mr":"adopted"},
-"SD":{"tier":1,"tiers":["Tier 1: State Course Code"],"name":"South Dakota","mc":"3","mr":"adopted"},
-"TN":{"tier":1,"tiers":["Tier 1: State Course Code"],"name":"Tennessee","mc":"4","mr":"adopted"},
-"TX":{"tier":0,"tiers":[],"name":"Texas","mc":"3","mr":"revision-future"},
-"UT":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program"],"name":"Utah","mc":"3","mr":"revision"},
-"VT":{"tier":0,"tiers":[],"name":"Vermont","mc":"N/A","mr":"adopted"},
-"VA":{"tier":3,"tiers":["Tier 3: Standards Adoption","Tier 1: State Course Code"],"name":"Virginia","mc":"3","mr":"adopted"},
-"WA":{"tier":2,"tiers":["Tier 2: Course Pilot or Teacher Professional Development Program","Tier 1: State Course Code"],"name":"Washington","mc":"3","mr":"adopted"},
-"WV":{"tier":3,"tiers":["Tier 3: Standards Adoption","Tier 1: State Course Code"],"name":"West Virginia","mc":"4","mr":"revision-future"},
-"WI":{"tier":1,"tiers":["Tier 1: State Course Code"],"name":"Wisconsin","mc":"3","mr":"revision-future"},
-"WY":{"tier":1,"tiers":["Tier 1: State Course Code"],"name":"Wyoming","mc":"3","mr":"adopted"}
-};
+// Populated at runtime from STATES array (names/icons) and filled in by loadTierData()
+var STATE_ABBR_DATA = {};
 
 // Parse the "State Tiers" CSV tab into STATE_ABBR_DATA
+function parseMathRevText(val) {
+  if (!val) return 4;
+  var s = String(val).trim().toLowerCase();
+  if (!s || s === "none" || s === "n/a") return 4;
+  if (s.indexOf("recently completed") >= 0) return 0;
+  if (s.indexOf("currently in revision") >= 0 || s.indexOf("currently revising") >= 0) return 1;
+  // Year range like "2026 - 2027" or "2031-2032" — parse the start year
+  var yearMatch = s.match(/(\d{4})/);
+  if (yearMatch) {
+    var startYear = parseInt(yearMatch[1]);
+    var currentYear = new Date().getFullYear();
+    var yearsAway = startYear - currentYear;
+    if (yearsAway <= 0) return 1;       // already started = currently revising
+    if (yearsAway <= 5) return 2;        // next 5 years
+    return 3;                             // next 10 years
+  }
+  return 4;
+}
+
 function parseStateTiersCSV(csv) {
   var rows = parseCSV(csv);
   for (var i = 1; i < rows.length; i++) {
@@ -1648,7 +1772,8 @@ function parseStateTiersCSV(csv) {
     if (!abbr) continue;
     var tiers = [];
     if (tiersStr && tiersStr !== "None") {
-      var parts = tiersStr.split(", Tier ");
+      // Handle both comma-separated and newline-separated chip exports
+      var parts = tiersStr.replace(/\n/g, ", ").split(/,\s*Tier /);
       for (var j = 0; j < parts.length; j++) {
         var p = (j === 0 ? parts[j] : "Tier " + parts[j]).trim();
         if (p && p !== "None") tiers.push(p);
@@ -1656,16 +1781,28 @@ function parseStateTiersCSV(csv) {
     }
     var nums = tiers.map(tierNum); nums.push(-1);
     var highest = Math.max.apply(null, nums);
-    var mc = (rows[i][2] || "").trim() || (STATE_ABBR_DATA[abbr] ? STATE_ABBR_DATA[abbr].mc : "");
-    var mrCycle = parseInt(rows[i][3] || "");
-    if (abbr && mrCycle >= 1 && mrCycle <= 4) MATH_REV_DATA[abbr] = mrCycle;
-    STATE_ABBR_DATA[abbr] = {tier: highest, tiers: tiers, name: name, mc: mc};
+    // Col C = Math Revision text value
+    var mrText = (rows[i][2] || "").trim();
+    MATH_REV_DATA[abbr] = parseMathRevText(mrText);
+    STATE_ABBR_DATA[abbr] = {tier: highest, tiers: tiers, name: name};
   }
 }
 
-// Fetch tier data from Google Sheet to refresh baked-in data (optional — page renders from baked data immediately)
+// Seed STATE_ABBR_DATA from the STATES array so the list renders immediately
+// (with no tiers until the sheet loads)
+function seedStateAbbrData() {
+  for (var i = 0; i < STATES.length; i++) {
+    var s = STATES[i];
+    var abbr = NAME_TO_ABBR[s.name];
+    if (abbr && !STATE_ABBR_DATA[abbr]) {
+      STATE_ABBR_DATA[abbr] = {tier: 0, tiers: [], name: s.name};
+    }
+  }
+}
+
+// Fetch tier + math revision data from the public "State Tiers" sheet tab
 function loadTierData() {
-  var url = PROXY_URL + "?state=State%20Tiers";
+  var url = PUBLIC_SHEET_BASE + "State%20Tiers";
   fetch(url)
     .then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
     .then(function(csv) {
@@ -1676,7 +1813,7 @@ function loadTierData() {
       renderList();
     })
     .catch(function(err) {
-      console.log("Tier sheet unavailable, using baked-in data:", err.message);
+      console.log("State Tiers sheet unavailable:", err.message);
     });
 }
 
@@ -1710,7 +1847,7 @@ function applyMapColors() {
       fill = gt ? (TIER_FILL[gt] || "#b8b6b6") : "#b8b6b6";
     } else if (currentMapView === "mathrev") {
       var cat = MATH_REV_DATA[abbr];
-      fill = cat ? (MATH_REV_FILL[cat] || "#b8b6b6") : "#b8b6b6";
+      fill = (cat !== undefined && cat !== null) ? (MATH_REV_FILL[cat] || "#b8b6b6") : "#b8b6b6";
     } else {
       var mapTier = 0;
       var tiers = d.tiers || [];
@@ -1744,13 +1881,14 @@ function updateMapLegend() {
       legendItem("#6290c8", "Goal Tier 1", gc[1]) +
       legendItem("#b8b6b6", "Not assigned", gnone);
   } else if (currentMapView === "mathrev") {
-    var mc = {1:0, 2:0, 3:0, 4:0};
+    var mc = {0:0, 1:0, 2:0, 3:0, 4:0};
     for (var ma in MATH_REV_DATA) { var mv = MATH_REV_DATA[ma]; if (mc[mv] !== undefined) mc[mv]++; }
     legend.innerHTML =
-      legendItem("#f9c6a4", "Currently revising", mc[1], "#d97a4a") +
-      legendItem("#6290c8", "Next 5 years",        mc[2]) +
-      legendItem("#16a34a", "Next 10 years",        mc[3]) +
-      legendItem("#b8b6b6", "No revision cycle",   mc[4]);
+      legendItem("#ef4a23", "Recently completed (last 2 yrs)", mc[0]) +
+      legendItem("#f9c6a4", "Currently revising",              mc[1], "#d97a4a") +
+      legendItem("#6290c8", "Next 5 years",                    mc[2]) +
+      legendItem("#66c2a4", "Next 10 years",                   mc[3]) +
+      legendItem("#b8b6b6", "No revision cycle",               mc[4]);
   } else {
     var tc = {3:0, 2:0, 1:0, 0:0};
     for (var ti2 = 0; ti2 < allAbbrs.length; ti2++) {
@@ -1820,33 +1958,41 @@ function switchTab(tab) {
   var mapV  = document.getElementById("map-view");
   var listV = document.getElementById("list-view");
   var updV  = document.getElementById("updates-view");
+  var rptV  = document.getElementById("reports-view");
   var subV  = document.getElementById("submit-view");
   // clear all nav buttons
-  var ids = ["nav-map","nav-states","nav-updates","nav-submit",
-             "nav-map2","nav-states2","nav-updates2","nav-submit2",
-             "nav-map3","nav-states3","nav-updates3","nav-submit3",
-             "nav-map4","nav-states4","nav-updates4","nav-submit4"];
+  var ids = ["nav-map","nav-states","nav-updates","nav-reports","nav-submit",
+             "nav-map2","nav-states2","nav-updates2","nav-reports2","nav-submit2",
+             "nav-map3","nav-states3","nav-updates3","nav-reports3","nav-submit3",
+             "nav-map4","nav-states4","nav-updates4","nav-reports4","nav-submit4",
+             "nav-map5","nav-states5","nav-updates5","nav-reports5","nav-submit5"];
   for (var i = 0; i < ids.length; i++) {
     var el = document.getElementById(ids[i]);
     if (el) el.className = "nav-tab";
   }
   // hide all views
   mapV.style.display = "none"; listV.style.display = "none";
-  if (updV) updV.style.display = "none"; if (subV) subV.style.display = "none";
+  if (updV) updV.style.display = "none";
+  if (rptV) rptV.style.display = "none";
+  if (subV) subV.style.display = "none";
 
   if (tab === "map") {
     mapV.style.display = "flex";
-    ["nav-map","nav-map2","nav-map3","nav-map4"].forEach(function(id) { var e = document.getElementById(id); if (e) e.className = "nav-tab active"; });
+    ["nav-map","nav-map2","nav-map3","nav-map4","nav-map5"].forEach(function(id) { var e = document.getElementById(id); if (e) e.className = "nav-tab active"; });
   } else if (tab === "updates") {
     if (updV) updV.style.display = "block";
-    ["nav-updates","nav-updates2","nav-updates3","nav-updates4"].forEach(function(id) { var e = document.getElementById(id); if (e) e.className = "nav-tab active"; });
+    ["nav-updates","nav-updates2","nav-updates3","nav-updates4","nav-updates5"].forEach(function(id) { var e = document.getElementById(id); if (e) e.className = "nav-tab active"; });
     if (!UPDATES_LOADED) fetchUpdates();
+  } else if (tab === "reports") {
+    if (rptV) rptV.style.display = "block";
+    ["nav-reports","nav-reports2","nav-reports3","nav-reports4","nav-reports5"].forEach(function(id) { var e = document.getElementById(id); if (e) e.className = "nav-tab active"; });
+    if (!UPDATES_LOADED) fetchUpdates(); // need updates data for reports
   } else if (tab === "submit") {
     if (subV) subV.style.display = "block";
-    ["nav-submit","nav-submit2","nav-submit3","nav-submit4"].forEach(function(id) { var e = document.getElementById(id); if (e) e.className = "nav-tab active"; });
+    ["nav-submit","nav-submit2","nav-submit3","nav-submit4","nav-submit5"].forEach(function(id) { var e = document.getElementById(id); if (e) e.className = "nav-tab active"; });
   } else {
     listV.style.display = "block";
-    ["nav-states","nav-states2","nav-states3","nav-states4"].forEach(function(id) { var e = document.getElementById(id); if (e) e.className = "nav-tab active"; });
+    ["nav-states","nav-states2","nav-states3","nav-states4","nav-states5"].forEach(function(id) { var e = document.getElementById(id); if (e) e.className = "nav-tab active"; });
   }
   window.scrollTo(0, 0);
 }
@@ -1997,7 +2143,7 @@ function renderUpdates(entries) {
     if (tierChange) {
       if (tierChange.type === "added") {
         tierHtml = '<div style="margin-top:5px;display:flex;align-items:center;gap:4px;">'
-          + '<span style="font-size:12px;font-weight:600;color:#16a34a;">+</span>'
+          + '<span style="font-size:12px;font-weight:600;color:#66c2a4;">+</span>'
           + tierChipHtml(tierChange.to)
           + '</div>';
       } else if (tierChange.type === "stays") {
@@ -2126,15 +2272,342 @@ function resetSubmitForm() {
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
+seedStateAbbrData(); // seed STATE_ABBR_DATA from STATES so list renders immediately
 buildFilters();
 initMap();
 renderList();
-loadTierData(); // refreshes from Google Sheet if reachable
+loadTierData(); // fetches tier + math rev data from public "State Tiers" sheet tab
 // On load: warm the cache (reads all sheets, fills CacheService)
 fetch(PROXY_URL + "?warm=1").catch(function() {});
 // Every 4 min: lightweight ping to keep the Apps Script runtime alive
 // (does NOT read any sheets, so it never competes with unlock)
 setInterval(function() { fetch(PROXY_URL + "?ping=1").catch(function() {}); }, 4 * 60 * 1000);
+
+// ── Reports ───────────────────────────────────────────────────────────────────
+var REPORT_UNLOCKED = false;
+var REPORT_PASSWORD_CACHED = "";
+// NOTE: Set this in your GAS script as REPORT_PASSWORD. The app validates against the proxy.
+var REPORT_PROXY_PARAM = "report_validate";
+
+var MATH_REV_LABELS = {0:"Recently Completed (Last 2 Years)",1:"Currently Revising",2:"Next 5 Years",3:"Next 10 Years",4:"No Revision Cycle / Unknown"};
+var TIER_LABELS = {4:"Tier 4",3:"Tier 3",2:"Tier 2",1:"Tier 1",0:"None"};
+
+function showReportModal() {
+  var m = document.getElementById("report-modal");
+  m.style.display = "flex";
+  setTimeout(function() { var i = document.getElementById("rpt-pw-input"); if (i) i.focus(); }, 100);
+}
+function hideReportModal() {
+  document.getElementById("report-modal").style.display = "none";
+  document.getElementById("rpt-pw-error").textContent = "";
+  document.getElementById("rpt-pw-input").value = "";
+}
+
+function submitReportPassword() {
+  var pw = (document.getElementById("rpt-pw-input").value || "").trim();
+  if (!pw) { document.getElementById("rpt-pw-error").textContent = "Please enter a password."; return; }
+  var btn = document.getElementById("rpt-pw-btn");
+  btn.disabled = true; btn.textContent = "Checking...";
+  document.getElementById("rpt-pw-error").textContent = "";
+  fetch(PROXY_URL + "?report_validate=1&password=" + encodeURIComponent(pw))
+    .then(function(r) { return r.json(); })
+    .then(function(json) {
+      if (json && json.ok) {
+        REPORT_UNLOCKED = true;
+        REPORT_PASSWORD_CACHED = pw;
+        hideReportModal();
+        document.getElementById("reports-lock").style.display = "none";
+        document.getElementById("reports-builder").style.display = "block";
+        buildReportStateDropdown();
+        // Also fetch private data (goals) using report password
+        fetchReportPrivateData(pw);
+      } else {
+        document.getElementById("rpt-pw-error").textContent = (json && json.error) ? "Incorrect password." : "Could not connect. Try again.";
+        btn.disabled = false; btn.textContent = "Unlock";
+      }
+    })
+    .catch(function() {
+      document.getElementById("rpt-pw-error").textContent = "Could not connect. Try again.";
+      btn.disabled = false; btn.textContent = "Unlock";
+    });
+}
+
+function fetchReportPrivateData(pw) {
+  // Fetch State Maps for goals data using the report password
+  fetch(PROXY_URL + "?password=" + encodeURIComponent(pw) + "&state=State%20Maps")
+    .then(function(r) { return r.json(); })
+    .then(function(json) {
+      if (!json || json.error || !json.states) return;
+      var rows = json.states["State Maps"];
+      if (!rows) return;
+      for (var i = 0; i < rows.length; i++) {
+        var sn = String(rows[i][0] || "").trim();
+        if (!sn || sn === "State") continue;
+        var ab = NAME_TO_ABBR[sn];
+        if (!ab) continue;
+        var gr = String(rows[i][2] || "").trim();
+        var gm = gr.match(/Tier\s*(\d)/i);
+        var g = gm ? parseInt(gm[1]) : 0;
+        if (g >= 1 && g <= 4) STATE_GOALS_DATA[ab] = g;
+      }
+    }).catch(function() {});
+}
+
+function buildReportStateDropdown() {
+  var opts = document.getElementById("report-state-options");
+  if (!opts) return;
+  var stateNames = Object.keys(ABBR_TO_NAME).map(function(k) { return ABBR_TO_NAME[k]; }).sort();
+  var html = "";
+  for (var i = 0; i < stateNames.length; i++) {
+    var sn = stateNames[i];
+    html += '<label class="updates-filter-option"><input type="checkbox" value="' + sn + '" onchange="updateReportStateLabel()"> ' + sn + '</label>';
+  }
+  opts.innerHTML = html;
+}
+
+function toggleReportStateDropdown(e) {
+  e.stopPropagation();
+  var dd = document.getElementById("report-state-dropdown");
+  dd.style.display = dd.style.display === "none" ? "block" : "none";
+}
+document.addEventListener("click", function(e) {
+  var wrap = document.getElementById("report-state-filter-wrap");
+  if (wrap && !wrap.contains(e.target)) {
+    var dd = document.getElementById("report-state-dropdown");
+    if (dd) dd.style.display = "none";
+  }
+});
+
+function clearReportStateFilter() {
+  var cbs = document.querySelectorAll("#report-state-options input[type=checkbox]");
+  for (var i = 0; i < cbs.length; i++) cbs[i].checked = false;
+  updateReportStateLabel();
+}
+function updateReportStateLabel() {
+  var cbs = document.querySelectorAll("#report-state-options input[type=checkbox]");
+  var sel = [];
+  for (var i = 0; i < cbs.length; i++) { if (cbs[i].checked) sel.push(cbs[i].value); }
+  var lbl = document.getElementById("report-state-label");
+  if (sel.length === 0) lbl.textContent = "All States & DC (51)";
+  else if (sel.length <= 3) lbl.textContent = sel.join(", ");
+  else lbl.textContent = sel.length + " states selected";
+}
+
+function getReportSelectedStates() {
+  var cbs = document.querySelectorAll("#report-state-options input[type=checkbox]");
+  var sel = [];
+  for (var i = 0; i < cbs.length; i++) { if (cbs[i].checked) sel.push(cbs[i].value); }
+  if (sel.length === 0) {
+    // all states
+    return Object.keys(ABBR_TO_NAME).map(function(k) { return ABBR_TO_NAME[k]; }).sort();
+  }
+  return sel.sort();
+}
+
+function buildReportData() {
+  var stateNames = getReportSelectedStates();
+  var includeTiers   = document.getElementById("rpt-tiers").checked;
+  var includeUpdates = document.getElementById("rpt-updates").checked;
+  var includePrivate = document.getElementById("rpt-private").checked;
+  var reportDate = new Date().toLocaleDateString("en-US", {year:"numeric",month:"long",day:"numeric"});
+
+  // State summary rows
+  var summaryRows = [];
+  if (includeTiers) {
+    for (var i = 0; i < stateNames.length; i++) {
+      var sn = stateNames[i];
+      // find abbr
+      var abbr = "";
+      for (var k in ABBR_TO_NAME) { if (ABBR_TO_NAME[k] === sn) { abbr = k; break; } }
+      var d = STATE_ABBR_DATA[abbr] || {};
+      var tiers = d.tiers || [];
+      var highTier = 0;
+      for (var t = 0; t < tiers.length; t++) { var tn = tierNum(tiers[t]); if (tn < 4 && tn > highTier) highTier = tn; }
+      var goal = STATE_GOALS_DATA[abbr] ? "Tier " + STATE_GOALS_DATA[abbr] : "—";
+      var mr = MATH_REV_DATA[abbr] ? MATH_REV_LABELS[MATH_REV_DATA[abbr]] : "—";
+      var tierLabel = highTier > 0 ? "Tier " + highTier : "None";
+      summaryRows.push({state: sn, abbr: abbr, tier: tierLabel, tierNum: highTier, goal: goal, mathrev: mr, tierList: tiers.join(", ") || "None"});
+    }
+  }
+
+  // Updates filtered to selected states
+  var updateRows = [];
+  if (includeUpdates && ALL_UPDATES && ALL_UPDATES.length) {
+    var stateSet = {};
+    for (var s = 0; s < stateNames.length; s++) stateSet[stateNames[s]] = true;
+    for (var u = 0; u < ALL_UPDATES.length; u++) {
+      var upd = ALL_UPDATES[u];
+      if (stateSet[upd.state]) updateRows.push(upd);
+    }
+  }
+
+  // Private data filtered
+  var privateRows = [];
+  if (includePrivate && PRIVATE_DATA) {
+    for (var si = 0; si < stateNames.length; si++) {
+      var psn = stateNames[si];
+      var pd = PRIVATE_DATA[psn];
+      if (pd && pd.length) {
+        for (var pi = 0; pi < pd.length; pi++) {
+          privateRows.push({state: psn, data: pd[pi]});
+        }
+      }
+    }
+  }
+
+  return {
+    date: reportDate,
+    states: stateNames,
+    summaryRows: summaryRows,
+    updateRows: updateRows,
+    privateRows: privateRows,
+    includeTiers: includeTiers,
+    includeUpdates: includeUpdates,
+    includePrivate: includePrivate
+  };
+}
+
+// ── PDF (print window) ────────────────────────────────────────────────────────
+function downloadReportPDF() {
+  var d = buildReportData();
+  var html = buildPrintHTML(d);
+  var win = window.open("", "_blank");
+  if (!win) { alert("Please allow pop-ups to download the PDF."); return; }
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  setTimeout(function() { win.print(); }, 600);
+}
+
+function buildPrintHTML(d) {
+  var tierColors = {4:"#7c2d12",3:"#ef4a23",2:"#d97a4a",1:"#185fa5",0:"#888"};
+  var rows = "";
+  if (d.includeTiers) {
+    for (var i = 0; i < d.summaryRows.length; i++) {
+      var r = d.summaryRows[i];
+      var col = tierColors[r.tierNum] || "#888";
+      rows += "<tr><td>" + r.state + "</td><td style='color:" + col + ";font-weight:600;'>" + r.tier + "</td><td>" + r.goal + "</td><td>" + r.mathrev + "</td></tr>";
+    }
+  }
+  var updateSection = "";
+  if (d.includeUpdates && d.updateRows.length) {
+    var uRows = "";
+    for (var u = 0; u < d.updateRows.length; u++) {
+      var upd = d.updateRows[u];
+      var dLabel = upd.dateRaw || "Date Unknown";
+      uRows += "<tr><td>" + dLabel + "</td><td>" + (upd.state || "") + "</td><td>" + (upd.text || "") + "</td></tr>";
+    }
+    updateSection = "<h2>Updates Log</h2><table><thead><tr><th>Date</th><th>State</th><th>Update</th></tr></thead><tbody>" + uRows + "</tbody></table>";
+  }
+  var privateSection = "";
+  if (d.includePrivate && d.privateRows.length) {
+    var pRows = "";
+    for (var p = 0; p < d.privateRows.length; p++) {
+      var pr = d.privateRows[p];
+      var dataStr = Array.isArray(pr.data) ? pr.data.join(" | ") : String(pr.data);
+      pRows += "<tr><td>" + pr.state + "</td><td>" + dataStr + "</td></tr>";
+    }
+    privateSection = "<h2>Private State Details</h2><p style='color:#b45309;font-size:12px;margin-bottom:12px;'>&#128274; Confidential — for internal use only.</p><table><thead><tr><th>State</th><th>Details</th></tr></thead><tbody>" + pRows + "</tbody></table>";
+  }
+  var summarySection = d.includeTiers ? ("<h2>State Summary</h2><table><thead><tr><th>State</th><th>Current Tier</th><th>DS4E Goal</th><th>Math Revision</th></tr></thead><tbody>" + rows + "</tbody></table>") : "";
+  return "<!DOCTYPE html><html><head><meta charset='UTF-8'><title>DS4E National Tracker Report " + d.date + "</title><style>" +
+    "body{font-family:Georgia,serif;color:#1c1c1e;margin:0;padding:0;}" +
+    "@media print{body{margin:0;}@page{margin:1.2cm 1.5cm;size:letter portrait;}}" +
+    ".cover{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:80px 60px;page-break-after:always;}" +
+    ".cover-badge{display:inline-flex;gap:0;margin-bottom:24px;}" +
+    ".badge-l{background:#ef4a23;color:#fff;font-weight:700;font-size:18px;padding:8px 12px;border-radius:4px 0 0 4px;}" +
+    ".badge-r{background:#1c1c1e;color:#fff;font-weight:700;font-size:11px;padding:8px 10px;border-radius:0 4px 4px 0;line-height:1.3;text-transform:uppercase;letter-spacing:0.5px;}" +
+    "h1{font-size:32px;font-weight:700;color:#1c1c1e;margin:0 0 12px;}" +
+    ".cover-sub{font-size:16px;color:#555;margin-bottom:8px;}" +
+    ".cover-date{font-size:13px;color:#aaa;}" +
+    ".cover-states{margin-top:32px;font-size:13px;color:#888;line-height:1.6;}" +
+    ".section{padding:60px 60px 0;page-break-inside:avoid;}" +
+    "h2{font-size:20px;font-weight:600;color:#1c1c1e;border-bottom:2px solid #ef4a23;padding-bottom:8px;margin-bottom:20px;margin-top:0;}" +
+    "table{width:100%;border-collapse:collapse;margin-bottom:40px;font-size:13px;}" +
+    "th{text-align:left;padding:8px 12px;background:#f2f2f7;font-weight:600;color:#555;font-size:11px;text-transform:uppercase;letter-spacing:0.4px;border-bottom:1px solid #ddd;}" +
+    "td{padding:8px 12px;border-bottom:0.5px solid #f0f0f0;vertical-align:top;}" +
+    "tr:last-child td{border-bottom:none;}" +
+    ".confidential{background:#fef9ec;border:1px solid #f59e0b;border-radius:6px;padding:12px 16px;font-size:12px;color:#92400e;margin:40px 60px 0;}" +
+    "</style></head><body>" +
+    "<div class='cover'>" +
+    "<div class='cover-badge'><div class='badge-l'>DS4E</div><div class='badge-r'>National<br>Tracker</div></div>" +
+    "<h1>National Report</h1>" +
+    "<div class='cover-sub'>" + d.states.length + " state" + (d.states.length !== 1 ? "s" : "") + " included</div>" +
+    "<div class='cover-date'>Generated " + d.date + "</div>" +
+    "<div class='cover-states'>" + d.states.join(" &bull; ") + "</div>" +
+    "</div>" +
+    (d.includeTiers ? "<div class='section'>" + summarySection + "</div>" : "") +
+    (d.includeUpdates && d.updateRows.length ? "<div class='section'>" + updateSection + "</div>" : "") +
+    (d.includePrivate && d.privateRows.length ? "<div class='confidential'>&#128274; The following section contains confidential internal information.</div><div class='section'>" + privateSection + "</div>" : "") +
+    "<div style='padding:40px 60px;font-size:11px;color:#aaa;border-top:0.5px solid #eee;margin-top:40px;'>Data Science 4 Everyone &bull; " + d.date + " &bull; ds4everyone.org</div>" +
+    "</body></html>";
+}
+
+// ── Excel (.xlsx via SheetJS) ─────────────────────────────────────────────────
+function downloadReportXLSX() {
+  // Load SheetJS from CDN if not already loaded
+  if (typeof XLSX === "undefined") {
+    var script = document.createElement("script");
+    script.src = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
+    script.onload = function() { _doXLSX(); };
+    script.onerror = function() { alert("Could not load Excel library. Check your connection."); };
+    document.head.appendChild(script);
+  } else {
+    _doXLSX();
+  }
+}
+
+function _doXLSX() {
+  var d = buildReportData();
+  var wb = XLSX.utils.book_new();
+
+  if (d.includeTiers && d.summaryRows.length) {
+    var rows = [["State","Abbreviation","Current Tier","DS4E Goal","Math Revision","All Tiers"]];
+    for (var i = 0; i < d.summaryRows.length; i++) {
+      var r = d.summaryRows[i];
+      rows.push([r.state, r.abbr, r.tier, r.goal, r.mathrev, r.tierList]);
+    }
+    var ws = XLSX.utils.aoa_to_sheet(rows);
+    ws["!cols"] = [{wch:22},{wch:5},{wch:12},{wch:12},{wch:28},{wch:30}];
+    XLSX.utils.book_append_sheet(wb, ws, "State Summary");
+  }
+
+  if (d.includeUpdates && d.updateRows.length) {
+    var uRows = [["Date","State","Update","Tier Change"]];
+    for (var u = 0; u < d.updateRows.length; u++) {
+      var upd = d.updateRows[u];
+      uRows.push([upd.dateRaw || "Date Unknown", upd.state || "", upd.text || "", upd.tier || ""]);
+    }
+    var uwS = XLSX.utils.aoa_to_sheet(uRows);
+    uwS["!cols"] = [{wch:20},{wch:22},{wch:60},{wch:30}];
+    XLSX.utils.book_append_sheet(wb, uwS, "Updates Log");
+  }
+
+  if (d.includePrivate && d.privateRows.length) {
+    var pRows = [["State","Details"]];
+    for (var p = 0; p < d.privateRows.length; p++) {
+      var pr = d.privateRows[p];
+      var dataStr = Array.isArray(pr.data) ? pr.data.join(" | ") : String(pr.data);
+      pRows.push([pr.state, dataStr]);
+    }
+    var pwS = XLSX.utils.aoa_to_sheet(pRows);
+    pwS["!cols"] = [{wch:22},{wch:80}];
+    XLSX.utils.book_append_sheet(wb, pwS, "Private Details");
+  }
+
+  // Metadata sheet
+  var meta = [
+    ["DS4E National Tracker Report"],
+    ["Generated", d.date],
+    ["States included", d.states.length],
+    ["State list", d.states.join(", ")]
+  ];
+  var mwS = XLSX.utils.aoa_to_sheet(meta);
+  XLSX.utils.book_append_sheet(wb, mwS, "Report Info");
+
+  var filename = "DS4E_Report_" + new Date().toISOString().slice(0,10) + ".xlsx";
+  XLSX.writeFile(wb, filename);
+}
 </script>
 
 <!-- ═══════════════════════════ PASSWORD MODAL ═══════════════════════════ -->
