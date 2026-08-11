@@ -64,7 +64,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .report-check-label{font-size:14px;color:#1c1c1e;}
 .report-check-sub{font-size:11px;color:#888;margin-top:1px;}
 .report-dl-btn{flex:1;padding:12px;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;}
-.report-dl-pdf{background:#ef4a23;color:#fff;}
 .report-dl-xlsx{background:#66c2a4;color:#fff;}
 .report-dl-btn:disabled{opacity:0.45;cursor:default;}
 .report-lock-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 32px;text-align:center;}
@@ -158,7 +157,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 /* ── CARDS ── */
 .card{background:#fff;border-radius:12px;border:0.5px solid #e5e5e5;overflow:hidden;}
-.card-header{padding:9px 14px;border-bottom:0.5px solid #f0f0f0;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.5px;background:#fafafa;}
+.card-header{padding:9px 14px;border-bottom:0.5px solid #f0f0f0;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.5px;background:#fafafa;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;}
+.card-header .card-chevron{color:#c7c7cc;font-size:12px;transition:transform 0.2s;flex-shrink:0;}
+.card.collapsed .card-chevron{transform:rotate(-90deg);}
+.card.collapsed .card-body{display:none;}
+.card-body{}
 .card-row{padding:8px 14px;border-bottom:0.5px solid #f5f5f5;}
 .card-row:last-child{border-bottom:none;}
 .row-label{font-size:11px;color:#888;margin-bottom:2px;}
@@ -481,70 +484,76 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <!-- Sections -->
     <div class="report-section-card">
       <div class="report-section-title">Fields to Include</div>
-      <div style="font-size:11px;color:#aaa;margin-bottom:8px;">Only fields with available data will appear in the report. Private fields require the reports password.</div>
+      <div style="font-size:11px;color:#aaa;margin-bottom:10px;">Select any combination. Only fields with available data appear in the output. &#x1F512; fields require the reports password.</div>
 
-      <div style="font-size:10px;font-weight:700;color:#ef4a23;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px;">Public Data</div>
-      <label class="report-check-row">
-        <input type="checkbox" id="rpt-tier" checked>
-        <div>
-          <div class="report-check-label">DS4E Tier</div>
-          <div class="report-check-sub">Current implementation tier(s) per state</div>
-        </div>
-      </label>
-      <label class="report-check-row">
-        <input type="checkbox" id="rpt-mathrev" checked>
-        <div>
-          <div class="report-check-label">Math Revision Cycle</div>
-          <div class="report-check-sub">Where each state is in their math standards revision</div>
-        </div>
-      </label>
-      <label class="report-check-row">
-        <input type="checkbox" id="rpt-updates" checked>
-        <div>
-          <div class="report-check-label">State Updates</div>
-          <div class="report-check-sub">Chronological history of changes and milestones</div>
-        </div>
-      </label>
+      <!-- State Maps -->
+      <div style="font-size:10px;font-weight:700;color:#ef4a23;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 3px;">State Maps</div>
+      <label class="report-check-row"><input type="checkbox" id="rpt-tier" checked><div class="report-check-label">Current DS4E Tier</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-mathrev" checked><div class="report-check-label">Math Revision Cycle</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-goal"><div class="report-check-label">&#x1F512; DS4E Goal Tier</div></label>
 
-      <div style="font-size:10px;font-weight:700;color:#4c4c4c;text-transform:uppercase;letter-spacing:0.5px;padding:10px 0 4px;">&#x1F512; Private Data</div>
-      <label class="report-check-row">
-        <input type="checkbox" id="rpt-goal">
-        <div>
-          <div class="report-check-label">DS4E Goal</div>
-          <div class="report-check-sub">Target tier set by DS4E for each state</div>
-        </div>
-      </label>
-      <label class="report-check-row">
-        <input type="checkbox" id="rpt-notes">
-        <div>
-          <div class="report-check-label">Internal Notes</div>
-          <div class="report-check-sub">Private notes and messaging on file</div>
-        </div>
-      </label>
-      <label class="report-check-row">
-        <input type="checkbox" id="rpt-contacts">
-        <div>
-          <div class="report-check-label">Points of Contact</div>
-          <div class="report-check-sub">Contacts, emails, and relationship notes</div>
-        </div>
-      </label>
+      <!-- State Updates -->
+      <div style="font-size:10px;font-weight:700;color:#ef4a23;text-transform:uppercase;letter-spacing:0.5px;padding:10px 0 3px;">State Updates</div>
+      <label class="report-check-row"><input type="checkbox" id="rpt-updates" checked><div class="report-check-label">State Updates Log</div></label>
+
+      <!-- Adoption -->
+      <div style="font-size:10px;font-weight:700;color:#ef4a23;text-transform:uppercase;letter-spacing:0.5px;padding:10px 0 3px;">Adoption</div>
+      <label class="report-check-row"><input type="checkbox" id="rpt-date-updated" checked><div class="report-check-label">Date Updated</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-agency" checked><div class="report-check-label">State K-12 Education Agency</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-impl-tier" checked><div class="report-check-label">Implementation Tier</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-type-adoption" checked><div class="report-check-label">Type of Adoption</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-content-areas"><div class="report-check-label">Content Areas</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-grade-band"><div class="report-check-label">Grade Band</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-pub-comments"><div class="report-check-label">Additional Comments (public)</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-internal"><div class="report-check-label">&#x1F512; Internal Notes (private)</div></label>
+
+      <!-- Educational Landscape -->
+      <div style="font-size:10px;font-weight:700;color:#ef4a23;text-transform:uppercase;letter-spacing:0.5px;padding:10px 0 3px;">Educational Landscape</div>
+      <label class="report-check-row"><input type="checkbox" id="rpt-superintendent"><div class="report-check-label">Superintendent / Commissioner</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-elected"><div class="report-check-label">Elected or Appointed</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-term-end"><div class="report-check-label">Term End</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-party"><div class="report-check-label">Political Party</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-rural"><div class="report-check-label">Rural (30%+ population)</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-strategic-plan"><div class="report-check-label">Current Strategic Plan</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-link-standards"><div class="report-check-label">Link to Standards</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-math-std" checked><div class="report-check-label">Math Standards</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-ela-std"><div class="report-check-label">English Standards</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-ss-std"><div class="report-check-label">Social Studies Standards</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-science-std"><div class="report-check-label">Science Standards</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-cs-std"><div class="report-check-label">Computer Science Standards</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-cte-std"><div class="report-check-label">CTE Standards</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-rev-cycle" checked><div class="report-check-label">Standards Revision Cycle</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-std-comments"><div class="report-check-label">Additional Comments on Standards</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-std-resources"><div class="report-check-label">Additional Standards Resources</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-course-updated"><div class="report-check-label">Course Code Updated</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-course-catalog-added"><div class="report-check-label">Added to State Course Catalog</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-course-catalog-link"><div class="report-check-label">Link to Course Catalog</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-course-codes"><div class="report-check-label">State Course Code(s)</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-course-category"><div class="report-check-label">State Course Category</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-grad-credits"><div class="report-check-label">Math Graduation Credits</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-grad-coursework"><div class="report-check-label">Math Graduation Coursework</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-grad-resources"><div class="report-check-label">Graduation Req. Resources</div></label>
+
+      <!-- Events Tracker -->
+      <div style="font-size:10px;font-weight:700;color:#ef4a23;text-transform:uppercase;letter-spacing:0.5px;padding:10px 0 3px;">Events Tracker</div>
+      <label class="report-check-row"><input type="checkbox" id="rpt-events" checked><div class="report-check-label">Events Tracker (public + &#x1F512; private)</div></label>
+
+      <!-- Private Data -->
+      <div style="font-size:10px;font-weight:700;color:#4c4c4c;text-transform:uppercase;letter-spacing:0.5px;padding:10px 0 3px;">&#x1F512; Private Data</div>
+      <label class="report-check-row"><input type="checkbox" id="rpt-messaging"><div class="report-check-label">Messaging</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-contacts"><div class="report-check-label">Points of Contact</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-engagement"><div class="report-check-label">Engagement Data</div></label>
     </div>
 
     <!-- Download -->
     <div class="report-section-card">
       <div class="report-section-title">Download Report</div>
-      <div id="rpt-generating" style="display:none;text-align:center;padding:10px 0;font-size:13px;color:#888;">Building report&#8230;</div>
-      <div style="display:flex;gap:10px;">
-        <button class="report-dl-btn report-dl-pdf" id="rpt-pdf-btn" onclick="downloadReportPDF()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          PDF
-        </button>
-        <button class="report-dl-btn report-dl-xlsx" id="rpt-xlsx-btn" onclick="downloadReportXLSX()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-          Excel
-        </button>
-      </div>
-      <div style="font-size:11px;color:#aaa;margin-top:10px;">PDF opens a print dialog — choose "Save as PDF". Excel downloads directly.</div>
+      <div id="rpt-generating" style="display:none;text-align:center;padding:10px 0;font-size:13px;color:#888;">Fetching state data&#8230; this may take a moment.</div>
+      <button class="report-dl-btn report-dl-xlsx" id="rpt-xlsx-btn" onclick="downloadReportXLSX()" style="width:100%;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        Download Excel
+      </button>
+      <div style="font-size:11px;color:#aaa;margin-top:8px;">Each section exports as a separate tab in the workbook.</div>
     </div>
 
   </div>
@@ -673,7 +682,29 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div id="detail-hero-area"></div>
   <div class="tab-bar" id="detail-tab-bar"></div>
   <div id="detail-tab-contents"></div>
-  <div style="height:24px;"></div>
+  <div style="height:80px;"></div>
+  <div class="bottom-nav">
+    <div class="nav-tab" id="nav-mapD" onclick="switchTab('map')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3V6z"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+      Map
+    </div>
+    <div class="nav-tab" id="nav-statesD" onclick="switchTab('states')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      States
+    </div>
+    <div class="nav-tab" id="nav-updatesD" onclick="switchTab('updates')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+      Updates
+    </div>
+    <div class="nav-tab" id="nav-reportsD" onclick="switchTab('reports')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Reports
+    </div>
+    <div class="nav-tab" id="nav-submitD" onclick="switchTab('submit')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Submit
+    </div>
+  </div>
 </div>
 
 <script>
@@ -1195,8 +1226,12 @@ var DETAIL_TABS = [
 
 function showDetail(s) {
   currentDetailState = s;
+  // Hide all main views but don't change _lastTab — keep it as origin
   document.getElementById("map-view").style.display = "none";
   document.getElementById("list-view").style.display = "none";
+  var updV = document.getElementById("updates-view"); if (updV) updV.style.display = "none";
+  var rptV = document.getElementById("reports-view"); if (rptV) rptV.style.display = "none";
+  var subV = document.getElementById("submit-view"); if (subV) subV.style.display = "none";
   var dv = document.getElementById("detail-view"); dv.style.display = "flex";
   document.getElementById("detail-header-name").textContent = s.name;
   updateLockUI();
@@ -1242,9 +1277,11 @@ function onDataLoaded(s, fetched) {
   }
 }
 
+var _lastTab = "map"; // tracks which main tab was active before entering a state detail
+
 function goBack() {
   document.getElementById("detail-view").style.display = "none";
-  switchTab("map");
+  switchTab(_lastTab);
 }
 
 function renderDetailHero(s, fetched) {
@@ -1284,6 +1321,7 @@ function renderDetailTabs(s, fetched) {
     div.className = "tab-content"; div.id = "dtcontent-" + t.id;
     div.innerHTML = renderTabContent(t.id, s, fetched);
     contents.appendChild(div);
+    afterTabRender(t.id);
   });
 }
 
@@ -1296,6 +1334,45 @@ function switchDetailTab(id) {
   });
 }
 
+// ── Collapsible cards ─────────────────────────────────────────────────────────
+// Called after any tab's HTML is set. Wraps .card content in a .card-body div,
+// injects a chevron into .card-header, and attaches toggle behaviour.
+function initCollapsibleCards(container) {
+  if (!container) return;
+  var cards = container.querySelectorAll(".card");
+  for (var ci = 0; ci < cards.length; ci++) {
+    var card = cards[ci];
+    if (card.getAttribute("data-collapsible")) continue; // already done
+    card.setAttribute("data-collapsible", "1");
+    var header = card.querySelector(".card-header");
+    if (!header) continue;
+    // Add chevron to header if not already present
+    if (!header.querySelector(".card-chevron")) {
+      var chev = document.createElement("span");
+      chev.className = "card-chevron";
+      chev.innerHTML = "&#9660;";
+      header.appendChild(chev);
+    }
+    // Wrap non-header children in .card-body
+    var body = card.querySelector(".card-body");
+    if (!body) {
+      body = document.createElement("div");
+      body.className = "card-body";
+      var children = Array.prototype.slice.call(card.children);
+      for (var ch = 0; ch < children.length; ch++) {
+        if (children[ch] !== header) body.appendChild(children[ch]);
+      }
+      card.appendChild(body);
+    }
+    // Toggle on header click
+    (function(c, h) {
+      h.addEventListener("click", function() {
+        c.classList.toggle("collapsed");
+      });
+    })(card, header);
+  }
+}
+
 function renderTabContent(tabId, s, fetched) {
   if (tabId === "overview")    return renderOverview(s, fetched);
   if (tabId === "adoption")    return renderAdoption(s, fetched);
@@ -1303,6 +1380,12 @@ function renderTabContent(tabId, s, fetched) {
   if (tabId === "engagement")  return renderEngagement(s);
   if (tabId === "contacts")    return renderContacts(s);
   return "";
+}
+
+// Run after a tab's innerHTML is set
+function afterTabRender(tabId) {
+  var cnt = document.getElementById("dtcontent-" + tabId);
+  if (cnt) initCollapsibleCards(cnt);
 }
 
 // ── OVERVIEW TAB ──────────────────────────────────────────────────────────────
@@ -1988,44 +2071,48 @@ var UPDATES_LOADED = false;
 var ALL_UPDATES = [];
 
 function switchTab(tab) {
+  _lastTab = tab;
   var mapV  = document.getElementById("map-view");
   var listV = document.getElementById("list-view");
   var updV  = document.getElementById("updates-view");
   var rptV  = document.getElementById("reports-view");
   var subV  = document.getElementById("submit-view");
-  // clear all nav buttons
+  var detV  = document.getElementById("detail-view");
+  // clear all nav buttons across all navbars
   var ids = ["nav-map","nav-states","nav-updates","nav-reports","nav-submit",
              "nav-map2","nav-states2","nav-updates2","nav-reports2","nav-submit2",
              "nav-map3","nav-states3","nav-updates3","nav-reports3","nav-submit3",
              "nav-map4","nav-states4","nav-updates4","nav-reports4","nav-submit4",
-             "nav-map5","nav-states5","nav-updates5","nav-reports5","nav-submit5"];
+             "nav-map5","nav-states5","nav-updates5","nav-reports5","nav-submit5",
+             "nav-mapD","nav-statesD","nav-updatesD","nav-reportsD","nav-submitD"];
   for (var i = 0; i < ids.length; i++) {
     var el = document.getElementById(ids[i]);
     if (el) el.className = "nav-tab";
   }
-  // hide all views
+  // hide all views including detail
   mapV.style.display = "none"; listV.style.display = "none";
   if (updV) updV.style.display = "none";
   if (rptV) rptV.style.display = "none";
   if (subV) subV.style.display = "none";
+  if (detV) detV.style.display = "none";
 
   if (tab === "map") {
     mapV.style.display = "flex";
-    ["nav-map","nav-map2","nav-map3","nav-map4","nav-map5"].forEach(function(id) { var e = document.getElementById(id); if (e) e.className = "nav-tab active"; });
+    ["nav-map","nav-map2","nav-map3","nav-map4","nav-map5","nav-mapD"].forEach(function(id) { var e = document.getElementById(id); if (e) e.className = "nav-tab active"; });
   } else if (tab === "updates") {
     if (updV) updV.style.display = "block";
-    ["nav-updates","nav-updates2","nav-updates3","nav-updates4","nav-updates5"].forEach(function(id) { var e = document.getElementById(id); if (e) e.className = "nav-tab active"; });
+    ["nav-updates","nav-updates2","nav-updates3","nav-updates4","nav-updates5","nav-updatesD"].forEach(function(id) { var e = document.getElementById(id); if (e) e.className = "nav-tab active"; });
     if (!UPDATES_LOADED) fetchUpdates();
   } else if (tab === "reports") {
     if (rptV) rptV.style.display = "block";
-    ["nav-reports","nav-reports2","nav-reports3","nav-reports4","nav-reports5"].forEach(function(id) { var e = document.getElementById(id); if (e) e.className = "nav-tab active"; });
-    if (!UPDATES_LOADED) fetchUpdates(); // need updates data for reports
+    ["nav-reports","nav-reports2","nav-reports3","nav-reports4","nav-reports5","nav-reportsD"].forEach(function(id) { var e = document.getElementById(id); if (e) e.className = "nav-tab active"; });
+    if (!UPDATES_LOADED) fetchUpdates();
   } else if (tab === "submit") {
     if (subV) subV.style.display = "block";
-    ["nav-submit","nav-submit2","nav-submit3","nav-submit4","nav-submit5"].forEach(function(id) { var e = document.getElementById(id); if (e) e.className = "nav-tab active"; });
+    ["nav-submit","nav-submit2","nav-submit3","nav-submit4","nav-submit5","nav-submitD"].forEach(function(id) { var e = document.getElementById(id); if (e) e.className = "nav-tab active"; });
   } else {
     listV.style.display = "block";
-    ["nav-states","nav-states2","nav-states3","nav-states4","nav-states5"].forEach(function(id) { var e = document.getElementById(id); if (e) e.className = "nav-tab active"; });
+    ["nav-states","nav-states2","nav-states3","nav-states4","nav-states5","nav-statesD"].forEach(function(id) { var e = document.getElementById(id); if (e) e.className = "nav-tab active"; });
   }
   window.scrollTo(0, 0);
 }
@@ -2437,241 +2524,313 @@ function getReportSelectedStates() {
   return sel.sort();
 }
 
-function buildReportData() {
-  var stateNames  = getReportSelectedStates();
-  var fTier       = document.getElementById("rpt-tier").checked;
-  var fMathrev    = document.getElementById("rpt-mathrev").checked;
-  var fUpdates    = document.getElementById("rpt-updates").checked;
-  var fGoal       = document.getElementById("rpt-goal").checked;
-  var fNotes      = document.getElementById("rpt-notes").checked;
-  var fContacts   = document.getElementById("rpt-contacts").checked;
-  var reportDate  = new Date().toLocaleDateString("en-US", {year:"numeric",month:"long",day:"numeric"});
+// ── Report: read checkbox state ────────────────────────────────────────────────
+function rptChk(id) { var el = document.getElementById(id); return el ? el.checked : false; }
 
-  // Build per-state rows — only include columns that were selected AND have data
-  var stateRows = [];
-  for (var i = 0; i < stateNames.length; i++) {
-    var sn = stateNames[i];
-    var abbr = "";
-    for (var k in ABBR_TO_NAME) { if (ABBR_TO_NAME[k] === sn) { abbr = k; break; } }
-    var sd = STATE_ABBR_DATA[abbr] || {};
-    var tiers = sd.tiers || [];
-    var highTier = 0;
-    for (var t = 0; t < tiers.length; t++) { var tn = tierNum(tiers[t]); if (tn < 4 && tn > highTier) highTier = tn; }
-    var tierVal   = fTier    ? (tiers.filter(function(x){return x&&x!=="None";}).join(", ") || null) : undefined;
-    var mrVal     = fMathrev ? ((MATH_REV_DATA[abbr] !== undefined) ? MATH_REV_LABELS[MATH_REV_DATA[abbr]] : null) : undefined;
-    var goalVal   = fGoal    ? (STATE_GOALS_DATA[abbr] ? "Tier " + STATE_GOALS_DATA[abbr] : null) : undefined;
-    var priv      = (PRIVATE_DATA && PRIVATE_DATA[sn]) || {};
-    var notesVal  = fNotes   ? (priv.internal || null) : undefined;
-    stateRows.push({state: sn, abbr: abbr, tierNum: highTier, tier: tierVal, mathrev: mrVal, goal: goalVal, notes: notesVal});
-  }
-
-  // Updates filtered to selected states
-  var updateRows = [];
-  if (fUpdates && ALL_UPDATES && ALL_UPDATES.length) {
-    var stateSet = {};
-    for (var s = 0; s < stateNames.length; s++) stateSet[stateNames[s]] = true;
-    for (var u = 0; u < ALL_UPDATES.length; u++) {
-      if (stateSet[ALL_UPDATES[u].state]) updateRows.push(ALL_UPDATES[u]);
-    }
-  }
-
-  // Contacts filtered to selected states
-  var contactRows = [];
-  if (fContacts && PRIVATE_DATA) {
-    for (var ci = 0; ci < stateNames.length; ci++) {
-      var csn = stateNames[ci];
-      var cp = PRIVATE_DATA[csn];
-      if (cp && cp.contacts && cp.contacts.length) {
-        for (var cj = 0; cj < cp.contacts.length; cj++) {
-          contactRows.push({state: csn, contact: cp.contacts[cj]});
-        }
-      }
-    }
-  }
-
-  return {
-    date: reportDate, states: stateNames,
-    stateRows: stateRows, updateRows: updateRows, contactRows: contactRows,
-    fTier: fTier, fMathrev: fMathrev, fGoal: fGoal,
-    fUpdates: fUpdates, fNotes: fNotes, fContacts: fContacts
-  };
-}
-
-// ── PDF (print window) ────────────────────────────────────────────────────────
-function downloadReportPDF() {
-  var d = buildReportData();
-  var html = buildPrintHTML(d);
-  var win = window.open("", "_blank");
-  if (!win) { alert("Please allow pop-ups to download the PDF."); return; }
-  win.document.write(html);
-  win.document.close();
-  win.focus();
-  setTimeout(function() { win.print(); }, 600);
-}
-
-function esc(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
-
-function buildPrintHTML(d) {
-  var tierColors = {4:"#7c2d12",3:"#ef4a23",2:"#d97a4a",1:"#185fa5",0:"#888"};
-  var hasPrivate = d.fGoal || d.fNotes || d.fContacts;
-
-  // State data table — build headers + rows only for selected fields that have any data
-  var hasAnyStateField = d.fTier || d.fMathrev || d.fGoal || d.fNotes;
-  var stateSection = "";
-  if (hasAnyStateField) {
-    var thead = "<tr><th>State</th>";
-    if (d.fTier)    thead += "<th>DS4E Tier</th>";
-    if (d.fMathrev) thead += "<th>Math Revision</th>";
-    if (d.fGoal)    thead += "<th>DS4E Goal</th>";
-    if (d.fNotes)   thead += "<th>Internal Notes</th>";
-    thead += "</tr>";
-    var tbody = "";
-    for (var i = 0; i < d.stateRows.length; i++) {
-      var r = d.stateRows[i];
-      var hasData = (d.fTier && r.tier) || (d.fMathrev && r.mathrev) || (d.fGoal && r.goal) || (d.fNotes && r.notes);
-      var col = tierColors[r.tierNum] || "#888";
-      tbody += "<tr><td>" + esc(r.state) + "</td>";
-      if (d.fTier)    tbody += "<td style='color:" + col + ";font-weight:600;'>" + esc(r.tier || "—") + "</td>";
-      if (d.fMathrev) tbody += "<td>" + esc(r.mathrev || "—") + "</td>";
-      if (d.fGoal)    tbody += "<td>" + esc(r.goal || "—") + "</td>";
-      if (d.fNotes)   tbody += "<td>" + esc(r.notes || "—") + "</td>";
-      tbody += "</tr>";
-    }
-    stateSection = "<h2>State Data</h2><table><thead>" + thead + "</thead><tbody>" + tbody + "</tbody></table>";
-  }
-
-  // Updates
-  var updateSection = "";
-  if (d.fUpdates && d.updateRows.length) {
-    var uRows = "";
-    for (var u = 0; u < d.updateRows.length; u++) {
-      var upd = d.updateRows[u];
-      uRows += "<tr><td>" + esc(upd.dateRaw||"Date Unknown") + "</td><td>" + esc(upd.state||"") + "</td><td>" + esc(upd.text||"") + "</td><td>" + esc(upd.tier||"") + "</td></tr>";
-    }
-    updateSection = "<h2>State Updates</h2><table><thead><tr><th>Date</th><th>State</th><th>Update</th><th>Tier Change</th></tr></thead><tbody>" + uRows + "</tbody></table>";
-  }
-
-  // Contacts
-  var contactSection = "";
-  if (d.fContacts && d.contactRows.length) {
-    var cRows = "";
-    for (var ci = 0; ci < d.contactRows.length; ci++) {
-      var cr = d.contactRows[ci]; var c = cr.contact;
-      cRows += "<tr><td>" + esc(cr.state) + "</td><td>" + esc((c.first||"") + " " + (c.last||"")).trim() + (c.vip ? " ★" : "") + "</td><td>" + esc(c.title||"") + "</td><td>" + esc(c.org||"") + "</td><td>" + esc(c.email||"") + "</td><td>" + esc(c.notes||"") + "</td></tr>";
-    }
-    contactSection = "<h2>Points of Contact</h2><table><thead><tr><th>State</th><th>Name</th><th>Title/Role</th><th>Organization</th><th>Email</th><th>Notes</th></tr></thead><tbody>" + cRows + "</tbody></table>";
-  }
-
-  var css = "body{font-family:Georgia,serif;color:#1c1c1e;margin:0;padding:0;}" +
-    "@media print{body{margin:0;}@page{margin:1.2cm 1.5cm;size:letter portrait;}}" +
-    ".cover{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:80px 60px;page-break-after:always;}" +
-    ".badge-l{background:#ef4a23;color:#fff;font-weight:700;font-size:18px;padding:8px 12px;border-radius:4px 0 0 4px;display:inline-block;}" +
-    ".badge-r{background:#1c1c1e;color:#fff;font-weight:700;font-size:11px;padding:8px 10px;border-radius:0 4px 4px 0;line-height:1.3;text-transform:uppercase;letter-spacing:0.5px;display:inline-block;vertical-align:top;}" +
-    "h1{font-size:32px;font-weight:700;color:#1c1c1e;margin:24px 0 12px;}" +
-    ".cover-sub{font-size:16px;color:#555;margin-bottom:8px;}" +
-    ".cover-date{font-size:13px;color:#aaa;}" +
-    ".cover-states{margin-top:32px;font-size:12px;color:#888;line-height:1.8;}" +
-    ".section{padding:60px 60px 0;}" +
-    "h2{font-size:18px;font-weight:600;color:#1c1c1e;border-bottom:2px solid #ef4a23;padding-bottom:8px;margin-bottom:20px;margin-top:0;}" +
-    "table{width:100%;border-collapse:collapse;margin-bottom:40px;font-size:12px;}" +
-    "th{text-align:left;padding:7px 10px;background:#f2f2f7;font-weight:600;color:#555;font-size:10px;text-transform:uppercase;letter-spacing:0.4px;border-bottom:1px solid #ddd;}" +
-    "td{padding:7px 10px;border-bottom:0.5px solid #f0f0f0;vertical-align:top;}" +
-    "tr:last-child td{border-bottom:none;}" +
-    ".conf{background:#fef9ec;border:1px solid #f59e0b;border-radius:6px;padding:10px 14px;font-size:11px;color:#92400e;margin:0 60px 20px;}";
-
-  return "<!DOCTYPE html><html><head><meta charset='UTF-8'><title>DS4E Report " + d.date + "</title><style>" + css + "</style></head><body>" +
-    "<div class='cover'><div><span class='badge-l'>DS4E</span><span class='badge-r'>National<br>Tracker</span></div>" +
-    "<h1>National Report</h1>" +
-    "<div class='cover-sub'>" + d.states.length + " state" + (d.states.length !== 1 ? "s" : "") + " included</div>" +
-    "<div class='cover-date'>Generated " + d.date + "</div>" +
-    "<div class='cover-states'>" + d.states.join(" &bull; ") + "</div></div>" +
-    (hasAnyStateField ? "<div class='section'>" + stateSection + "</div>" : "") +
-    (d.fUpdates && d.updateRows.length ? "<div class='section'>" + updateSection + "</div>" : "") +
-    (hasPrivate ? "<div class='conf'>&#128274; The following information is confidential — for internal use only.</div>" : "") +
-    (d.fContacts && d.contactRows.length ? "<div class='section'>" + contactSection + "</div>" : "") +
-    "<div style='padding:40px 60px;font-size:11px;color:#aaa;border-top:0.5px solid #eee;margin-top:20px;'>Data Science 4 Everyone &bull; " + d.date + " &bull; ds4everyone.org</div>" +
-    "</body></html>";
+// ── Ensure public state tab data is loaded (returns Promise of parsed data) ───
+function ensurePublicState(stateName) {
+  if (STATE_CACHE[stateName]) return Promise.resolve(STATE_CACHE[stateName]);
+  return fetch(PROXY_URL + "?state=" + encodeURIComponent(stateName))
+    .then(function(r) { return r.text(); })
+    .then(function(csv) {
+      var parsed = parsePublicSheet(csv);
+      STATE_CACHE[stateName] = parsed;
+      return parsed;
+    })
+    .catch(function() { return {}; });
 }
 
 // ── Excel (.xlsx via SheetJS) ─────────────────────────────────────────────────
 function downloadReportXLSX() {
-  // Load SheetJS from CDN if not already loaded
+  var btn = document.getElementById("rpt-xlsx-btn");
+  var gen = document.getElementById("rpt-generating");
+  btn.disabled = true;
+  gen.style.display = "block";
+
+  function doIt() {
+    var stateNames = getReportSelectedStates();
+    // Fetch any public state data not yet cached
+    var needFetch = stateNames.filter(function(sn) { return !STATE_CACHE[sn]; });
+    var fetches = needFetch.map(function(sn) { return ensurePublicState(sn); });
+    Promise.all(fetches).then(function() {
+      try { _doXLSX(stateNames); } catch(e) { alert("Export error: " + e.message); }
+      btn.disabled = false;
+      gen.style.display = "none";
+    }).catch(function(e) {
+      alert("Failed to fetch state data: " + e.message);
+      btn.disabled = false;
+      gen.style.display = "none";
+    });
+  }
+
   if (typeof XLSX === "undefined") {
     var script = document.createElement("script");
     script.src = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
-    script.onload = function() { _doXLSX(); };
-    script.onerror = function() { alert("Could not load Excel library. Check your connection."); };
+    script.onload = doIt;
+    script.onerror = function() {
+      alert("Could not load Excel library. Check your connection.");
+      btn.disabled = false; gen.style.display = "none";
+    };
     document.head.appendChild(script);
   } else {
-    _doXLSX();
+    doIt();
   }
 }
 
-function _doXLSX() {
-  var d = buildReportData();
+function _doXLSX(stateNames) {
+  var reportDate = new Date().toLocaleDateString("en-US", {year:"numeric",month:"long",day:"numeric"});
   var wb = XLSX.utils.book_new();
 
-  // State Data sheet — only include selected columns
-  var hasStateSheet = d.fTier || d.fMathrev || d.fGoal || d.fNotes;
-  if (hasStateSheet && d.stateRows.length) {
-    var header = ["State", "Abbreviation"];
-    if (d.fTier)    header.push("DS4E Tier");
-    if (d.fMathrev) header.push("Math Revision");
-    if (d.fGoal)    header.push("DS4E Goal");
-    if (d.fNotes)   header.push("Internal Notes");
-    var sRows = [header];
-    for (var i = 0; i < d.stateRows.length; i++) {
-      var r = d.stateRows[i];
-      var row = [r.state, r.abbr];
-      if (d.fTier)    row.push(r.tier || "—");
-      if (d.fMathrev) row.push(r.mathrev || "—");
-      if (d.fGoal)    row.push(r.goal || "—");
-      if (d.fNotes)   row.push(r.notes || "");
-      sRows.push(row);
-    }
-    var sws = XLSX.utils.aoa_to_sheet(sRows);
-    sws["!cols"] = [{wch:24},{wch:5},{wch:30},{wch:28},{wch:14},{wch:60}].slice(0, header.length);
-    XLSX.utils.book_append_sheet(wb, sws, "State Data");
+  // Helper: get abbr for state name
+  function getAbbr(sn) {
+    for (var k in ABBR_TO_NAME) { if (ABBR_TO_NAME[k] === sn) return k; }
+    return "";
   }
 
-  // Updates sheet
-  if (d.fUpdates && d.updateRows.length) {
+  // ── State Maps sheet ──────────────────────────────────────────────────────────
+  var fTier = rptChk("rpt-tier"), fMathrev = rptChk("rpt-mathrev"), fGoal = rptChk("rpt-goal");
+  if (fTier || fMathrev || fGoal) {
+    var hdr = ["State", "Abbreviation"];
+    if (fTier)    hdr.push("Current DS4E Tier");
+    if (fMathrev) hdr.push("Math Revision Cycle");
+    if (fGoal)    hdr.push("DS4E Goal Tier");
+    var rows = [hdr];
+    for (var i = 0; i < stateNames.length; i++) {
+      var sn = stateNames[i];
+      var abbr = getAbbr(sn);
+      var sd = STATE_ABBR_DATA[abbr] || {};
+      var tiers = (sd.tiers || []).filter(function(x){return x&&x!=="None";});
+      var row = [sn, abbr];
+      if (fTier)    row.push(tiers.join(", ") || "");
+      if (fMathrev) row.push((MATH_REV_DATA[abbr] !== undefined && MATH_REV_DATA[abbr] !== null) ? MATH_REV_LABELS[MATH_REV_DATA[abbr]] : "");
+      if (fGoal)    row.push(STATE_GOALS_DATA[abbr] ? "Tier " + STATE_GOALS_DATA[abbr] : "");
+      rows.push(row);
+    }
+    var ws = XLSX.utils.aoa_to_sheet(rows);
+    ws["!cols"] = [{wch:24},{wch:5},{wch:40},{wch:32},{wch:18}].slice(0, hdr.length);
+    XLSX.utils.book_append_sheet(wb, ws, "State Maps");
+  }
+
+  // ── State Updates sheet ───────────────────────────────────────────────────────
+  if (rptChk("rpt-updates") && ALL_UPDATES && ALL_UPDATES.length) {
+    var stateSet = {};
+    for (var si = 0; si < stateNames.length; si++) stateSet[stateNames[si]] = true;
     var uRows = [["Date","State","Update","Tier Change"]];
-    for (var u = 0; u < d.updateRows.length; u++) {
-      var upd = d.updateRows[u];
-      uRows.push([upd.dateRaw || "Date Unknown", upd.state || "", upd.text || "", upd.tier || ""]);
+    for (var u = 0; u < ALL_UPDATES.length; u++) {
+      if (stateSet[ALL_UPDATES[u].state]) {
+        var upd = ALL_UPDATES[u];
+        uRows.push([upd.dateRaw||"", upd.state||"", upd.text||"", upd.tier||""]);
+      }
     }
-    var uws = XLSX.utils.aoa_to_sheet(uRows);
-    uws["!cols"] = [{wch:20},{wch:22},{wch:60},{wch:30}];
-    XLSX.utils.book_append_sheet(wb, uws, "Updates");
+    if (uRows.length > 1) {
+      var uws = XLSX.utils.aoa_to_sheet(uRows);
+      uws["!cols"] = [{wch:20},{wch:22},{wch:70},{wch:32}];
+      XLSX.utils.book_append_sheet(wb, uws, "State Updates");
+    }
   }
 
-  // Contacts sheet
-  if (d.fContacts && d.contactRows.length) {
-    var cRows = [["State","First Name","Last Name","Title/Role","Organization","Email","VIP","Notes","URL"]];
-    for (var ci = 0; ci < d.contactRows.length; ci++) {
-      var cr = d.contactRows[ci]; var c = cr.contact;
-      cRows.push([cr.state, c.first||"", c.last||"", c.title||"", c.org||"", c.email||"", c.vip?"Yes":"", c.notes||"", c.url||""]);
+  // ── Adoption sheet ────────────────────────────────────────────────────────────
+  var adoptFields = [
+    {id:"rpt-date-updated",   label:"Date Updated",               key:"updated"},
+    {id:"rpt-agency",         label:"State K-12 Education Agency",key:"agency"},
+    {id:"rpt-impl-tier",      label:"Implementation Tier",        key:"implementationTier"},
+    {id:"rpt-type-adoption",  label:"Type of Adoption",           key:"typeAdoption"},
+    {id:"rpt-content-areas",  label:"Content Areas",              key:"contentAreas"},
+    {id:"rpt-grade-band",     label:"Grade Band",                 key:"gradeBand"},
+    {id:"rpt-pub-comments",   label:"Additional Comments",        key:"comments"}
+  ];
+  var selAdopt = adoptFields.filter(function(f){ return rptChk(f.id); });
+  var wantInternal = rptChk("rpt-internal");
+  if (selAdopt.length || wantInternal) {
+    var aHdr = ["State"];
+    selAdopt.forEach(function(f){ aHdr.push(f.label); });
+    if (wantInternal) aHdr.push("Internal Notes (Private)");
+    var aRows = [aHdr];
+    for (var ai = 0; ai < stateNames.length; ai++) {
+      var asn = stateNames[ai];
+      var pub = STATE_CACHE[asn] || {};
+      var priv = (PRIVATE_DATA && PRIVATE_DATA[asn]) || {};
+      var aRow = [asn];
+      selAdopt.forEach(function(f){ aRow.push(pub[f.key] || ""); });
+      if (wantInternal) aRow.push(priv.internal || "");
+      aRows.push(aRow);
     }
-    var cws = XLSX.utils.aoa_to_sheet(cRows);
-    cws["!cols"] = [{wch:22},{wch:14},{wch:14},{wch:24},{wch:28},{wch:30},{wch:5},{wch:50},{wch:40}];
-    XLSX.utils.book_append_sheet(wb, cws, "Contacts");
+    var aws = XLSX.utils.aoa_to_sheet(aRows);
+    aws["!cols"] = [{wch:22}].concat(aHdr.slice(1).map(function(){ return {wch:40}; }));
+    XLSX.utils.book_append_sheet(wb, aws, "Adoption");
   }
 
-  // Report info sheet
+  // ── Educational Landscape sheet ───────────────────────────────────────────────
+  var lsFields = [
+    {id:"rpt-superintendent",       label:"Superintendent / Commissioner", key:"superintendent"},
+    {id:"rpt-elected",              label:"Elected or Appointed",          key:"electedAppointed"},
+    {id:"rpt-term-end",             label:"Term End",                      key:"termEnd"},
+    {id:"rpt-party",                label:"Political Party",               key:"party"},
+    {id:"rpt-rural",                label:"Rural (30%+ population)",       key:"rural"},
+    {id:"rpt-strategic-plan",       label:"Current Strategic Plan",        key:"strategicPlan"},
+    {id:"rpt-link-standards",       label:"Link to Standards",             key:"linkStandards"},
+    {id:"rpt-math-std",             label:"Math Standards",                key:"mathStd"},
+    {id:"rpt-ela-std",              label:"English Standards",             key:"elaStd"},
+    {id:"rpt-ss-std",               label:"Social Studies Standards",      key:"ssStd"},
+    {id:"rpt-science-std",          label:"Science Standards",             key:"scienceStd"},
+    {id:"rpt-cs-std",               label:"Computer Science Standards",    key:"csStd"},
+    {id:"rpt-cte-std",              label:"CTE Standards",                 key:"cteStd"},
+    {id:"rpt-rev-cycle",            label:"Standards Revision Cycle",      key:"revisionCycle"},
+    {id:"rpt-std-comments",         label:"Additional Comments on Standards", key:"stdComments"},
+    {id:"rpt-std-resources",        label:"Additional Standards Resources",key:"stdResources"}
+  ];
+  var selLs = lsFields.filter(function(f){ return rptChk(f.id); });
+  if (selLs.length) {
+    var lHdr = ["State"].concat(selLs.map(function(f){ return f.label; }));
+    var lRows = [lHdr];
+    for (var li = 0; li < stateNames.length; li++) {
+      var lsn = stateNames[li]; var lpub = STATE_CACHE[lsn] || {};
+      var lRow = [lsn];
+      selLs.forEach(function(f){ lRow.push(lpub[f.key] || ""); });
+      lRows.push(lRow);
+    }
+    var lws = XLSX.utils.aoa_to_sheet(lRows);
+    lws["!cols"] = [{wch:22}].concat(selLs.map(function(){ return {wch:42}; }));
+    XLSX.utils.book_append_sheet(wb, lws, "Educational Landscape");
+  }
+
+  // ── Course Codes sheet ────────────────────────────────────────────────────────
+  var ccFields = [
+    {id:"rpt-course-updated",       label:"Course Code Updated",      key:"courseCodeUpdated"},
+    {id:"rpt-course-catalog-added", label:"Added to State Course Catalog", key:"addedToCatalog"},
+    {id:"rpt-course-catalog-link",  label:"Link to Course Catalog",   key:"linkCatalog"},
+    {id:"rpt-course-codes",         label:"State Course Code(s)",     key:"courseCodesRaw"},
+    {id:"rpt-course-category",      label:"State Course Category",    key:"courseCategory"},
+    {id:"rpt-grad-credits",         label:"Math Graduation Credits",  key:"gradCredits"},
+    {id:"rpt-grad-coursework",      label:"Math Graduation Coursework",key:"gradCoursework"},
+    {id:"rpt-grad-resources",       label:"Graduation Req. Resources",key:"gradReqResources"}
+  ];
+  var selCc = ccFields.filter(function(f){ return rptChk(f.id); });
+  if (selCc.length) {
+    var ccHdr = ["State"].concat(selCc.map(function(f){ return f.label; }));
+    var ccRows = [ccHdr];
+    for (var ci2 = 0; ci2 < stateNames.length; ci2++) {
+      var csn2 = stateNames[ci2]; var cpub = STATE_CACHE[csn2] || {};
+      var ccRow = [csn2];
+      selCc.forEach(function(f){ ccRow.push(cpub[f.key] || ""); });
+      ccRows.push(ccRow);
+    }
+    var ccws = XLSX.utils.aoa_to_sheet(ccRows);
+    ccws["!cols"] = [{wch:22}].concat(selCc.map(function(){ return {wch:36}; }));
+    XLSX.utils.book_append_sheet(wb, ccws, "Course Codes");
+  }
+
+  // ── Events Tracker sheet ──────────────────────────────────────────────────────
+  if (rptChk("rpt-events")) {
+    var evRows = [["State","Year","Event","URL","Source"]];
+    for (var ei = 0; ei < stateNames.length; ei++) {
+      var esn = stateNames[ei];
+      var epub = STATE_CACHE[esn] || {};
+      var epriv = (PRIVATE_DATA && PRIVATE_DATA[esn]) || {};
+      var pubEvts = (epub.timeline || []);
+      var confEvts = (epriv.confEvents || []);
+      pubEvts.forEach(function(ev){
+        evRows.push([esn, ev.year||"", ev.event||"", ev.url||"", "Public"]);
+      });
+      confEvts.forEach(function(ev){
+        evRows.push([esn, ev.year||"", ev.notes||"", ev.url||"", "Private"]);
+      });
+    }
+    if (evRows.length > 1) {
+      var evws = XLSX.utils.aoa_to_sheet(evRows);
+      evws["!cols"] = [{wch:22},{wch:20},{wch:70},{wch:50},{wch:10}];
+      XLSX.utils.book_append_sheet(wb, evws, "Events Tracker");
+    }
+  }
+
+  // ── Messaging sheet (private) ─────────────────────────────────────────────────
+  if (rptChk("rpt-messaging") && PRIVATE_DATA) {
+    var mRows = [["State","DS4E Goal","Messaging"]];
+    for (var mi = 0; mi < stateNames.length; mi++) {
+      var msn = stateNames[mi];
+      var mp = PRIVATE_DATA[msn] || {};
+      if (mp.stateGoal || mp.messaging) {
+        mRows.push([msn, mp.stateGoal||"", mp.messaging||""]);
+      }
+    }
+    if (mRows.length > 1) {
+      var mws = XLSX.utils.aoa_to_sheet(mRows);
+      mws["!cols"] = [{wch:22},{wch:20},{wch:80}];
+      XLSX.utils.book_append_sheet(wb, mws, "Messaging");
+    }
+  }
+
+  // ── Contacts sheet (private) ──────────────────────────────────────────────────
+  if (rptChk("rpt-contacts") && PRIVATE_DATA) {
+    var coRows = [["State","First Name","Last Name","Title / Role","Organization","Email","VIP","Notes","URL"]];
+    for (var coi = 0; coi < stateNames.length; coi++) {
+      var cosn = stateNames[coi];
+      var cop = PRIVATE_DATA[cosn] || {};
+      (cop.contacts || []).forEach(function(c){
+        coRows.push([cosn, c.first||"", c.last||"", c.title||"", c.org||"", c.email||"", c.vip?"Yes":"", c.notes||"", c.url||""]);
+      });
+    }
+    if (coRows.length > 1) {
+      var cows = XLSX.utils.aoa_to_sheet(coRows);
+      cows["!cols"] = [{wch:22},{wch:14},{wch:14},{wch:26},{wch:30},{wch:32},{wch:5},{wch:50},{wch:40}];
+      XLSX.utils.book_append_sheet(wb, cows, "Contacts");
+    }
+  }
+
+  // ── Engagement Data sheet (private) ──────────────────────────────────────────
+  if (rptChk("rpt-engagement") && PRIVATE_DATA) {
+    var enRows = [["State","School Year","Enrollment","PD"]];
+    for (var eni = 0; eni < stateNames.length; eni++) {
+      var ensn = stateNames[eni];
+      var enp = PRIVATE_DATA[ensn] || {};
+      (enp.engagementData || []).forEach(function(row){
+        enRows.push([ensn, row.year||"", row.enrollment||"", row.pd||""]);
+      });
+    }
+    if (enRows.length > 1) {
+      var enws = XLSX.utils.aoa_to_sheet(enRows);
+      enws["!cols"] = [{wch:22},{wch:18},{wch:20},{wch:20}];
+      XLSX.utils.book_append_sheet(wb, enws, "Engagement Data");
+    }
+  }
+
+  // ── Report Info sheet ─────────────────────────────────────────────────────────
+  var selectedLabels = [];
+  var allCbIds = ["rpt-tier","rpt-mathrev","rpt-goal","rpt-updates","rpt-date-updated","rpt-agency","rpt-impl-tier",
+    "rpt-type-adoption","rpt-content-areas","rpt-grade-band","rpt-pub-comments","rpt-internal",
+    "rpt-superintendent","rpt-elected","rpt-term-end","rpt-party","rpt-rural","rpt-strategic-plan",
+    "rpt-link-standards","rpt-math-std","rpt-ela-std","rpt-ss-std","rpt-science-std","rpt-cs-std","rpt-cte-std",
+    "rpt-rev-cycle","rpt-std-comments","rpt-std-resources","rpt-course-updated","rpt-course-catalog-added",
+    "rpt-course-catalog-link","rpt-course-codes","rpt-course-category","rpt-grad-credits","rpt-grad-coursework",
+    "rpt-grad-resources","rpt-events","rpt-messaging","rpt-contacts","rpt-engagement"];
+  allCbIds.forEach(function(id){
+    var el = document.getElementById(id);
+    if (el && el.checked) {
+      var label = el.parentElement ? (el.parentElement.querySelector(".report-check-label") || {}).textContent : id;
+      selectedLabels.push(label || id);
+    }
+  });
   var meta = [
     ["DS4E National Tracker Report"],
-    ["Generated", d.date],
-    ["States included", d.states.length],
-    ["Fields included", [d.fTier&&"DS4E Tier",d.fMathrev&&"Math Revision",d.fGoal&&"DS4E Goal",d.fUpdates&&"Updates",d.fNotes&&"Internal Notes",d.fContacts&&"Contacts"].filter(Boolean).join(", ")],
-    ["State list", d.states.join(", ")]
+    ["Generated", reportDate],
+    ["States included", stateNames.length],
+    ["Fields included", selectedLabels.join(", ")],
+    ["State list", stateNames.join(", ")]
   ];
-  var mws = XLSX.utils.aoa_to_sheet(meta);
-  XLSX.utils.book_append_sheet(wb, mws, "Report Info");
+  var metaws = XLSX.utils.aoa_to_sheet(meta);
+  metaws["!cols"] = [{wch:20},{wch:100}];
+  XLSX.utils.book_append_sheet(wb, metaws, "Report Info");
+
+  if (wb.SheetNames.length <= 1) {
+    alert("No data to export. Select at least one field and make sure relevant data is loaded.");
+    return;
+  }
 
   var filename = "DS4E_Report_" + new Date().toISOString().slice(0,10) + ".xlsx";
   XLSX.writeFile(wb, filename);
 }
+
+function esc(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 </script>
 
 <!-- ═══════════════════════════ PASSWORD MODAL ═══════════════════════════ -->
