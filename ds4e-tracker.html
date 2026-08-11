@@ -38,7 +38,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 /* ── UPDATES VIEW ── */
 #updates-view{display:none;min-height:100vh;background:#f2f2f7;}
 .updates-month{background:#f2f2f7;padding:6px 16px;font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.5px;border-bottom:0.5px solid #e5e5e5;}
-.update-item{background:#fff;border-bottom:0.5px solid #f0f0f0;padding:12px 14px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;}
+.update-item{background:#fff;border-bottom:0.5px solid #f0f0f0;padding:12px 16px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;}
 .update-item:active{background:#f8f8f8;}
 .update-icon-wrap{width:36px;height:36px;flex-shrink:0;}
 .update-icon-wrap img{width:36px;height:36px;object-fit:contain;display:block;}
@@ -1847,18 +1847,23 @@ function switchTab(tab) {
 }
 
 // ── Updates ───────────────────────────────────────────────────────────────────
-// Build state name → icon lookup from STATES array
 var STATE_ICON_LOOKUP = {};
 for (var _si = 0; _si < STATES.length; _si++) {
   STATE_ICON_LOOKUP[STATES[_si].name] = STATES[_si].icon;
 }
 
+var UPDATE_MONTH_MAP = {January:0,February:1,March:2,April:3,May:4,June:5,July:6,August:7,September:8,October:9,November:10,December:11};
+
 function parseUpdateDate(val) {
   if (!val) return null;
-  // Try JS Date object from spreadsheet (comes as ISO string via CSV)
-  var d = new Date(val);
-  if (!isNaN(d.getTime())) return d;
-  return null;
+  var s = String(val).trim();
+  // "Month YYYY" format (e.g. "August 2026")
+  var parts = s.split(/\s+/);
+  if (parts.length === 2 && UPDATE_MONTH_MAP[parts[0]] !== undefined) {
+    return new Date(parseInt(parts[1]), UPDATE_MONTH_MAP[parts[0]], 1);
+  }
+  var d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
 }
 
 function formatUpdateMonth(d) {
@@ -1866,8 +1871,24 @@ function formatUpdateMonth(d) {
   return months[d.getMonth()] + " " + d.getFullYear();
 }
 
-function formatUpdateDay(d) {
-  return (d.getMonth()+1) + "/" + d.getDate() + "/" + d.getFullYear();
+function parseTierChange(text) {
+  if (!text) return null;
+  var t = String(text).toLowerCase();
+  var fromM = t.match(/from\s+(none|tier\s*(\d))/);
+  var toM   = t.match(/to\s+(none|tier\s*(\d))/);
+  if (!fromM && !toM) return null;
+  var fromT = (fromM && fromM[2]) ? parseInt(fromM[2]) : 0;
+  var toT   = (toM   && toM[2])   ? parseInt(toM[2])   : 0;
+  return { from: fromT, to: toT };
+}
+
+function tierChipHtml(tier) {
+  var colors  = ["#b8b6b6","#6290c8","#f9c6a4","#ef4a23","#7c2d12"];
+  var borders = ["","","1px solid #d97a4a","",""];
+  var labels  = ["None","Tier 1","Tier 2","Tier 3","Tier 4"];
+  var t = Math.max(0, Math.min(4, tier || 0));
+  var dot = "width:8px;height:8px;border-radius:50%;background:" + colors[t] + ";display:inline-block;flex-shrink:0;" + (borders[t] ? "border:" + borders[t] + ";" : "");
+  return '<span style="display:inline-flex;align-items:center;gap:3px;"><span style="' + dot + '"></span><span style="font-size:11px;color:#555;">' + labels[t] + '</span></span>';
 }
 
 function fetchUpdates() {
@@ -1877,22 +1898,19 @@ function fetchUpdates() {
     .then(function(text) {
       var rows = parseCSV(text);
       if (rows.length < 2) { document.getElementById("updates-list").innerHTML = '<div class="empty">No updates yet.</div>'; return; }
-      // skip header row
       var entries = [];
       for (var i = 1; i < rows.length; i++) {
         var row = rows[i];
-        var dateVal = (row[0] || "").trim();
+        var dateVal   = (row[0] || "").trim();
         var stateName = (row[1] || "").trim();
-        var updateText = (row[2] || "").trim();
-        if (!stateName && !updateText) continue;
-        var d = parseUpdateDate(dateVal);
-        entries.push({ date: d, dateRaw: dateVal, state: stateName, text: updateText });
+        var updateTxt = (row[2] || "").trim();
+        var tierTxt   = (row[3] || "").trim();
+        if (!stateName && !updateTxt) continue;
+        entries.push({ date: parseUpdateDate(dateVal), dateRaw: dateVal, state: stateName, text: updateTxt, tier: tierTxt });
       }
-      // sort newest first
       entries.sort(function(a, b) {
         if (!a.date && !b.date) return 0;
-        if (!a.date) return 1;
-        if (!b.date) return -1;
+        if (!a.date) return 1; if (!b.date) return -1;
         return b.date - a.date;
       });
       renderUpdates(entries);
@@ -1915,25 +1933,33 @@ function renderUpdates(entries) {
       html += '<div class="updates-month">' + monthLabel + '</div>';
       lastMonth = monthLabel;
     }
+    // Icon — no onerror in innerHTML to avoid quote-escaping issues
     var icon = STATE_ICON_LOOKUP[e.state];
     var iconHtml;
-    if (e.state === "District of Columbia") {
-      iconHtml = '<div class="update-icon-dc">DC</div>';
-    } else if (icon) {
-      iconHtml = '<div class="update-icon-wrap"><img src="https://raw.githubusercontent.com/sleav89/DS4E_Nat_Tracker/main/state-icons/' + icon + '.png" alt="" onerror="this.parentNode.innerHTML=\'<div class=\\\"update-icon-dc\\\" style=\\\"font-size:10px;\\\">' + (e.state ? e.state.substring(0,2) : "?") + '</div>\'"></div>';
+    if (icon) {
+      iconHtml = '<div class="update-icon-wrap"><img src="https://raw.githubusercontent.com/sleav89/DS4E_Nat_Tracker/main/state-icons/' + icon + '.png" alt=""></div>';
     } else {
-      iconHtml = '<div class="update-icon-dc" style="font-size:10px;">' + (e.state ? e.state.substring(0,2) : "?") + '</div>';
+      iconHtml = '<div class="update-icon-dc" style="font-size:10px;">' + esc(e.state ? e.state.substring(0,2) : "?") + '</div>';
     }
-    var dateStr = e.date ? formatUpdateDay(e.date) : e.dateRaw;
-    var stateAttr = e.state ? ' onclick="openStateByName(\'' + e.state.replace(/'/g,"\\'") + '\')"' : "";
-    html += '<div class="update-item"' + stateAttr + '>'
+    // Tier change badge
+    var tierChange = parseTierChange(e.tier);
+    var tierHtml = tierChange
+      ? '<div style="margin-top:5px;display:flex;align-items:center;gap:5px;">'
+          + tierChipHtml(tierChange.from)
+          + '<span style="color:#ccc;font-size:11px;">&rarr;</span>'
+          + tierChipHtml(tierChange.to)
+          + '</div>'
+      : "";
+    var clickAttr = e.state ? ' onclick="openStateByName(\'' + e.state.replace(/'/g,"\\'") + '\')"' : "";
+    html += '<div class="update-item"' + clickAttr + '>'
           + iconHtml
-          + '<div class="update-body">'
-          + '<div class="update-meta"><span class="update-state">' + esc(e.state) + '</span><span class="update-date">' + esc(dateStr) + '</span></div>'
-          + '<div class="update-text">' + esc(e.text).replace(/\n/g,"<br>") + '</div>'
+          + '<div class="update-body" style="padding-left:2px;">'
+          + '<div class="update-meta"><span class="update-state">' + esc(e.state) + '</span><span class="update-date">' + esc(e.dateRaw) + '</span></div>'
+          + (e.text ? '<div class="update-text">' + esc(e.text).replace(/\n/g,"<br>") + '</div>' : '')
+          + tierHtml
           + '</div></div>';
   }
-  html += '<div style="height:80px;"></div>'; // bottom padding above nav
+  html += '<div style="height:80px;"></div>';
   container.innerHTML = html;
 }
 
