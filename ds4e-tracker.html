@@ -48,6 +48,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .update-state{font-size:13px;font-weight:600;color:#1c1c1e;}
 .update-date{font-size:11px;color:#aaa;}
 .update-text{font-size:13px;color:#555;line-height:1.4;}
+.updates-filter-dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:0.5px solid #ddd;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.13);z-index:150;max-height:260px;overflow-y:auto;}
+.updates-filter-option{display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;font-size:13px;color:#1c1c1e;border-bottom:0.5px solid #f5f5f5;}
+.updates-filter-option:last-child{border-bottom:none;}
+.updates-filter-option:hover{background:#f2f2f7;}
+.updates-filter-option input[type=checkbox]{width:16px;height:16px;accent-color:#ef4a23;cursor:pointer;flex-shrink:0;}
 
 /* ── SUBMIT VIEW ── */
 #submit-view{display:none;min-height:100vh;background:#f2f2f7;}
@@ -367,6 +372,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#555;"><span style="display:inline-flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:50%;background:#6290c8;display:inline-block;"></span></span><span style="color:#ccc;">&#8594;</span><span style="display:inline-flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:50%;background:#ef4a23;display:inline-block;"></span><span>Tier changed</span></span></span>
     </div>
     <div style="font-size:11px;color:#92400e;">&#9888; External links may become outdated or broken over time.</div>
+    <div style="margin-top:8px;position:relative;" id="updates-filter-wrap">
+      <button id="updates-filter-btn" onclick="toggleUpdatesDropdown(event)"
+        style="width:100%;border:0.5px solid #ddd;border-radius:8px;padding:8px 12px;font-size:13px;background:#f2f2f7;color:#1c1c1e;text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center;outline:none;">
+        <span id="updates-filter-label">All States</span>
+        <span style="color:#aaa;font-size:10px;">&#9660;</span>
+      </button>
+      <div id="updates-filter-dropdown" class="updates-filter-dropdown" style="display:none;">
+        <div style="padding:8px 14px;border-bottom:0.5px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#fff;">
+          <span style="font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.4px;">Filter by State</span>
+          <button onclick="clearUpdatesFilter()" style="font-size:12px;color:#ef4a23;background:none;border:none;cursor:pointer;padding:0;font-weight:500;">Clear all</button>
+        </div>
+        <div id="updates-filter-options"></div>
+      </div>
+    </div>
   </div>
   <div id="updates-list"><div class="empty">Loading updates...</div></div>
   <div class="bottom-nav">
@@ -1818,6 +1837,7 @@ function initMap() {
 
 // ── Nav ───────────────────────────────────────────────────────────────────────
 var UPDATES_LOADED = false;
+var ALL_UPDATES = [];
 
 function switchTab(tab) {
   var mapV  = document.getElementById("map-view");
@@ -1964,6 +1984,8 @@ function fetchUpdates() {
         if (!a.date) return 1; if (!b.date) return -1;
         return b.date - a.date;
       });
+      ALL_UPDATES = entries;
+      buildUpdatesDropdown(entries);
       renderUpdates(entries);
       UPDATES_LOADED = true;
     })
@@ -2027,6 +2049,51 @@ function renderUpdates(entries) {
   html += '<div style="height:80px;"></div>';
   container.innerHTML = html;
 }
+
+function buildUpdatesDropdown(entries) {
+  var seen = {}; var stateNames = [];
+  for (var i = 0; i < entries.length; i++) {
+    if (entries[i].state && !seen[entries[i].state]) { seen[entries[i].state] = true; stateNames.push(entries[i].state); }
+  }
+  stateNames.sort();
+  var container = document.getElementById("updates-filter-options");
+  if (!container) return;
+  var html = "";
+  for (var j = 0; j < stateNames.length; j++) {
+    html += '<label class="updates-filter-option"><input type="checkbox" value="' + esc(stateNames[j]) + '" onchange="applyUpdatesFilter()"> ' + esc(stateNames[j]) + '</label>';
+  }
+  container.innerHTML = html;
+}
+
+function toggleUpdatesDropdown(event) {
+  event.stopPropagation();
+  var dd = document.getElementById("updates-filter-dropdown");
+  if (dd) dd.style.display = dd.style.display === "none" ? "block" : "none";
+}
+
+function applyUpdatesFilter() {
+  var checkboxes = document.querySelectorAll("#updates-filter-options input[type=checkbox]");
+  var selected = [];
+  for (var i = 0; i < checkboxes.length; i++) { if (checkboxes[i].checked) selected.push(checkboxes[i].value); }
+  var label = document.getElementById("updates-filter-label");
+  if (label) label.textContent = selected.length === 0 ? "All States" : selected.length + " state" + (selected.length !== 1 ? "s" : "") + " selected";
+  var filtered = selected.length === 0 ? ALL_UPDATES : ALL_UPDATES.filter(function(e) { return selected.indexOf(e.state) >= 0; });
+  renderUpdates(filtered);
+}
+
+function clearUpdatesFilter() {
+  var checkboxes = document.querySelectorAll("#updates-filter-options input[type=checkbox]");
+  for (var i = 0; i < checkboxes.length; i++) checkboxes[i].checked = false;
+  var label = document.getElementById("updates-filter-label");
+  if (label) label.textContent = "All States";
+  renderUpdates(ALL_UPDATES);
+}
+
+document.addEventListener("click", function(evt) {
+  var wrap = document.getElementById("updates-filter-wrap");
+  var dd = document.getElementById("updates-filter-dropdown");
+  if (dd && wrap && !wrap.contains(evt.target)) dd.style.display = "none";
+});
 
 function openStateByName(name) {
   for (var i = 0; i < STATES.length; i++) {
