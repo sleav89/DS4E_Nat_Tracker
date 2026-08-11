@@ -360,7 +360,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="ds4e-badge-r">National<br>Tracker</div>
     </div>
   </div>
-  <div style="background:#fef3e2;border-bottom:0.5px solid #f5d9a0;padding:8px 16px;font-size:11px;color:#92400e;">Note: External links may become outdated or broken over time.</div>
+  <div style="background:#fff;border-bottom:0.5px solid #e5e5e5;padding:10px 16px;">
+    <div style="display:flex;flex-wrap:wrap;gap:10px 18px;margin-bottom:6px;">
+      <span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#555;"><span style="font-size:12px;font-weight:600;color:#16a34a;">+</span><span style="display:inline-flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:50%;background:#6290c8;display:inline-block;"></span><span>Tier added</span></span></span>
+      <span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#555;"><span style="font-size:12px;color:#aaa;">=</span><span style="display:inline-flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:50%;background:#6290c8;display:inline-block;"></span><span>Tier unchanged</span></span></span>
+      <span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#555;"><span style="display:inline-flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:50%;background:#6290c8;display:inline-block;"></span></span><span style="color:#ccc;">&#8594;</span><span style="display:inline-flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:50%;background:#ef4a23;display:inline-block;"></span><span>Tier changed</span></span></span>
+    </div>
+    <div style="font-size:11px;color:#92400e;">&#9888; External links may become outdated or broken over time.</div>
+  </div>
   <div id="updates-list"><div class="empty">Loading updates...</div></div>
   <div class="bottom-nav">
     <div class="nav-tab" id="nav-map4" onclick="switchTab('map')">
@@ -1904,12 +1911,12 @@ function parseTierChange(text) {
   if (!text) return null;
   var t = String(text).trim();
   if (!t || t.toLowerCase() === "none") return null;
-  // "Added Tier 1" → from None to Tier 1
+  // "Added Tier 1" → show as + Tier 1
   var addM = t.match(/^added\s+(tier\s*\d)/i);
-  if (addM) return { from: 0, to: parseTierNum(addM[1]), label: t };
-  // "Stays Tier 1" → no change, just show current tier
+  if (addM) return { type: "added", to: parseTierNum(addM[1]) };
+  // "Stays Tier 1" → show as = Tier 1
   var stayM = t.match(/^stays?\s+(tier\s*\d)/i);
-  if (stayM) { var st = parseTierNum(stayM[1]); return { from: st, to: st, label: t }; }
+  if (stayM) return { type: "stays", to: parseTierNum(stayM[1]) };
   // "None to Tier 1", "Tier 1 to Tier 2", "Changed from None to Tier 1"
   var m = t.match(/(?:from\s+)?(.+?)\s+to\s+(.+)/i);
   if (!m) return null;
@@ -1987,13 +1994,26 @@ function renderUpdates(entries) {
     }
     // Tier change badge
     var tierChange = parseTierChange(e.tier);
-    var tierHtml = tierChange
-      ? '<div style="margin-top:5px;display:flex;align-items:center;gap:5px;">'
+    var tierHtml = "";
+    if (tierChange) {
+      if (tierChange.type === "added") {
+        tierHtml = '<div style="margin-top:5px;display:flex;align-items:center;gap:4px;">'
+          + '<span style="font-size:12px;font-weight:600;color:#16a34a;">+</span>'
+          + tierChipHtml(tierChange.to)
+          + '</div>';
+      } else if (tierChange.type === "stays") {
+        tierHtml = '<div style="margin-top:5px;display:flex;align-items:center;gap:4px;">'
+          + '<span style="font-size:12px;color:#aaa;">=</span>'
+          + tierChipHtml(tierChange.to)
+          + '</div>';
+      } else {
+        tierHtml = '<div style="margin-top:5px;display:flex;align-items:center;gap:5px;">'
           + tierChipHtml(tierChange.from)
           + '<span style="color:#ccc;font-size:11px;">&rarr;</span>'
           + tierChipHtml(tierChange.to)
-          + '</div>'
-      : "";
+          + '</div>';
+      }
+    }
     var clickAttr = e.state ? ' onclick="openStateByName(\'' + e.state.replace(/'/g,"\\'") + '\')"' : "";
     html += '<div class="update-item"' + clickAttr + '>'
           + iconHtml
