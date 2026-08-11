@@ -455,7 +455,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div id="reports-lock" class="report-lock-screen">
     <div class="report-lock-icon">&#x1F4CA;</div>
     <div class="report-lock-title">Executive Reports</div>
-    <div class="report-lock-sub">This section is restricted to DS4E leadership. Enter the reports password to build and export funder reports.</div>
+    <div class="report-lock-sub">This section is restricted to DS4E leadership. Enter your password to unlock reports and all private data.</div>
     <button class="report-unlock-btn" onclick="showReportModal()">Unlock Reports</button>
   </div>
 
@@ -586,7 +586,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div id="report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;align-items:center;justify-content:center;padding:20px;">
   <div style="background:#fff;border-radius:16px;padding:24px 20px;width:100%;max-width:360px;box-shadow:0 10px 40px rgba(0,0,0,0.2);">
     <div style="font-size:17px;font-weight:600;color:#1c1c1e;margin-bottom:6px;">&#x1F512; Reports Access</div>
-    <div style="font-size:13px;color:#888;margin-bottom:18px;">Enter the executive reports password to continue.</div>
+    <div style="font-size:13px;color:#888;margin-bottom:18px;">Enter your password to unlock reports and all private data.</div>
     <input id="rpt-pw-input" type="password" placeholder="Reports password"
       style="width:100%;border:1px solid #e0e0e0;border-radius:8px;padding:10px 12px;font-size:15px;color:#1c1c1e;background:#f9f9f9;outline:none;font-family:inherit;margin-bottom:10px;"
       onkeydown="if(event.key==='Enter')submitReportPassword()">
@@ -1640,8 +1640,14 @@ function renderContacts(s) {
   if (!priv.contacts || priv.contacts.length === 0) {
     return '<div class="loading-card" style="color:#888;">No contacts on file for this state.</div>';
   }
+  var sorted = priv.contacts.slice().sort(function(a, b) {
+    if (a.vip && !b.vip) return -1;
+    if (!a.vip && b.vip) return 1;
+    var la = (a.last || "").toLowerCase(), lb = (b.last || "").toLowerCase();
+    return la < lb ? -1 : la > lb ? 1 : 0;
+  });
   var h = '<div class="card"><div class="card-header">Points of Contact</div>';
-  priv.contacts.forEach(function(c) {
+  sorted.forEach(function(c) {
     h += '<div class="contact-row">';
     if (c.first || c.last) h += '<div class="contact-name">' + esc((c.first + " " + c.last).trim()) + (c.vip ? '<span class="contact-vip">★ VIP</span>' : '') + "</div>";
     if (c.title) h += '<div class="contact-title">' + esc(c.title) + "</div>";
@@ -1671,17 +1677,17 @@ function renderStandards(s, fetched) {
   ];
   var hasAny = false;
   subjects.forEach(function(sub) {
-    if (!sub.val) return;
+    if (!sub.val && !sub.url) return;
     hasAny = true;
     h += '<div class="std-row"><div class="std-subj">' + sub.label + "</div><div class=\"std-detail\">";
-    var lines = sub.val.split("\n");
+    var lines = (sub.val || "").split("\n");
     var linkUsed = false;
+    var firstContent = true; // track whether we've output anything yet (avoid leading <br>)
     for (var li = 0; li < lines.length; li++) {
       var line = lines[li].trim();
       if (!line) continue;
       var stdParenMatch = line.match(/\(https?:\/\/[^)]+\)/);
       if (line.toLowerCase().indexOf("link to") === 0 || line.toLowerCase().indexOf("link:") === 0 || stdParenMatch) {
-        // Any line starting with "link to"/"link:" OR containing an embedded (URL) → render as pill
         var embeddedUrl = null;
         var lineDisplay = line;
         if (stdParenMatch) {
@@ -1690,14 +1696,24 @@ function renderStandards(s, fetched) {
         }
         var href = embeddedUrl || ((sub.url && !linkUsed) ? (linkUsed = true, sub.url) : "");
         if (!embeddedUrl) linkUsed = true;
-        if (href) h += '<br><a class="std-link-pill" href="' + esc(href) + '" target="_blank" rel="noopener">' + esc(lineDisplay) + ' ↗</a>';
-        // if no URL, skip the line entirely
+        if (href) {
+          if (!firstContent) h += '<br>';
+          h += '<a class="std-link-pill" href="' + esc(href) + '" target="_blank" rel="noopener">' + esc(lineDisplay || line) + ' ↗</a>';
+          firstContent = false;
+        }
       } else if (line.toLowerCase().indexOf("revision") >= 0) {
-        h += '<br><span class="std-revision-tag">' + esc(line) + '</span>';
+        if (!firstContent) h += '<br>';
+        h += '<span class="std-revision-tag">' + esc(line) + '</span>';
+        firstContent = false;
       } else {
-        if (li > 0) h += "<br>";
+        if (!firstContent) h += "<br>";
         h += esc(line);
+        firstContent = false;
       }
+    }
+    // If only a URL col was provided (no text value), render the pill directly
+    if (firstContent && sub.url && !linkUsed) {
+      h += '<a class="std-link-pill" href="' + esc(sub.url) + '" target="_blank" rel="noopener">Link to Standards ↗</a>';
     }
     h += "</div></div>";
   });
@@ -1757,52 +1773,52 @@ function submitPassword() {
       updateLockUI();
       if (pendingGoalsView) { setMapView("goals"); }
 
-      // Phase 2: load actual data in background (non-blocking)
-      var stateName = currentDetailState ? currentDetailState.name : null;
-
-      // Goals map data — fetch State Maps tab from private sheet
-      fetch(PROXY_URL + "?password=" + encodeURIComponent(pw) + "&state=State%20Maps")
-        .then(function(r) { return r.json(); })
-        .then(function(stageJson) {
-          if (!stageJson) { console.warn("Goals fetch: null response"); return; }
-          if (stageJson.error) { console.warn("Goals fetch error:", stageJson.error); return; }
-          if (!stageJson.states) { console.warn("Goals fetch: no states key"); return; }
-          var rows = stageJson.states["State Maps"];
-          if (!rows) { console.warn("Goals fetch: State Maps tab not found in response"); return; }
-          console.log("Goals fetch: got", rows.length, "rows from State Maps");
-          STATE_GOALS_DATA = {};
-          for (var i = 0; i < rows.length; i++) {
-            var sn = String(rows[i][0] || "").trim();
-            if (!sn || sn === "State") continue;
-            var abbr = NAME_TO_ABBR[sn];
-            if (!abbr) { console.log("Goals: no abbr for state name:", sn); continue; }
-            var goalsRaw = String(rows[i][2] || "").trim();
-            var goalsMatch = goalsRaw.match(/Tier\s*(\d)/i);
-            var goals = goalsMatch ? parseInt(goalsMatch[1]) : 0;
-            if (goals >= 1 && goals <= 4) STATE_GOALS_DATA[abbr] = goals;
-          }
-          console.log("Goals populated for", Object.keys(STATE_GOALS_DATA).length, "states");
-          // Always reapply colors after data loads — view may have changed since modal closed
-          applyMapColors(); updateMapLegend();
-        }).catch(function(e) { console.warn("Goals fetch failed:", e); });
-
-      // State private data (contacts, notes, events)
-      fetchPrivateData(pw, stateName, function(data, err) {
-        if (err || !data) return;
-        if (!PRIVATE_DATA) PRIVATE_DATA = {};
-        var keys = Object.keys(data);
-        for (var i = 0; i < keys.length; i++) PRIVATE_DATA[keys[i]] = data[keys[i]];
-        if (currentDetailState && STATE_CACHE[currentDetailState.name]) {
-          renderDetailTabs(currentDetailState, STATE_CACHE[currentDetailState.name]);
-          switchDetailTab("contacts");
-        }
-      });
+      // Phase 2: load actual data in background
+      unlockPrivateData(pw);
     })
     .catch(function() {
       document.getElementById("pw-error").textContent = "Could not connect. Try again.";
       btn.disabled = false; btn.textContent = "Unlock";
     });
 }
+// Shared: fetch goals + per-state private data after any successful password unlock
+function unlockPrivateData(pw) {
+  var stateName = currentDetailState ? currentDetailState.name : null;
+
+  // Goals map data — fetch State Maps tab from private sheet
+  fetch(PROXY_URL + "?password=" + encodeURIComponent(pw) + "&state=State%20Maps")
+    .then(function(r) { return r.json(); })
+    .then(function(stageJson) {
+      if (!stageJson || stageJson.error || !stageJson.states) return;
+      var rows = stageJson.states["State Maps"];
+      if (!rows) return;
+      STATE_GOALS_DATA = {};
+      for (var i = 0; i < rows.length; i++) {
+        var sn = String(rows[i][0] || "").trim();
+        if (!sn || sn === "State") continue;
+        var abbr = NAME_TO_ABBR[sn];
+        if (!abbr) continue;
+        var goalsRaw = String(rows[i][2] || "").trim();
+        var goalsMatch = goalsRaw.match(/Tier\s*(\d)/i);
+        var goals = goalsMatch ? parseInt(goalsMatch[1]) : 0;
+        if (goals >= 1 && goals <= 4) STATE_GOALS_DATA[abbr] = goals;
+      }
+      applyMapColors(); updateMapLegend();
+    }).catch(function() {});
+
+  // Per-state private data (contacts, notes, events)
+  fetchPrivateData(pw, stateName, function(data, err) {
+    if (err || !data) return;
+    if (!PRIVATE_DATA) PRIVATE_DATA = {};
+    var keys = Object.keys(data);
+    for (var i = 0; i < keys.length; i++) PRIVATE_DATA[keys[i]] = data[keys[i]];
+    if (currentDetailState && STATE_CACHE[currentDetailState.name]) {
+      renderDetailTabs(currentDetailState, STATE_CACHE[currentDetailState.name]);
+      switchDetailTab("contacts");
+    }
+  });
+}
+
 function updateLockUI() {
   var btn = document.getElementById("lock-btn");
   if (!btn) return;
@@ -2439,7 +2455,13 @@ function submitReportPassword() {
         document.getElementById("reports-lock").style.display = "none";
         document.getElementById("reports-builder").style.display = "block";
         buildReportStateDropdown();
-        // Also fetch private data (goals) using report password
+        // Also unlock all private data so execs see everything with one password
+        if (!PRIVATE_UNLOCKED) {
+          CACHED_PASSWORD = pw;
+          PRIVATE_UNLOCKED = true;
+          updateLockUI();
+          unlockPrivateData(pw);
+        }
         fetchReportPrivateData(pw);
       } else {
         document.getElementById("rpt-pw-error").textContent = (json && json.error) ? "Incorrect password." : "Could not connect. Try again.";
