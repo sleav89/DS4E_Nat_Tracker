@@ -1651,27 +1651,31 @@ function submitPassword() {
       // Phase 2: load actual data in background (non-blocking)
       var stateName = currentDetailState ? currentDetailState.name : null;
 
-      // Stage map data
+      // Goals map data — fetch State Maps tab from private sheet
       fetch(PROXY_URL + "?password=" + encodeURIComponent(pw) + "&state=State%20Maps")
         .then(function(r) { return r.json(); })
         .then(function(stageJson) {
-          if (!stageJson || stageJson.error || !stageJson.states) return;
+          if (!stageJson) { console.warn("Goals fetch: null response"); return; }
+          if (stageJson.error) { console.warn("Goals fetch error:", stageJson.error); return; }
+          if (!stageJson.states) { console.warn("Goals fetch: no states key"); return; }
           var rows = stageJson.states["State Maps"];
-          if (!rows) return;
+          if (!rows) { console.warn("Goals fetch: State Maps tab not found in response"); return; }
+          console.log("Goals fetch: got", rows.length, "rows from State Maps");
           STATE_GOALS_DATA = {};
           for (var i = 0; i < rows.length; i++) {
-            var stateName = String(rows[i][0] || "").trim();
-            if (!stateName || stateName === "State") continue;
-            var abbr = NAME_TO_ABBR[stateName];
-            if (!abbr) continue;
-            // Goals: stored as full tier string e.g. "Tier 2: Course Pilot..."
+            var sn = String(rows[i][0] || "").trim();
+            if (!sn || sn === "State") continue;
+            var abbr = NAME_TO_ABBR[sn];
+            if (!abbr) { console.log("Goals: no abbr for state name:", sn); continue; }
             var goalsRaw = String(rows[i][2] || "").trim();
             var goalsMatch = goalsRaw.match(/Tier\s*(\d)/i);
             var goals = goalsMatch ? parseInt(goalsMatch[1]) : 0;
             if (goals >= 1 && goals <= 4) STATE_GOALS_DATA[abbr] = goals;
           }
-          if (currentMapView === "goals") { applyMapColors(); updateMapLegend(); }
-        }).catch(function() {});
+          console.log("Goals populated for", Object.keys(STATE_GOALS_DATA).length, "states");
+          // Always reapply colors after data loads — view may have changed since modal closed
+          applyMapColors(); updateMapLegend();
+        }).catch(function(e) { console.warn("Goals fetch failed:", e); });
 
       // State private data (contacts, notes, events)
       fetchPrivateData(pw, stateName, function(data, err) {
@@ -1800,20 +1804,23 @@ function seedStateAbbrData() {
   }
 }
 
-// Fetch tier + math revision data from the public "State Tiers" sheet tab
+// Fetch tier + math revision data from the public "State Tiers" sheet tab via GAS proxy
 function loadTierData() {
-  var url = PUBLIC_SHEET_BASE + "State%20Tiers";
+  var url = PROXY_URL + "?state=State%20Tiers";
   fetch(url)
     .then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
     .then(function(csv) {
+      console.log("State Tiers CSV first 200 chars:", csv ? csv.substring(0,200) : "empty");
+      if (!csv || csv.trim().length < 10) throw new Error("Empty or invalid CSV");
       parseStateTiersCSV(csv);
+      console.log("State Tiers parsed. STATE_ABBR_DATA keys:", Object.keys(STATE_ABBR_DATA).length, "MATH_REV_DATA keys:", Object.keys(MATH_REV_DATA).length);
       applyMapColors();
       updateMapLabels();
       updateMapLegend();
       renderList();
     })
     .catch(function(err) {
-      console.log("State Tiers sheet unavailable:", err.message);
+      console.warn("State Tiers fetch failed:", err.message);
     });
 }
 
