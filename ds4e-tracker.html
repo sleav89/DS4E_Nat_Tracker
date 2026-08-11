@@ -35,6 +35,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .map-legend-item{display:flex;align-items:center;gap:5px;}
 .map-legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
 
+/* ── UPDATES VIEW ── */
+#updates-view{display:none;min-height:100vh;background:#f2f2f7;}
+.updates-month{background:#f2f2f7;padding:6px 16px;font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.5px;border-bottom:0.5px solid #e5e5e5;}
+.update-item{background:#fff;border-bottom:0.5px solid #f0f0f0;padding:12px 14px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;}
+.update-item:active{background:#f8f8f8;}
+.update-icon-wrap{width:36px;height:36px;flex-shrink:0;}
+.update-icon-wrap img{width:36px;height:36px;object-fit:contain;display:block;}
+.update-icon-dc{width:36px;height:36px;background:#4c4c4c;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:10px;flex-shrink:0;}
+.update-body{flex:1;min-width:0;}
+.update-meta{display:flex;align-items:center;gap:6px;margin-bottom:3px;}
+.update-state{font-size:13px;font-weight:600;color:#1c1c1e;}
+.update-date{font-size:11px;color:#aaa;}
+.update-text{font-size:13px;color:#555;line-height:1.4;}
+
 /* ── SUBMIT VIEW ── */
 #submit-view{display:none;min-height:100vh;background:#f2f2f7;}
 .form-label{font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:6px;display:block;}
@@ -283,6 +297,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
       States
     </div>
+    <div class="nav-tab" id="nav-updates" onclick="switchTab('updates')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Updates
+    </div>
     <div class="nav-tab" id="nav-submit" onclick="switchTab('submit')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
       Submit
@@ -323,7 +341,40 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
       States
     </div>
+    <div class="nav-tab" id="nav-updates2" onclick="switchTab('updates')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Updates
+    </div>
     <div class="nav-tab" id="nav-submit2" onclick="switchTab('submit')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      Submit
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ UPDATES VIEW ═══════════════════════════ -->
+<div id="updates-view">
+  <div class="app-header">
+    <div class="ds4e-badge">
+      <div class="ds4e-badge-l">DS4E</div>
+      <div class="ds4e-badge-r">National<br>Tracker</div>
+    </div>
+  </div>
+  <div id="updates-list"><div class="empty">Loading updates...</div></div>
+  <div class="bottom-nav">
+    <div class="nav-tab" id="nav-map4" onclick="switchTab('map')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3V6z"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+      Map
+    </div>
+    <div class="nav-tab" id="nav-states4" onclick="switchTab('states')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      States
+    </div>
+    <div class="nav-tab active" id="nav-updates4" onclick="switchTab('updates')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Updates
+    </div>
+    <div class="nav-tab" id="nav-submit4" onclick="switchTab('submit')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
       Submit
     </div>
@@ -382,6 +433,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="nav-tab" id="nav-states3" onclick="switchTab('states')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
       States
+    </div>
+    <div class="nav-tab" id="nav-updates3" onclick="switchTab('updates')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Updates
     </div>
     <div class="nav-tab active" id="nav-submit3" onclick="switchTab('submit')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
@@ -1754,33 +1809,138 @@ function initMap() {
 }
 
 // ── Nav ───────────────────────────────────────────────────────────────────────
+var UPDATES_LOADED = false;
+
 function switchTab(tab) {
   var mapV  = document.getElementById("map-view");
   var listV = document.getElementById("list-view");
+  var updV  = document.getElementById("updates-view");
   var subV  = document.getElementById("submit-view");
-  // all nav buttons
-  var ids = ["nav-map","nav-states","nav-submit","nav-map2","nav-states2","nav-submit2","nav-map3","nav-states3","nav-submit3"];
+  // clear all nav buttons
+  var ids = ["nav-map","nav-states","nav-updates","nav-submit",
+             "nav-map2","nav-states2","nav-updates2","nav-submit2",
+             "nav-map3","nav-states3","nav-updates3","nav-submit3",
+             "nav-map4","nav-states4","nav-updates4","nav-submit4"];
   for (var i = 0; i < ids.length; i++) {
     var el = document.getElementById(ids[i]);
     if (el) el.className = "nav-tab";
   }
+  // hide all views
+  mapV.style.display = "none"; listV.style.display = "none";
+  if (updV) updV.style.display = "none"; if (subV) subV.style.display = "none";
+
   if (tab === "map") {
-    mapV.style.display = "flex"; listV.style.display = "none"; if (subV) subV.style.display = "none";
-    var nm = document.getElementById("nav-map"); if (nm) nm.className = "nav-tab active";
-    var nm2 = document.getElementById("nav-map2"); if (nm2) nm2.className = "nav-tab active";
-    var nm3 = document.getElementById("nav-map3"); if (nm3) nm3.className = "nav-tab active";
+    mapV.style.display = "flex";
+    ["nav-map","nav-map2","nav-map3","nav-map4"].forEach(function(id) { var e = document.getElementById(id); if (e) e.className = "nav-tab active"; });
+  } else if (tab === "updates") {
+    if (updV) updV.style.display = "block";
+    ["nav-updates","nav-updates2","nav-updates3","nav-updates4"].forEach(function(id) { var e = document.getElementById(id); if (e) e.className = "nav-tab active"; });
+    if (!UPDATES_LOADED) fetchUpdates();
   } else if (tab === "submit") {
-    mapV.style.display = "none"; listV.style.display = "none"; if (subV) subV.style.display = "block";
-    var ns = document.getElementById("nav-submit"); if (ns) ns.className = "nav-tab active";
-    var ns2 = document.getElementById("nav-submit2"); if (ns2) ns2.className = "nav-tab active";
-    var ns3 = document.getElementById("nav-submit3"); if (ns3) ns3.className = "nav-tab active";
+    if (subV) subV.style.display = "block";
+    ["nav-submit","nav-submit2","nav-submit3","nav-submit4"].forEach(function(id) { var e = document.getElementById(id); if (e) e.className = "nav-tab active"; });
   } else {
-    mapV.style.display = "none"; listV.style.display = "block"; if (subV) subV.style.display = "none";
-    var nst = document.getElementById("nav-states"); if (nst) nst.className = "nav-tab active";
-    var nst2 = document.getElementById("nav-states2"); if (nst2) nst2.className = "nav-tab active";
-    var nst3 = document.getElementById("nav-states3"); if (nst3) nst3.className = "nav-tab active";
+    listV.style.display = "block";
+    ["nav-states","nav-states2","nav-states3","nav-states4"].forEach(function(id) { var e = document.getElementById(id); if (e) e.className = "nav-tab active"; });
   }
   window.scrollTo(0, 0);
+}
+
+// ── Updates ───────────────────────────────────────────────────────────────────
+// Build state name → icon lookup from STATES array
+var STATE_ICON_LOOKUP = {};
+for (var _si = 0; _si < STATES.length; _si++) {
+  STATE_ICON_LOOKUP[STATES[_si].name] = STATES[_si].icon;
+}
+
+function parseUpdateDate(val) {
+  if (!val) return null;
+  // Try JS Date object from spreadsheet (comes as ISO string via CSV)
+  var d = new Date(val);
+  if (!isNaN(d.getTime())) return d;
+  return null;
+}
+
+function formatUpdateMonth(d) {
+  var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  return months[d.getMonth()] + " " + d.getFullYear();
+}
+
+function formatUpdateDay(d) {
+  return (d.getMonth()+1) + "/" + d.getDate() + "/" + d.getFullYear();
+}
+
+function fetchUpdates() {
+  var url = PUBLIC_SHEET_BASE + "State%20Updates";
+  fetch(url)
+    .then(function(r) { return r.text(); })
+    .then(function(text) {
+      var rows = parseCSV(text);
+      if (rows.length < 2) { document.getElementById("updates-list").innerHTML = '<div class="empty">No updates yet.</div>'; return; }
+      // skip header row
+      var entries = [];
+      for (var i = 1; i < rows.length; i++) {
+        var row = rows[i];
+        var dateVal = (row[0] || "").trim();
+        var stateName = (row[1] || "").trim();
+        var updateText = (row[2] || "").trim();
+        if (!stateName && !updateText) continue;
+        var d = parseUpdateDate(dateVal);
+        entries.push({ date: d, dateRaw: dateVal, state: stateName, text: updateText });
+      }
+      // sort newest first
+      entries.sort(function(a, b) {
+        if (!a.date && !b.date) return 0;
+        if (!a.date) return 1;
+        if (!b.date) return -1;
+        return b.date - a.date;
+      });
+      renderUpdates(entries);
+      UPDATES_LOADED = true;
+    })
+    .catch(function() {
+      document.getElementById("updates-list").innerHTML = '<div class="empty">Could not load updates.</div>';
+    });
+}
+
+function renderUpdates(entries) {
+  var container = document.getElementById("updates-list");
+  if (!entries.length) { container.innerHTML = '<div class="empty">No updates yet.</div>'; return; }
+  var html = "";
+  var lastMonth = "";
+  for (var i = 0; i < entries.length; i++) {
+    var e = entries[i];
+    var monthLabel = e.date ? formatUpdateMonth(e.date) : "";
+    if (monthLabel && monthLabel !== lastMonth) {
+      html += '<div class="updates-month">' + monthLabel + '</div>';
+      lastMonth = monthLabel;
+    }
+    var icon = STATE_ICON_LOOKUP[e.state];
+    var iconHtml;
+    if (e.state === "District of Columbia") {
+      iconHtml = '<div class="update-icon-dc">DC</div>';
+    } else if (icon) {
+      iconHtml = '<div class="update-icon-wrap"><img src="https://raw.githubusercontent.com/sleav89/DS4E_Nat_Tracker/main/state-icons/' + icon + '.png" alt="" onerror="this.parentNode.innerHTML=\'<div class=\\\"update-icon-dc\\\" style=\\\"font-size:10px;\\\">' + (e.state ? e.state.substring(0,2) : "?") + '</div>\'"></div>';
+    } else {
+      iconHtml = '<div class="update-icon-dc" style="font-size:10px;">' + (e.state ? e.state.substring(0,2) : "?") + '</div>';
+    }
+    var dateStr = e.date ? formatUpdateDay(e.date) : e.dateRaw;
+    var stateAttr = e.state ? ' onclick="openStateByName(\'' + e.state.replace(/'/g,"\\'") + '\')"' : "";
+    html += '<div class="update-item"' + stateAttr + '>'
+          + iconHtml
+          + '<div class="update-body">'
+          + '<div class="update-meta"><span class="update-state">' + esc(e.state) + '</span><span class="update-date">' + esc(dateStr) + '</span></div>'
+          + '<div class="update-text">' + esc(e.text).replace(/\n/g,"<br>") + '</div>'
+          + '</div></div>';
+  }
+  html += '<div style="height:80px;"></div>'; // bottom padding above nav
+  container.innerHTML = html;
+}
+
+function openStateByName(name) {
+  for (var i = 0; i < STATES.length; i++) {
+    if (STATES[i].name === name) { openDetail(STATES[i]); return; }
+  }
 }
 
 // ── Contact Form ──────────────────────────────────────────────────────────────
