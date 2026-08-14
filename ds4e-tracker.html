@@ -1931,9 +1931,9 @@ function seedStateAbbrData() {
   }
 }
 
-// Fetch tier + math revision data from the public "State Maps" sheet tab via GAS proxy
+// Fetch tier + math revision data from the public "State Maps" sheet tab (direct CSV — no GAS)
 function loadTierData() {
-  var url = PROXY_URL + "?state=State%20Maps";
+  var url = PUBLIC_SHEET_BASE + "State%20Maps";
   fetch(url)
     .then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
     .then(function(csv) {
