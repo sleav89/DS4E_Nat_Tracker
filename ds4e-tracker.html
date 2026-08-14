@@ -523,8 +523,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <label class="report-check-row"><input type="checkbox" id="rpt-cs-std"><div class="report-check-label">Computer Science Standards</div></label>
       <label class="report-check-row"><input type="checkbox" id="rpt-cte-std"><div class="report-check-label">CTE Standards</div></label>
       <label class="report-check-row"><input type="checkbox" id="rpt-rev-cycle" checked><div class="report-check-label">Standards Revision Cycle</div></label>
-      <label class="report-check-row"><input type="checkbox" id="rpt-std-comments"><div class="report-check-label">Additional Comments on Standards</div></label>
-      <label class="report-check-row"><input type="checkbox" id="rpt-std-resources"><div class="report-check-label">Additional Standards Resources</div></label>
+      <label class="report-check-row"><input type="checkbox" id="rpt-std-comments"><div class="report-check-label">Additional Standards Notes</div></label>
       <label class="report-check-row"><input type="checkbox" id="rpt-course-updated"><div class="report-check-label">Course Code Updated</div></label>
       <label class="report-check-row"><input type="checkbox" id="rpt-course-catalog-added"><div class="report-check-label">Added to State Course Catalog</div></label>
       <label class="report-check-row"><input type="checkbox" id="rpt-course-catalog-link"><div class="report-check-label">Link to Course Catalog</div></label>
@@ -803,7 +802,8 @@ function parsePublicSheet(csv) {
       else if (c0 === "Computer Science Standards")    { d.csStd = c1; d.csStdUrl = c2; }
       else if (c0 === "CTE Standards")                 { d.cteStd = c1; d.cteStdUrl = c2; }
       else if (c0 === "Standards Revision Cycle")      d.revisionCycle = c1;
-      else if (c0 === "Additional Comments on Standards") d.stdComments = c1;
+      else if (c0 === "Additional Standards Notes")        d.stdComments = c1;
+      else if (c0 === "Additional Comments on Standards") d.stdComments = d.stdComments || c1;
       else if (c0 === "Additional Standards Resources")   d.stdResources = c1;
       else if (c0 === "Course Code Updated")              d.courseCodeUpdated = c1;
       else if (c0 === "Added to State Course Catalog")    d.addedToCatalog = c1;
@@ -887,8 +887,10 @@ function parseCourseCodesRaw(raw) {
     if (spaceIdx > 0) {
       var code = line.substring(0, spaceIdx);
       var rest = line.substring(spaceIdx + 1).trim();
-      rest = rest.replace(/\s*\[SY[\s\d\-current]+\]/gi, "").trim();
-      result.push({code: code, title: rest});
+      var syMatch = rest.match(/\[([^\]]+)\]/);
+      var sy = syMatch ? syMatch[1] : "";
+      rest = rest.replace(/\s*\[[^\]]+\]/g, "").trim();
+      result.push({code: code, title: rest, sy: sy});
     } else { result.push({code:"", title:line}); }
   }
   return result;
@@ -1493,16 +1495,16 @@ function renderAdoption(s, fetched) {
         for (var ci = 0; ci < maxLen; ci++) {
           h += '<div style="display:grid;grid-template-columns:1fr 1fr;padding:7px 14px;border-bottom:0.5px solid #f5f5f5;">';
           if (codes[ci]) {
-            h += '<div style="display:flex;gap:8px;align-items:flex-start;"><div class="code-num">' + esc(codes[ci].code) + '</div><div class="code-title">' + esc(codes[ci].title) + '</div></div>';
+            h += '<div style="display:flex;gap:8px;align-items:flex-start;"><div class="code-num">' + esc(codes[ci].code) + '</div><div class="code-title">' + esc(codes[ci].title) + (codes[ci].sy ? ' <span style="color:#aaa;font-size:10px;white-space:nowrap;">' + esc(codes[ci].sy) + '</span>' : '') + '</div></div>';
           } else { h += '<div></div>'; }
           if (archivedCodes[ci]) {
-            h += '<div style="display:flex;gap:8px;align-items:flex-start;"><div class="code-num" style="color:#ef4a23;">' + esc(archivedCodes[ci].code) + '</div><div class="code-title">' + esc(archivedCodes[ci].title) + '</div></div>';
+            h += '<div style="display:flex;gap:8px;align-items:flex-start;"><div class="code-num" style="color:#ef4a23;">' + esc(archivedCodes[ci].code) + '</div><div class="code-title">' + esc(archivedCodes[ci].title) + (archivedCodes[ci].sy ? ' <span style="color:#aaa;font-size:10px;white-space:nowrap;">' + esc(archivedCodes[ci].sy) + '</span>' : '') + '</div></div>';
           } else { h += '<div></div>'; }
           h += '</div>';
         }
       } else {
         // Single-column layout (no archived codes)
-        codes.forEach(function(cc) { h += '<div class="code-row"><div class="code-num">' + esc(cc.code) + '</div><div class="code-title">' + esc(cc.title) + "</div></div>"; });
+        codes.forEach(function(cc) { h += '<div class="code-row"><div class="code-num">' + esc(cc.code) + '</div><div class="code-title">' + esc(cc.title) + (cc.sy ? ' <span style="color:#aaa;font-size:10px;white-space:nowrap;">' + esc(cc.sy) + '</span>' : '') + "</div></div>"; });
       }
       if (fetched.courseCategory) h += '<div class="card-row"><div class="row-label">Category</div><div class="row-value">' + esc(fetched.courseCategory).replace(/\n/g,", ") + "</div></div>";
       if (fetched.linkCatalog) {
@@ -1734,9 +1736,10 @@ function renderStandards(s, fetched) {
     h += '<div class="card"><div class="card-header">Revision Cycle</div>';
     h += '<div class="card-row"><div class="row-value">' + esc(fetched.revisionCycle).replace(/\n/g,"<br>") + "</div></div></div>";
   }
-  if (fetched.stdComments) {
-    h += '<div class="card"><div class="card-header">Additional Comments</div>';
-    h += '<div class="card-row"><div class="row-value">' + esc(fetched.stdComments).replace(/\n/g,"<br>") + "</div></div></div>";
+  var stdNotes = [fetched.stdComments, fetched.stdResources].filter(Boolean).join("\n\n");
+  if (stdNotes) {
+    h += '<div class="card"><div class="card-header">Additional Standards Notes</div>';
+    h += '<div class="card-row"><div class="row-value">' + esc(stdNotes).replace(/\n/g,"<br>") + "</div></div></div>";
   }
   return h;
 }
@@ -2706,8 +2709,7 @@ function _doXLSX(stateNames) {
     {id:"rpt-cs-std",               label:"Computer Science Standards",    key:"csStd"},
     {id:"rpt-cte-std",              label:"CTE Standards",                 key:"cteStd"},
     {id:"rpt-rev-cycle",            label:"Standards Revision Cycle",      key:"revisionCycle"},
-    {id:"rpt-std-comments",         label:"Additional Comments on Standards", key:"stdComments"},
-    {id:"rpt-std-resources",        label:"Additional Standards Resources",key:"stdResources"}
+    {id:"rpt-std-comments",         label:"Additional Standards Notes",      key:"stdComments"}
   ];
   var selLs = lsFields.filter(function(f){ return rptChk(f.id); });
   if (selLs.length) {
