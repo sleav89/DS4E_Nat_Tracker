@@ -737,7 +737,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <script>
 // ── Config ───────────────────────────────────────────────────────────────────
 var PUBLIC_SHEET_BASE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRU0_I99UuZvfBam8y_Z2wGwbDfsL5A0CB5MYNogbPfSWnnLIpSQP-sCtgR3Uwz2vByq7thFBIp-MbB/pub?output=csv&sheet=";
-var PROXY_URL = "https://script.google.com/macros/s/AKfycbxIGR2qDE0g7X4-PO_T9cxwpvNyuXqK1fvoGV3_MLBT35BYtvTR0JrFuZ5DgWOfSX-y/exec";
+var PROXY_URL = "https://script.google.com/macros/s/AKfycbwE2_TjYIXCY3Q0pHOhubEwmDJAkca7kzqL6AqZphCHTfilzm8VTmEVYEiJoQcXgg3V/exec";
 
 // ── Slim state data (map + list only) ────────────────────────────────────────
 var STATES = [{"name": "Alabama", "icon": "Alabama", "updated": "Jun 30, 2026"}, {"name": "Alaska", "icon": "Alaska", "updated": "Jun 30, 2026"}, {"name": "Arizona", "icon": "Arizona", "updated": "Jun 30, 2026"}, {"name": "Arkansas", "icon": "Arkansas", "updated": "Jun 30, 2026"}, {"name": "California", "icon": "California", "updated": "Jun 30, 2026"}, {"name": "Colorado", "icon": "Colorado", "updated": "Jun 30, 2026"}, {"name": "Connecticut", "icon": "Connecticut", "updated": "Jun 30, 2026"}, {"name": "Delaware", "icon": "Delaware", "updated": "Jun 30, 2026"}, {"name": "District of Columbia", "icon": null, "updated": "Jun 30, 2026"}, {"name": "Florida", "icon": "Florida", "updated": "Jun 30, 2026"}, {"name": "Georgia", "icon": "Georgia", "updated": "Jun 30, 2026"}, {"name": "Hawaii", "icon": "Hawaii", "updated": "Jun 30, 2026"}, {"name": "Idaho", "icon": "Idaho", "updated": "Jun 30, 2026"}, {"name": "Illinois", "icon": "Illinois", "updated": "Jun 30, 2026"}, {"name": "Indiana", "icon": "Indiana", "updated": "Jun 30, 2026"}, {"name": "Iowa", "icon": "Iowa", "updated": "Jun 30, 2026"}, {"name": "Kansas", "icon": "Kansas", "updated": "Jun 30, 2026"}, {"name": "Kentucky", "icon": "Kentucky", "updated": "Jun 30, 2026"}, {"name": "Louisiana", "icon": "Louisiana_", "updated": "Jun 30, 2026"}, {"name": "Maine", "icon": "Maine", "updated": "Jun 30, 2026"}, {"name": "Maryland", "icon": "Maryland", "updated": "Jun 30, 2026"}, {"name": "Massachusetts", "icon": "Massachusetts", "updated": "Jun 30, 2026"}, {"name": "Michigan", "icon": "Michigan", "updated": "Jun 30, 2026"}, {"name": "Minnesota", "icon": "Minnesota", "updated": "Jun 30, 2026"}, {"name": "Mississippi", "icon": "Mississippi", "updated": "Jun 30, 2026"}, {"name": "Missouri", "icon": "Missouri", "updated": "Jun 30, 2026"}, {"name": "Montana", "icon": "Montana", "updated": "Jun 30, 2026"}, {"name": "Nebraska", "icon": "Nebraska", "updated": "Jun 30, 2026"}, {"name": "Nevada", "icon": "Nevada", "updated": "Jun 30, 2026"}, {"name": "New Hampshire", "icon": "New_Hampshire", "updated": "Jun 30, 2026"}, {"name": "New Jersey", "icon": "New_Jersey", "updated": "Jun 30, 2026"}, {"name": "New Mexico", "icon": "New_Mexico", "updated": "Jun 30, 2026"}, {"name": "New York", "icon": "New_York", "updated": "Jun 30, 2026"}, {"name": "North Carolina", "icon": "North_Carolina", "updated": "Jun 30, 2026"}, {"name": "North Dakota", "icon": "North_Dakota", "updated": "Jun 30, 2026"}, {"name": "Ohio", "icon": "Ohio", "updated": "Jun 30, 2026"}, {"name": "Oklahoma", "icon": "Oklahoma", "updated": "Jun 30, 2026"}, {"name": "Oregon", "icon": "Oregon", "updated": "Jun 30, 2026"}, {"name": "Pennsylvania", "icon": "Pennsylvania", "updated": "Jun 30, 2026"}, {"name": "Rhode Island", "icon": "Rhode_Island", "updated": "Jun 30, 2026"}, {"name": "South Carolina", "icon": "South_Carolina", "updated": "Jun 30, 2026"}, {"name": "South Dakota", "icon": "South_Dakota", "updated": "Jun 30, 2026"}, {"name": "Tennessee", "icon": "Tennessee_", "updated": "Jun 30, 2026"}, {"name": "Texas", "icon": "Texas", "updated": "Jun 30, 2026"}, {"name": "Utah", "icon": "Utah", "updated": "Jun 30, 2026"}, {"name": "Vermont", "icon": "Vermont", "updated": "Jun 30, 2026"}, {"name": "Virginia", "icon": "Virginia_", "updated": "Jun 30, 2026"}, {"name": "Washington", "icon": "Washington", "updated": "Jun 30, 2026"}, {"name": "West Virginia", "icon": "West_Virginia_", "updated": "Jun 30, 2026"}, {"name": "Wisconsin", "icon": "Wisconsin", "updated": "Jun 30, 2026"}, {"name": "Wyoming", "icon": "Wyoming_", "updated": "Jun 30, 2026"}];
@@ -745,6 +745,7 @@ var STATES = [{"name": "Alabama", "icon": "Alabama", "updated": "Jun 30, 2026"},
 // ── Runtime cache ────────────────────────────────────────────────────────────
 var STATE_CACHE = {};      // stateName -> parsed public sheet data
 var PRIVATE_DATA = null;   // null until unlocked; then {stateName: {internal,contacts,confEvents}}
+var ORG_DATA = {};         // cache for cross-org partner data, keyed by state name
 var CACHED_PASSWORD = null; // stored after first successful unlock for per-state lazy fetching
 var PRIVATE_UNLOCKED = false;
 var currentDetailState = null;
@@ -977,6 +978,15 @@ function fetchPrivateData(password, stateName, callback) {
       callback(parsed, null);
     })
     .catch(function(err) { callback(null, err.message); });
+}
+
+function fetchOrgData(stateName, callback) {
+  if (!CACHED_PASSWORD) { callback(null, "no password"); return; }
+  var url = PROXY_URL + "?orgdata=" + encodeURIComponent(stateName) + "&password=" + encodeURIComponent(CACHED_PASSWORD);
+  fetch(url)
+    .then(function(r) { return r.json(); })
+    .then(function(d) { callback(d, null); })
+    .catch(function(e) { callback(null, e.message); });
 }
 
 // ── Tier helpers ──────────────────────────────────────────────────────────────
@@ -1252,6 +1262,7 @@ var DETAIL_TABS = [
   {id:"standards",   label:"Standards"},
   {id:"engagement",  label:"State Data"},
   {id:"contacts",    label:"Contacts"},
+  {id:"orgdata",     label:"Organization Data"},
 ];
 
 function showDetail(s) {
@@ -1409,6 +1420,7 @@ function renderTabContent(tabId, s, fetched) {
   if (tabId === "standards")   return renderStandards(s, fetched);
   if (tabId === "engagement")  return renderEngagement(s);
   if (tabId === "contacts")    return renderContacts(s);
+  if (tabId === "orgdata")     return renderOrgData(s);
   return "";
 }
 
@@ -1690,6 +1702,41 @@ function renderContacts(s) {
     h += "</div>";
   });
   h += "</div>";
+  return h;
+}
+
+// ── ORGANIZATION DATA TAB ─────────────────────────────────────────────────────
+function renderOrgData(s) {
+  if (!CACHED_PASSWORD) {
+    return '<div class="loading-card" style="color:#888;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#bbb" stroke-width="2" style="margin-bottom:8px;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><div>Unlock private data to view organization data.</div></div>';
+  }
+  var cached = ORG_DATA[s.name];
+  if (!cached) {
+    fetchOrgData(s.name, function(d, err) {
+      if (!err && d) {
+        ORG_DATA[s.name] = d;
+        if (currentDetailState && currentDetailState.name === s.name) {
+          var cnt = document.getElementById("dtcontent-orgdata");
+          if (cnt) { cnt.innerHTML = buildOrgDataHtml(d); initCollapsibleCards(cnt); }
+        }
+      }
+    });
+    return '<div class="loading-card"><div class="loading-spinner"></div><div>Loading organization data...</div></div>';
+  }
+  return buildOrgDataHtml(cached);
+}
+
+function buildOrgDataHtml(d) {
+  if (!d || !d.found) return '<div class="loading-card" style="color:#888;">No organization data on file for this state.</div>';
+  var h = '<div class="card card-private"><div class="card-header"><span class="private-badge">&#x1F512; ' + esc(d.org || "Organization") + '</span></div>';
+  (d.data || []).forEach(function(item) {
+    var val = String(item.v || "");
+    var valHtml = val.replace(/(https?:\/\/[^\s,\n]+)/g, function(url) {
+      return '<a href="' + esc(url) + '" target="_blank" rel="noopener" class="useful-link">' + esc(url) + ' ↗</a>';
+    }).replace(/\n/g, "<br>");
+    h += '<div class="card-row"><div class="row-label">' + esc(item.k) + '</div><div class="row-value">' + valHtml + '</div></div>';
+  });
+  h += '</div>';
   return h;
 }
 
